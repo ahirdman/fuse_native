@@ -26,7 +26,16 @@
       }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "flipper": true
+          }
+        }
+      ],
+      ["react-native-flipper-performance-plugin"]
     ],
     "experiments": {
       "tsconfigPaths": true,
