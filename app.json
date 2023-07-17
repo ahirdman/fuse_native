@@ -16,7 +16,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ahirdman.fuse"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,6 +31,15 @@
     "experiments": {
       "tsconfigPaths": true,
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "deeb4c71-d291-4e30-b509-43b38582400a"
+      }
+    },
+    "owner": "ahirdman"
   }
 }
