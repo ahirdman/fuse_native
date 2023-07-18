@@ -1,17 +1,17 @@
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 
-import { Pressable, Text } from 'native-base';
+import { Text, Button } from 'native-base';
 
 import PageView from '@/components/atoms/PageView';
 
-export default function SignIn() {
+export default function AuthView() {
+  const router = useRouter();
+
   return (
     <PageView>
-      <Link href="/(tabs)/lists" asChild>
-        <Pressable accessibilityRole="button">
-          <Text color="brand">Sign in!</Text>
-        </Pressable>
-      </Link>
+      <Button onPress={() => router.push('/(tabs)')}>
+        <Text>Sign in!</Text>
+      </Button>
     </PageView>
   );
 }
