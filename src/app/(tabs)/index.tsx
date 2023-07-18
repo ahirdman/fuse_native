@@ -1,17 +1,17 @@
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 
-import { Pressable, Text } from 'native-base';
+import { Button, Text } from 'native-base';
 
 import PageView from '@/components/atoms/PageView';
 
-export default function SignIn() {
+export default function Home() {
+  const router = useRouter();
+
   return (
     <PageView>
-      <Link href="/(auth)" replace asChild>
-        <Pressable accessibilityRole="button">
-          <Text color="brand">Sign out!</Text>
-        </Pressable>
-      </Link>
+      <Button onPress={() => router.replace('/auth')}>
+        <Text>Sign Out</Text>
+      </Button>
     </PageView>
   );
 }
