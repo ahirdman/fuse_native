@@ -1,5 +1,5 @@
-import * as Sentry from 'sentry-expo';
 import * as Network from 'expo-network';
+import * as Sentry from 'sentry-expo';
 import type { SentryExpoNativeOptions } from 'sentry-expo';
 
 export function sentryInitOptions(): SentryExpoNativeOptions {
