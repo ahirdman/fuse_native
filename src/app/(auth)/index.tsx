@@ -7,9 +7,9 @@ import PageView from '@/components/atoms/PageView';
 export default function SignIn() {
   return (
     <PageView>
-      <Link href="/(auth)" replace asChild>
+      <Link href="/(tabs)" asChild>
         <Pressable accessibilityRole="button">
-          <Text color="brand">Sign out!</Text>
+          <Text color="brand">Sign in!</Text>
         </Pressable>
       </Link>
     </PageView>
