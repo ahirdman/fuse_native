@@ -1,6 +1,6 @@
 import AuthView from '../../src/app/(auth)/auth';
 
-import { renderWithProviders } from '@/lib/jest/helpers';
+import { renderWithProviders } from '@/lib/jest/jest.renderer';
 import { setupStore } from '@/store/store';
 
 describe('<Auth />', () => {
