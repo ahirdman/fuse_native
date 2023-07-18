@@ -3,7 +3,9 @@ import { extendTheme } from 'native-base';
 export const ApplicationTheme = extendTheme({
   colors: {
     brand: '#fa701b',
-    primary: '#3d3e42',
+    primary: {
+      500: '#3d3e42',
+    },
     border: '#BFBFBF',
     singelton: {
       white: '#FFFFFF',
