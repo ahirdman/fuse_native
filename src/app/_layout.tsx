@@ -1,17 +1,13 @@
 import { trackView } from '@/lib/aptabase/aptabase';
 import { sentryInitOptions } from '@/lib/sentry/sentry.init';
 import { store } from '@/store/store';
+import { ApplicationTheme } from '@/style/theme';
 import { init } from '@aptabase/react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from '@react-navigation/native';
+import { NativeBaseProvider } from 'native-base';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack, usePathname } from 'expo-router';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
 import { Provider as ReduxProvider } from 'react-redux';
 import * as Sentry from 'sentry-expo';
 
@@ -62,16 +58,14 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
   return (
     <ReduxProvider store={store}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <NativeBaseProvider theme={ApplicationTheme}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
         </Stack>
-      </ThemeProvider>
+      </NativeBaseProvider>
     </ReduxProvider>
   );
 }

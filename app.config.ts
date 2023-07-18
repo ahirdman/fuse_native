@@ -39,7 +39,7 @@ export default (): ExpoConfig => {
     splash: {
       image: './assets/images/splash.png',
       resizeMode: 'contain',
-      backgroundColor: '#ffffff',
+      backgroundColor: '#3d3e42',
     },
     assetBundlePatterns: ['**/*'],
     ios: {
@@ -49,7 +49,7 @@ export default (): ExpoConfig => {
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#3d3e42',
       },
     },
     plugins,
