@@ -20,11 +20,9 @@ Sentry.init(sentryInitOptions());
 export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: '/(auth)/auth',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -63,9 +61,9 @@ function RootLayoutNav() {
   return (
     <ReduxProvider store={store}>
       <NativeBaseProvider theme={ApplicationTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)/index" options={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)/auth" />
+          <Stack.Screen name="(tabs)" />
         </Stack>
       </NativeBaseProvider>
     </ReduxProvider>
