@@ -35,6 +35,7 @@ module.exports = {
     "no-void": ["error", { "allowAsStatement": true }],
     "no-console": "error",
     "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/no-namespace": ["error", { "allowDeclarations": true }],
     "@typescript-eslint/consistent-type-definitions": "error",
     "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/member-ordering": [
