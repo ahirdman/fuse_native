@@ -1,34 +1,40 @@
 import { Tabs } from 'expo-router';
 
 import { StyleSheet } from 'react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
+interface TabBarIconProps {
+  name: React.ComponentProps<typeof Ionicons>['name'];
   color: string;
-}) {
-  return <FontAwesome size={28} style={styles.tabBarIcon} {...props} />;
+}
+
+function TabBarIcon({ name, color }: TabBarIconProps) {
+  return (
+    <Ionicons size={28} style={styles.tabBarIcon} color={color} name={name} />
+  );
 }
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: 'black',
+        tabBarActiveTintColor: 'white',
+        headerShown: false,
+        tabBarStyle: { backgroundColor: 'black' },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
         }}
       />
       <Tabs.Screen
         name="lists"
         options={{
           title: 'Lists',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
     </Tabs>
@@ -38,9 +44,5 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   tabBarIcon: {
     marginBottom: -3,
-  },
-  infoCircle: {
-    marginRight: 15,
-    opacity: 1,
   },
 });
