@@ -1,15 +1,17 @@
+import { useFonts } from 'expo-font';
+import { SplashScreen, Stack, usePathname } from 'expo-router';
+import * as Sentry from 'sentry-expo';
+
+import { NativeBaseProvider } from 'native-base';
+import { useEffect } from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
+import { init } from '@aptabase/react-native';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+
 import { trackView } from '@/lib/aptabase/aptabase';
 import { sentryInitOptions } from '@/lib/sentry/sentry.init';
 import { store } from '@/store/store';
 import { ApplicationTheme } from '@/style/theme';
-import { init } from '@aptabase/react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { NativeBaseProvider } from 'native-base';
-import { useFonts } from 'expo-font';
-import { SplashScreen, Stack, usePathname } from 'expo-router';
-import { useEffect } from 'react';
-import { Provider as ReduxProvider } from 'react-redux';
-import * as Sentry from 'sentry-expo';
 
 init(process.env.EXPO_PUBLIC_APTABASE_KEY);
 
