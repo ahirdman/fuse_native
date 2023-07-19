@@ -47,6 +47,7 @@ module.exports = {
     "@typescript-eslint/no-duplicate-type-constituents": "off",
     "@typescript-eslint/no-redundant-type-constituents": "error",
     "@typescript-eslint/no-unnecessary-condition": "error",
+    "@typescript-eslint/no-misused-promises": "off",
     "react/react-in-jsx-scope": "off",
     "react/no-unstable-nested-components": "off",
     "jest/no-disabled-tests": "off",
