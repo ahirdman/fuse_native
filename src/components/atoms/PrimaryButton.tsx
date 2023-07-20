@@ -13,14 +13,16 @@ function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
       onPress={onPress}
       {...props}
       bg={props.bg ?? 'brand'}
-      rounded="4"
+      rounded="6"
       width="100%"
       height="40px"
       margin="4"
       justifyContent="center"
       alignItems="center"
     >
-      <Text>{label}</Text>
+      <Text color="singelton.lightText" fontWeight="bold" letterSpacing="xl">
+        {label.toUpperCase()}
+      </Text>
     </Pressable>
   );
 }

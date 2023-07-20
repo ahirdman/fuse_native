@@ -13,7 +13,7 @@ export function sentryInitOptions(): SentryExpoNativeOptions {
   return {
     dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
     environment: process.env.NODE_ENV,
-    enableInExpoDevelopment: true,
+    enableInExpoDevelopment: false,
     debug: true,
     tracesSampleRate: 1,
     enableAppHangTracking: false,

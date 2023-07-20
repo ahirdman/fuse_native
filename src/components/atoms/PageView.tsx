@@ -1,10 +1,12 @@
 import { View } from 'native-base';
 
-interface PageViewProps {
+import type { IViewProps } from 'native-base/lib/typescript/components/basic/View/types';
+
+interface PageViewProps extends IViewProps {
   children: React.ReactNode;
 }
 
-export default function PageView({ children }: PageViewProps) {
+export default function PageView({ children, ...props }: PageViewProps) {
   return (
     <View
       flex={1}
@@ -12,6 +14,7 @@ export default function PageView({ children }: PageViewProps) {
       justifyContent="center"
       alignItems="center"
       backgroundColor="primary.500"
+      {...props}
     >
       {children}
     </View>
