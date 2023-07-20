@@ -9,7 +9,7 @@ export default function Lists() {
 
   return (
     <PageView>
-      <Button onPress={() => router.replace('/auth')}>
+      <Button onPress={() => router.replace('/sign-in')}>
         <Text>Sign Out</Text>
       </Button>
     </PageView>
