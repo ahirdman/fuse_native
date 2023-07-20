@@ -1,27 +1,32 @@
-import { useFonts } from 'expo-font';
-import { SplashScreen, Stack, usePathname } from 'expo-router';
+import { SplashScreen, Stack, router, usePathname } from 'expo-router';
 import * as Sentry from 'sentry-expo';
 
+import {
+  Mulish_200ExtraLight,
+  Mulish_300Light,
+  Mulish_400Regular,
+  Mulish_500Medium,
+  Mulish_600SemiBold,
+  Mulish_700Bold,
+  Mulish_800ExtraBold,
+  Mulish_900Black,
+  useFonts,
+} from '@expo-google-fonts/mulish';
 import { NativeBaseProvider } from 'native-base';
 import { useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { init } from '@aptabase/react-native';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 import { trackView } from '@/lib/aptabase/aptabase';
 import { sentryInitOptions } from '@/lib/sentry/sentry.init';
 import { store } from '@/store/store';
 import { ApplicationTheme } from '@/style/theme';
+import { supabase } from '@/lib/supabase/supabase.init';
 
 init(process.env.EXPO_PUBLIC_APTABASE_KEY);
-
 Sentry.init(sentryInitOptions());
 
 export { ErrorBoundary } from 'expo-router';
-
-export const unstable_settings = {
-  initialRouteName: '/(auth)/auth',
-};
 
 SplashScreen.preventAutoHideAsync();
 
@@ -29,9 +34,14 @@ export default function RootLayout() {
   const pathname = usePathname();
 
   const [fontsLoaded, fontsError] = useFonts({
-    /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
-    SpaceMono: require('../../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
+    Mulish_200ExtraLight,
+    Mulish_300Light,
+    Mulish_400Regular,
+    Mulish_500Medium,
+    Mulish_600SemiBold,
+    Mulish_700Bold,
+    Mulish_800ExtraBold,
+    Mulish_900Black,
   });
 
   useEffect(() => {
@@ -58,11 +68,25 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  useEffect(() => {
+    const authState = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        router.replace('/(tabs)');
+      } else {
+        router.replace('/sign-in');
+      }
+    });
+
+    return () => {
+      authState.data.subscription.unsubscribe();
+    };
+  }, []);
+
   return (
     <ReduxProvider store={store}>
       <NativeBaseProvider theme={ApplicationTheme}>
         <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)/auth" />
+          <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
         </Stack>
       </NativeBaseProvider>

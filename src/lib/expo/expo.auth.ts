@@ -5,6 +5,7 @@ import { assertIsDefined } from '../util/assert';
 import { generateShortUUID } from '../util';
 
 import { setSecureItem } from './expo.secure';
+import { redirectUri } from './expo.linking';
 
 import { store } from '@/store/store';
 import { setToken } from '@/store/user/user.slice';
@@ -19,11 +20,6 @@ export async function authorizeSpotify() {
       authorizationEndpoint: 'https://accounts.spotify.com/authorize',
       tokenEndpoint: 'https://accounts.spotify.com/api/token',
     };
-
-    const redirectUri = AuthSession.makeRedirectUri({
-      scheme: 'fuse',
-      path: 'auth',
-    });
 
     const authRequestOptions: AuthSession.AuthRequestConfig = {
       responseType: AuthSession.ResponseType.Code,
