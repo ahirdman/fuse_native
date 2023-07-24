@@ -58,6 +58,7 @@ function SignUpForm() {
             value={value}
             onChangeText={(val) => onChange(val)}
             error={error?.message}
+            label="Email"
             placeholder="Email"
             keyboardType="email-address"
           />
@@ -75,7 +76,8 @@ function SignUpForm() {
             value={value}
             onChangeText={(val) => onChange(val)}
             error={error?.message}
-            placeholder="Password"
+            label="Password"
+            placeholder="********"
             type="password"
           />
         )}
@@ -91,8 +93,9 @@ function SignUpForm() {
             onBlur={onBlur}
             value={value}
             onChangeText={(val) => onChange(val)}
+            label="Confirm Password"
             error={error?.message}
-            placeholder="Confirm Password"
+            placeholder="********"
             type="password"
           />
         )}

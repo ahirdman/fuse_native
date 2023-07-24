@@ -106,8 +106,8 @@ const styles = StyleSheet.create({
   animatedView: {
     width: '100%',
     borderWidth: 1,
-    borderColor: '#8A8C95',
-    backgroundColor: '#5F6167',
+    borderColor: '#505050',
+    backgroundColor: '#1C1C1C',
     borderRadius: 15,
     overflow: 'hidden',
   },

@@ -2,17 +2,17 @@ import { Pressable, Text } from 'native-base';
 
 import type { IPressableProps } from 'native-base';
 
-interface IPrimaryButtonProps extends IPressableProps {
+interface ISecondaryButtonProps extends IPressableProps {
   onPress(): void;
   label: string;
 }
 
-function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
+function SecondaryButton({ label, onPress, ...props }: ISecondaryButtonProps) {
   return (
     <Pressable
       onPress={onPress}
-      bg={props.bg ?? 'brand.dark'}
-      borderColor="brand.light"
+      bg={props.bg ?? 'primary.600'}
+      borderColor="border.400"
       borderWidth="1"
       rounded="6"
       width="100%"
@@ -20,7 +20,7 @@ function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
       margin="4"
       justifyContent="center"
       alignItems="center"
-      _pressed={{ bg: 'brand.light' }}
+      _pressed={{ borderColor: '#707070' }}
       {...props}
     >
       <Text color="singelton.white" fontWeight="bold" letterSpacing="xl">
@@ -30,4 +30,4 @@ function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
   );
 }
 
-export default PrimaryButton;
+export default SecondaryButton;
