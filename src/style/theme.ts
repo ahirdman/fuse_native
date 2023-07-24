@@ -2,15 +2,33 @@ import { extendTheme } from 'native-base';
 
 export const ApplicationTheme = extendTheme({
   colors: {
-    brand: '#fa701b',
-    primary: {
-      500: '#3d3e42',
+    brand: {
+      light: '#F07123',
+      default: '#F59E0B',
+      dark: '#F3640B',
     },
-    border: '#BFBFBF',
+    primary: {
+      400: '#505050',
+      500: '#3d3e42',
+      600: '#1C1C1C',
+      700: '#222222',
+      800: '#1C1C1C',
+    },
+    error: {
+      400: '#1D1415',
+      500: '#5F2324',
+      600: '#772829',
+      700: '#D45453',
+    },
+    border: {
+      300: '#707070',
+      400: '#505050',
+      500: '#3E3E3E',
+    },
     singelton: {
       white: '#FFFFFF',
       black: '#000000',
-      lightText: '#FFFFFF',
+      lightText: '#BBBBBB',
       darkText: '#191C1D',
     },
   },
@@ -56,15 +74,41 @@ export const ApplicationTheme = extendTheme({
     Input: {
       baseStyle: {
         height: '40px',
-        focusOutlineColor: 'brand',
+        focusOutlineColor: 'border.300',
+        borderColor: 'border.500',
+        placeholderTextColor: '#505050',
+        bg: 'primary.700',
         _focus: {
           _ios: {
-            selectionColor: 'brand',
+            selectionColor: 'brand.dark',
           },
         },
         _input: {
+          bg: 'primary.700',
+          color: 'singelton.white',
+        },
+        _invalid: {
+          placeholderTextColor: 'error.500',
+          _input: { backgroundColor: 'error.400' },
+        },
+      },
+    },
+    FormControlLabel: {
+      baseStyle: {
+        paddingBottom: 1,
+        _text: {
           color: 'singelton.lightText',
         },
+      },
+    },
+    FormControlErrorMessage: {
+      baseStyle: {
+        _text: { color: 'error.700' },
+      },
+    },
+    Divider: {
+      baseStyle: {
+        bg: 'border.500',
       },
     },
   },

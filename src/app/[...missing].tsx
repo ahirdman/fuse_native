@@ -12,7 +12,7 @@ export default function NotFoundScreen() {
         <Text>Missing Page</Text>
         <Link href="/" replace asChild>
           <Pressable accessibilityRole="button">
-            <Text color="brand">Sign out!</Text>
+            <Text color="brand.dark">Sign out!</Text>
           </Pressable>
         </Link>
       </PageView>

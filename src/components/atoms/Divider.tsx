@@ -10,14 +10,20 @@ function HorizontalDivider({ label, ...props }: IHorizontalDividerProps) {
   return (
     <Box
       w="100%"
+      marginBottom="4"
       flexDir="row"
       justifyContent="center"
       alignItems="center"
+      overflow="hidden"
       {...props}
     >
-      <NativeDivider w="10" mx="5" />
-      {label && <Text color="singelton.lightText">{label.toUpperCase()}</Text>}
-      <NativeDivider w="10" mx="5" />
+      <NativeDivider maxW="100%" mx="5" />
+      {label && (
+        <Text color="singelton.white" fontWeight="bold">
+          {label}
+        </Text>
+      )}
+      <NativeDivider maxW="100%" mx="5" />
     </Box>
   );
 }

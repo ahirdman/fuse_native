@@ -10,6 +10,7 @@ import PrimaryButton from '@/components/atoms/PrimaryButton';
 import HorizontalDivider from '@/components/atoms/Divider';
 import Input from '@/components/atoms/ControlledInput';
 import { supabaseSignIn } from '@/lib/supabase/supabase.auth';
+import SecondaryButton from '@/components/atoms/SecondaryButton';
 
 const signInschema = z.object({
   email: z.string().email({ message: 'Invalid Email' }),
@@ -47,7 +48,7 @@ function SignInView() {
     <PageView justifyContent="space-between" paddingY="10">
       <Box w="full" justifyContent="center" alignItems="center">
         <Heading
-          color="brand"
+          color="brand.dark"
           fontWeight="extrabold"
           fontSize="9xl"
           paddingY="10"
@@ -63,6 +64,7 @@ function SignInView() {
             fieldState: { error },
           }) => (
             <Input
+              label="Email"
               onBlur={onBlur}
               value={value}
               onChangeText={(val) => onChange(val)}
@@ -81,11 +83,12 @@ function SignInView() {
             fieldState: { error },
           }) => (
             <Input
+              label="Password"
               onBlur={onBlur}
               value={value}
               onChangeText={(val) => onChange(val)}
               error={error?.message}
-              placeholder="Password"
+              placeholder="********"
               secureTextEntry
             />
           )}
@@ -97,8 +100,8 @@ function SignInView() {
       <Box w="full" justifyContent="center" alignItems="center">
         <HorizontalDivider label="or" mt="100" />
 
-        <PrimaryButton
-          label="Create New Account"
+        <SecondaryButton
+          label="Sign Up Now"
           onPress={() => router.push('/sign-up')}
         />
       </Box>

@@ -1,5 +1,6 @@
 import { SplashScreen, Stack, router, usePathname } from 'expo-router';
 import * as Sentry from 'sentry-expo';
+import { StatusBar } from 'expo-status-bar';
 
 import {
   Mulish_200ExtraLight,
@@ -85,6 +86,7 @@ function RootLayoutNav() {
   return (
     <ReduxProvider store={store}>
       <NativeBaseProvider theme={ApplicationTheme}>
+        <StatusBar style="light" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
