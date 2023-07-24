@@ -11,7 +11,6 @@ function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
   return (
     <Pressable
       onPress={onPress}
-      {...props}
       bg={props.bg ?? 'brand'}
       rounded="6"
       width="100%"
@@ -19,6 +18,8 @@ function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
       margin="4"
       justifyContent="center"
       alignItems="center"
+      _pressed={{ bg: 'coolGray.500' }}
+      {...props}
     >
       <Text color="singelton.lightText" fontWeight="bold" letterSpacing="xl">
         {label.toUpperCase()}
