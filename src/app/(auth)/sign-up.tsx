@@ -1,59 +1,73 @@
-import { useForm } from 'react-hook-form';
+import { Button, Spacer, Text, View } from 'native-base';
+import { useState } from 'react';
 
 import PageView from '@/components/atoms/PageView';
-import ControlledInput from '@/components/atoms/ControlledInput';
+import SignUpForm from '@/hooks/useSignUp';
+import Accordion from '@/components/atoms/Accordion';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
-import { supabaseCreateAccount } from '@/lib/supabase/supabase.auth';
+import { authorizeSpotify } from '@/lib/expo/expo.auth';
+import { useAppSelector } from '@/store/hooks';
 
-interface ISignUpInput {
-  email: string;
-  password: string;
-  repeatPassword: string;
-}
+const COLLAPSED_HEIGHT = 80;
+const EXPANDED_HEIGHT = 400;
 
 function SignUpView() {
-  const { control, handleSubmit } = useForm<ISignUpInput>();
+  const [activeAccordion, setActiveAccordion] = useState<number>(0);
+  const user = useAppSelector((state) => state.user.user);
 
-  function signUp({ email, password }: ISignUpInput) {
-    // Submit should not allow password if not same as repeatPassword
-    //
-    void supabaseCreateAccount({ email, password });
+  function handleNext() {
+    if (activeAccordion === 2) {
+      setActiveAccordion(-1);
+    } else {
+      setActiveAccordion(activeAccordion + 1);
+    }
   }
 
   return (
-    <PageView>
-      <ControlledInput
-        placeholder="Email"
-        control={control}
-        name="email"
-        rules={{ required: 'Username is required' }}
-      />
+    <PageView justifyContent="start">
+      <Button onPress={handleNext}>Next</Button>
+      <Spacer />
+      <Accordion
+        collapsedHeight={COLLAPSED_HEIGHT}
+        expandedHeight={EXPANDED_HEIGHT}
+        initial="EXPANDED"
+        index={0}
+        activeAccordion={activeAccordion}
+        setActiveAccordion={setActiveAccordion}
+        headerLeft={<Text>Created Account</Text>}
+        headerRight={!user ? <Text>ahirdman</Text> : null}
+      >
+        <SignUpForm />
+      </Accordion>
+      <Spacer />
+      <Accordion
+        collapsedHeight={COLLAPSED_HEIGHT}
+        expandedHeight={EXPANDED_HEIGHT}
+        initial="COLLAPSED"
+        index={1}
+        activeAccordion={activeAccordion}
+        setActiveAccordion={setActiveAccordion}
+      >
+        <PrimaryButton
+          label="Authorize Spotify"
+          onPress={() => authorizeSpotify()}
+        />
+      </Accordion>
+      <Spacer />
+      <Accordion
+        collapsedHeight={COLLAPSED_HEIGHT}
+        expandedHeight={EXPANDED_HEIGHT}
+        initial="COLLAPSED"
+        index={2}
+        activeAccordion={activeAccordion}
+        setActiveAccordion={setActiveAccordion}
+      >
+        <View>
+          <Text>Subscribe for better things</Text>
+        </View>
+      </Accordion>
 
-      <ControlledInput
-        placeholder="Password"
-        control={control}
-        name="password"
-        type="password"
-        rules={{
-          required: 'Password is required',
-          maxLength: 72,
-          minLength: 6,
-        }}
-      />
-
-      <ControlledInput
-        placeholder="Repeat Password"
-        control={control}
-        name="repeatPassword"
-        type="password"
-        rules={{
-          required: 'Password is required',
-          maxLength: 72,
-          minLength: 6,
-        }}
-      />
-
-      <PrimaryButton label="Sign In" onPress={handleSubmit(signUp)} />
+      <Spacer />
     </PageView>
   );
 }

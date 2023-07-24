@@ -1,36 +1,20 @@
-import { FormControl, Input } from 'native-base';
-import { useController } from 'react-hook-form';
+import { FormControl, Input as BaseInput } from 'native-base';
 
 import type { IInputProps } from 'native-base';
-import type { FieldValues, UseControllerProps } from 'react-hook-form';
 
-interface ControlledInputProps<T extends FieldValues>
-  extends UseControllerProps<T>,
-    Omit<IInputProps, 'defaultValue'> {
+interface ControlledInputProps extends IInputProps {
   label?: string;
+  error?: string | undefined;
 }
 
-function ControlledInput<T extends FieldValues>({
-  label,
-  ...props
-}: ControlledInputProps<T>) {
-  const {
-    field: { onBlur, onChange, value },
-    fieldState: { error },
-  } = useController(props);
+function Input({ label, error, ...props }: ControlledInputProps) {
   return (
-    <FormControl isRequired isInvalid={error !== undefined} m="2">
+    <FormControl m="2" isInvalid={error !== undefined}>
       {label && <FormControl.Label>{label}</FormControl.Label>}
-      <Input
-        onBlur={onBlur}
-        onChangeText={onChange}
-        value={value}
-        size="lg"
-        {...props}
-      />
-      <FormControl.ErrorMessage>{error?.message}</FormControl.ErrorMessage>
+      <BaseInput size="lg" {...props} />
+      <FormControl.ErrorMessage>{error}</FormControl.ErrorMessage>
     </FormControl>
   );
 }
 
-export default ControlledInput;
+export default Input;

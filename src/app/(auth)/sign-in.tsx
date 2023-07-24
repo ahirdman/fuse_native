@@ -1,32 +1,47 @@
 import { useRouter } from 'expo-router';
 
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { Box, Heading } from 'native-base';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import PageView from '@/components/atoms/PageView';
-import ControlledInput from '@/components/atoms/ControlledInput';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
-import { supabaseSignIn } from '@/lib/supabase/supabase.auth';
 import HorizontalDivider from '@/components/atoms/Divider';
+import Input from '@/components/atoms/ControlledInput';
+import { supabaseSignIn } from '@/lib/supabase/supabase.auth';
 
-export interface IAuthInput {
-  email: string;
-  password: string;
-}
+const signInschema = z.object({
+  email: z.string().email({ message: 'Invalid Email' }),
+  password: z
+    .string()
+    .min(6, {
+      message: 'Password cannot be shorter than 6 characters',
+    })
+    .max(72, { message: 'Password cannot be longer than 72 characters' }),
+});
+
+export type ISignIn = z.infer<typeof signInschema>;
 
 function SignInView() {
-  const { control, handleSubmit } = useForm<IAuthInput>({
+  const router = useRouter();
+
+  const { control, handleSubmit, setError } = useForm<ISignIn>({
     defaultValues: {
       email: '',
       password: '',
     },
+    resolver: zodResolver(signInschema),
   });
 
-  function signIn({ email, password }: IAuthInput) {
-    void supabaseSignIn({ email, password });
-  }
+  async function submit({ email, password }: ISignIn) {
+    const { error } = await supabaseSignIn({ email, password });
 
-  const router = useRouter();
+    if (error) {
+      setError('password', { message: error.message });
+      setError('email', { message: error.message });
+    }
+  }
 
   return (
     <PageView justifyContent="space-between" paddingY="10">
@@ -40,26 +55,43 @@ function SignInView() {
           FUSE
         </Heading>
 
-        <ControlledInput
-          placeholder="Email"
+        <Controller
           control={control}
           name="email"
-          rules={{ required: 'Username is required' }}
+          render={({
+            field: { onBlur, onChange, value },
+            fieldState: { error },
+          }) => (
+            <Input
+              onBlur={onBlur}
+              value={value}
+              onChangeText={(val) => onChange(val)}
+              error={error?.message}
+              placeholder="Email"
+              keyboardType="email-address"
+            />
+          )}
         />
 
-        <ControlledInput
-          placeholder="Password"
+        <Controller
           control={control}
           name="password"
-          type="password"
-          rules={{
-            required: 'Password is required',
-            maxLength: 72,
-            minLength: 6,
-          }}
+          render={({
+            field: { onBlur, onChange, value },
+            fieldState: { error },
+          }) => (
+            <Input
+              onBlur={onBlur}
+              value={value}
+              onChangeText={(val) => onChange(val)}
+              error={error?.message}
+              placeholder="Password"
+              secureTextEntry
+            />
+          )}
         />
 
-        <PrimaryButton label="Sign In" onPress={handleSubmit(signIn)} />
+        <PrimaryButton label="Sign In" onPress={handleSubmit(submit)} />
       </Box>
 
       <Box w="full" justifyContent="center" alignItems="center">
