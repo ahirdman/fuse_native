@@ -1,4 +1,4 @@
-import { SplashScreen, Stack, router, usePathname } from 'expo-router';
+import { SplashScreen, Stack, usePathname } from 'expo-router';
 import * as Sentry from 'sentry-expo';
 import { StatusBar } from 'expo-status-bar';
 
@@ -22,7 +22,7 @@ import { trackView } from '@/lib/aptabase/aptabase';
 import { sentryInitOptions } from '@/lib/sentry/sentry.init';
 import { store } from '@/store/store';
 import { ApplicationTheme } from '@/style/theme';
-import { supabase } from '@/lib/supabase/supabase.init';
+import AuthProvider from '@/providers/auth.provider';
 
 init(process.env.EXPO_PUBLIC_APTABASE_KEY);
 Sentry.init(sentryInitOptions());
@@ -69,28 +69,16 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  useEffect(() => {
-    const authState = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        router.replace('/(tabs)');
-      } else {
-        router.replace('/sign-in');
-      }
-    });
-
-    return () => {
-      authState.data.subscription.unsubscribe();
-    };
-  }, []);
-
   return (
     <ReduxProvider store={store}>
       <NativeBaseProvider theme={ApplicationTheme}>
-        <StatusBar style="light" />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(tabs)" />
-        </Stack>
+        <AuthProvider>
+          <StatusBar style="light" />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        </AuthProvider>
       </NativeBaseProvider>
     </ReduxProvider>
   );

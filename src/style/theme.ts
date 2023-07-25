@@ -10,9 +10,11 @@ export const ApplicationTheme = extendTheme({
     primary: {
       400: '#505050',
       500: '#3d3e42',
-      600: '#1C1C1C',
-      700: '#222222',
-      800: '#1C1C1C',
+      600: '#222222',
+      700: '#1C1C1C',
+    },
+    success: {
+      500: '#10B981',
     },
     error: {
       400: '#1D1415',
@@ -30,6 +32,7 @@ export const ApplicationTheme = extendTheme({
       black: '#000000',
       lightText: '#BBBBBB',
       darkText: '#191C1D',
+      lightHeader: '#EDEDED',
     },
   },
   fontConfig: {
@@ -77,19 +80,19 @@ export const ApplicationTheme = extendTheme({
         focusOutlineColor: 'border.300',
         borderColor: 'border.500',
         placeholderTextColor: '#505050',
-        bg: 'primary.700',
+        bg: 'primary.600',
         _focus: {
           _ios: {
             selectionColor: 'brand.dark',
           },
         },
         _input: {
-          bg: 'primary.700',
+          bg: 'primary.600',
           color: 'singelton.white',
         },
         _invalid: {
           placeholderTextColor: 'error.500',
-          _input: { backgroundColor: 'error.400' },
+          _input: { bg: 'error.400' },
         },
       },
     },
@@ -109,6 +112,11 @@ export const ApplicationTheme = extendTheme({
     Divider: {
       baseStyle: {
         bg: 'border.500',
+      },
+    },
+    Heading: {
+      baseStyle: {
+        color: 'singelton.lightHeader',
       },
     },
   },

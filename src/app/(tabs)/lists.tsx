@@ -1,15 +1,12 @@
-import { useRouter } from 'expo-router';
-
 import { Button, Text } from 'native-base';
 
 import PageView from '@/components/atoms/PageView';
+import { supabaseSignOut } from '@/lib/supabase/supabase.auth';
 
 export default function Lists() {
-  const router = useRouter();
-
   return (
     <PageView>
-      <Button onPress={() => router.replace('/sign-in')}>
+      <Button onPress={() => supabaseSignOut()}>
         <Text>Sign Out</Text>
       </Button>
     </PageView>

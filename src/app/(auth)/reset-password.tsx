@@ -3,7 +3,7 @@ import { Heading, Text } from 'native-base';
 import { z } from 'zod';
 
 import PageView from '@/components/atoms/PageView';
-import Input from '@/components/atoms/ControlledInput';
+import Input from '@/components/atoms/Input';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
 import { supabaseResetPassword } from '@/lib/supabase/supabase.auth';
 

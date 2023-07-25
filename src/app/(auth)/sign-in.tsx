@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import PageView from '@/components/atoms/PageView';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
 import HorizontalDivider from '@/components/atoms/Divider';
-import Input from '@/components/atoms/ControlledInput';
+import Input from '@/components/atoms/Input';
 import { supabaseSignIn } from '@/lib/supabase/supabase.auth';
 import SecondaryButton from '@/components/atoms/SecondaryButton';
 
