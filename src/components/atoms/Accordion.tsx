@@ -1,12 +1,11 @@
 import { Box, HStack, Pressable, Text } from 'native-base';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 
 import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 interface IAccordionProps {
-  setActiveAccordion(index: number): void;
   headerLeft?: ReactNode | null;
   headerRight?: ReactNode | null;
   initial: 'COLLAPSED' | 'EXPANDED';
@@ -27,13 +26,10 @@ function Accordion({
   initial,
   index,
   activeAccordion,
-  setActiveAccordion,
   label,
   headerLeft,
   headerRight,
 }: IAccordionProps) {
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
-
   const animationRef = useRef(
     new Animated.Value(
       initial === 'COLLAPSED' ? collapsedHeight : expandedHeight,
@@ -41,13 +37,13 @@ function Accordion({
   ).current;
 
   function onPress() {
-    isCollapsed ? handleExpand() : handleCollapse();
-
-    if (index !== activeAccordion) {
-      setActiveAccordion(index);
-    }
-
-    setIsCollapsed(!isCollapsed);
+    // isCollapsed ? handleExpand() : handleCollapse();
+    //
+    // if (index !== activeAccordion) {
+    //   setActiveAccordion(index);
+    // }
+    //
+    // setIsCollapsed(!isCollapsed);
   }
 
   const handleCollapse = useCallback(() => {

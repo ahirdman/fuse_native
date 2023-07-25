@@ -1,11 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { SpotifyToken, User, UserState } from './user.interface';
+import type {
+  SpotifyToken,
+  Subscription,
+  User,
+  UserState,
+} from './user.interface';
 
 const initialState: UserState = {
   user: null,
   token: null,
+  subscription: null,
 };
 
 export const userSlice = createSlice({
@@ -21,9 +27,12 @@ export const userSlice = createSlice({
     setToken: (state, action: PayloadAction<SpotifyToken>) => {
       state.token = action.payload;
     },
+    setSubscription: (state, action: PayloadAction<Subscription>) => {
+      state.subscription = action.payload;
+    },
   },
 });
 
-export const { signIn, signOut, setToken } = userSlice.actions;
+export const { signIn, signOut, setToken, setSubscription } = userSlice.actions;
 
 export default userSlice.reducer;
