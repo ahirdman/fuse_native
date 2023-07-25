@@ -17,8 +17,8 @@ function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
       rounded="6"
       width="100%"
       height="40px"
-      margin="4"
       justifyContent="center"
+      marginY={props.marginY ?? '4'}
       alignItems="center"
       _pressed={{ bg: 'brand.light' }}
       {...props}

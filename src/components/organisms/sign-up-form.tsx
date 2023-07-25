@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import Input from '@/components/atoms/ControlledInput';
+import Input from '@/components/atoms/Input';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
 import { supabaseCreateAccount } from '@/lib/supabase/supabase.auth';
 
@@ -100,7 +100,7 @@ function SignUpForm() {
           />
         )}
       />
-      <PrimaryButton label="Sign In" onPress={handleSubmit(signUp)} />
+      <PrimaryButton label="Sign Up" onPress={handleSubmit(signUp)} />
     </>
   );
 }
