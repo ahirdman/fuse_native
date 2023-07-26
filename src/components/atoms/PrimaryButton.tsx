@@ -1,13 +1,19 @@
-import { Pressable, Text } from 'native-base';
+import { Pressable, Spinner, Text } from 'native-base';
 
 import type { IPressableProps } from 'native-base';
 
 interface IPrimaryButtonProps extends IPressableProps {
   onPress(): void;
+  isLoading?: boolean;
   label: string;
 }
 
-function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
+function PrimaryButton({
+  label,
+  onPress,
+  isLoading,
+  ...props
+}: IPrimaryButtonProps) {
   return (
     <Pressable
       onPress={onPress}
@@ -23,9 +29,13 @@ function PrimaryButton({ label, onPress, ...props }: IPrimaryButtonProps) {
       _pressed={{ bg: 'brand.light' }}
       {...props}
     >
-      <Text color="singelton.white" fontWeight="bold" letterSpacing="xl">
-        {label}
-      </Text>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <Text color="singelton.white" fontWeight="bold" letterSpacing="xl">
+          {label}
+        </Text>
+      )}
     </Pressable>
   );
 }

@@ -1,46 +1,38 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import Input from '@/components/atoms/Input';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
-import { supabaseCreateAccount } from '@/lib/supabase/supabase.auth';
+import {
+  CustomerQueryError,
+  signUpInputSchema,
+} from '@/services/supabase/auth/supabase.interface';
+import { useSignUpMutation } from '@/services/supabase/auth/supabase.auth';
 
-const passwordSchema = z
-  .string()
-  .min(6, {
-    message: 'Password cannot be shorter than 6 characters',
-  })
-  .max(72, { message: 'Password cannot be longer than 72 characters' });
-
-const signUpschema = z
-  .object({
-    email: z.string().email({ message: 'Invalid Email' }),
-    password: passwordSchema,
-    confirmPassword: passwordSchema,
-  })
-  .refine((schema) => schema.password === schema.confirmPassword, {
-    path: ['confirmPassword'],
-    message: "Password don't match",
-  });
-
-type ISignUpInput = z.infer<typeof signUpschema>;
+import type {
+  SignUpInput,
+  SignUpRequest,
+} from '@/services/supabase/auth/supabase.interface';
 
 function SignUpForm() {
-  const { control, handleSubmit, setError } = useForm<ISignUpInput>({
+  const { control, handleSubmit, setError } = useForm<SignUpInput>({
     defaultValues: {
       email: '',
       password: '',
       confirmPassword: '',
     },
-    resolver: zodResolver(signUpschema),
+    resolver: zodResolver(signUpInputSchema),
   });
 
-  async function signUp({ email, password }: ISignUpInput) {
-    const { error } = await supabaseCreateAccount({ email, password });
+  const [signUp, { isLoading }] = useSignUpMutation();
 
-    if (error) {
-      setError('email', { message: error.message });
+  async function submit({ email, password }: SignUpRequest) {
+    const result = await signUp({ email, password });
+
+    if ('error' in result) {
+      const message = CustomerQueryError.parse(result).error.data.message;
+      setError('password', { message });
+      setError('email', { message });
     }
   }
 
@@ -100,7 +92,11 @@ function SignUpForm() {
           />
         )}
       />
-      <PrimaryButton label="Sign Up" onPress={handleSubmit(signUp)} />
+      <PrimaryButton
+        label="Sign Up"
+        onPress={handleSubmit(submit)}
+        isLoading={isLoading}
+      />
     </>
   );
 }

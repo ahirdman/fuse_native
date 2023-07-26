@@ -1,28 +1,27 @@
 import { Controller, useForm } from 'react-hook-form';
 import { Heading, Text } from 'native-base';
-import { z } from 'zod';
 
 import PageView from '@/components/atoms/PageView';
 import Input from '@/components/atoms/Input';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
-import { supabaseResetPassword } from '@/lib/supabase/supabase.auth';
+import { useResetPasswordMutation } from '@/services/supabase/auth/supabase.auth';
+import { CustomerQueryError } from '@/services/supabase/auth/supabase.interface';
 
-const emailSchema = z.object({
-  email: z.string().email({ message: 'Invalid Email' }),
-});
-
-type IEmailInput = z.infer<typeof emailSchema>;
+import type { ResetPasswordInput } from '@/services/supabase/auth/supabase.interface';
 
 function ResetPasswordView() {
-  const { control, handleSubmit, setError } = useForm<IEmailInput>({
+  const { control, handleSubmit, setError } = useForm<ResetPasswordInput>({
     defaultValues: { email: '' },
   });
 
-  async function resetPassword({ email }: IEmailInput) {
-    const error = await supabaseResetPassword(email);
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
-    if (error) {
-      setError('email', { message: error.message });
+  async function submit({ email }: ResetPasswordInput) {
+    const result = await resetPassword({ email });
+
+    if ('error' in result) {
+      const message = CustomerQueryError.parse(result).error.data.message;
+      setError('email', { message });
     }
   }
 
@@ -56,7 +55,8 @@ function ResetPasswordView() {
 
       <PrimaryButton
         label="Restore Password"
-        onPress={handleSubmit(resetPassword)}
+        onPress={handleSubmit(submit)}
+        isLoading={isLoading}
       />
     </PageView>
   );
