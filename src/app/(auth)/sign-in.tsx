@@ -2,45 +2,41 @@ import { useRouter } from 'expo-router';
 
 import { Controller, useForm } from 'react-hook-form';
 import { Box, Heading } from 'native-base';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import PageView from '@/components/atoms/PageView';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
 import HorizontalDivider from '@/components/atoms/Divider';
 import Input from '@/components/atoms/Input';
-import { supabaseSignIn } from '@/lib/supabase/supabase.auth';
 import SecondaryButton from '@/components/atoms/SecondaryButton';
+import { useSignInMutation } from '@/services/supabase/auth/supabase.auth';
+import {
+  CustomerQueryError,
+  signInInputSchema,
+} from '@/services/supabase/auth/supabase.interface';
 
-const signInschema = z.object({
-  email: z.string().email({ message: 'Invalid Email' }),
-  password: z
-    .string()
-    .min(6, {
-      message: 'Password cannot be shorter than 6 characters',
-    })
-    .max(72, { message: 'Password cannot be longer than 72 characters' }),
-});
-
-export type ISignIn = z.infer<typeof signInschema>;
+import type { SignInInput } from '@/services/supabase/auth/supabase.interface';
 
 function SignInView() {
   const router = useRouter();
 
-  const { control, handleSubmit, setError } = useForm<ISignIn>({
+  const { control, handleSubmit, setError } = useForm<SignInInput>({
     defaultValues: {
       email: '',
       password: '',
     },
-    resolver: zodResolver(signInschema),
+    resolver: zodResolver(signInInputSchema),
   });
 
-  async function submit({ email, password }: ISignIn) {
-    const { error } = await supabaseSignIn({ email, password });
+  const [logIn, { isLoading }] = useSignInMutation();
 
-    if (error) {
-      setError('password', { message: error.message });
-      setError('email', { message: error.message });
+  async function submit({ email, password }: SignInInput) {
+    const result = await logIn({ email, password });
+
+    if ('error' in result) {
+      const message = CustomerQueryError.parse(result).error.data.message;
+      setError('password', { message });
+      setError('email', { message });
     }
   }
 
@@ -94,7 +90,11 @@ function SignInView() {
           )}
         />
 
-        <PrimaryButton label="Sign In" onPress={handleSubmit(submit)} />
+        <PrimaryButton
+          label="Sign In"
+          onPress={handleSubmit(submit)}
+          isLoading={isLoading}
+        />
       </Box>
 
       <Box w="full" justifyContent="center" alignItems="center">

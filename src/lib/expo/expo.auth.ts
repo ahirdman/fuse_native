@@ -58,6 +58,7 @@ export async function authorizeSpotify() {
 
 function persistTokenData(data: AuthSession.TokenResponse) {
   assertIsDefined(data.refreshToken);
+
   void setSecureItem({
     key: 'SPOTIFY_REFRESH_TOKEN',
     value: data.refreshToken,

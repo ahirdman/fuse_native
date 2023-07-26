@@ -113,7 +113,7 @@ function PickSubscription() {
   const dispatch = useAppDispatch();
 
   function handleSkip() {
-    dispatch(setSubscription({ subscribed: false, trial: false }));
+    dispatch(setSubscription({ subscribed: false }));
   }
 
   function handleSubscribe() {}
