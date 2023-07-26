@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 const Subscription = z.object({
   subscribed: z.boolean(),
-  trial: z.boolean(),
 });
 
 export type Subscription = z.infer<typeof Subscription>;
@@ -19,7 +18,7 @@ const SpotifyToken = z.object({
 export type SpotifyToken = z.infer<typeof SpotifyToken>;
 
 const User = z.object({
-  name: z.string(),
+  id: z.string(),
 });
 
 export type User = z.infer<typeof User>;
