@@ -3,6 +3,10 @@ import * as SecureStore from 'expo-secure-store';
 import { setupURLPolyfill } from 'react-native-url-polyfill';
 import { createClient } from '@supabase/supabase-js';
 
+import { config } from '@/config';
+
+import type { Database } from './database.interface';
+
 setupURLPolyfill();
 
 const ExpoSecureStoreAdapter = {
@@ -17,14 +21,15 @@ const ExpoSecureStoreAdapter = {
   },
 };
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: ExpoSecureStoreAdapter,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
+export const supabase = createClient<Database>(
+  config.supabase.url,
+  config.supabase.anonKey,
+  {
+    auth: {
+      storage: ExpoSecureStoreAdapter,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
   },
-});
+);

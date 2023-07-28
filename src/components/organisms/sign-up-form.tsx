@@ -6,13 +6,13 @@ import PrimaryButton from '@/components/atoms/PrimaryButton';
 import {
   CustomerQueryError,
   signUpInputSchema,
-} from '@/services/supabase/auth/supabase.interface';
-import { useSignUpMutation } from '@/services/supabase/auth/supabase.auth';
+} from '@/services/auth/auth.interface';
+import { useSignUpMutation } from '@/services/auth/auth.endpoints';
 
 import type {
   SignUpInput,
   SignUpRequest,
-} from '@/services/supabase/auth/supabase.interface';
+} from '@/services/auth/auth.interface';
 
 function SignUpForm() {
   const { control, handleSubmit, setError } = useForm<SignUpInput>({

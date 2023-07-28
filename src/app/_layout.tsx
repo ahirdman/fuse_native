@@ -23,9 +23,15 @@ import { sentryInitOptions } from '@/lib/sentry/sentry.init';
 import { store } from '@/store/store';
 import { ApplicationTheme } from '@/style/theme';
 import AuthProvider from '@/providers/auth.provider';
+import 'react-native-url-polyfill/auto';
+import useAppDataLoader from '@/hooks/useAppDataLoader';
 
 init(process.env.EXPO_PUBLIC_APTABASE_KEY);
 Sentry.init(sentryInitOptions());
+
+export const unstable_settings = {
+  initialRouteName: '/(auth)/sign-in',
+};
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -33,6 +39,8 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const pathname = usePathname();
+
+  const [appReady] = useAppDataLoader();
 
   const [fontsLoaded, fontsError] = useFonts({
     Mulish_200ExtraLight,
@@ -52,16 +60,16 @@ export default function RootLayout() {
   }, [fontsError]);
 
   useEffect(() => {
-    if (fontsLoaded) {
+    if (fontsLoaded && appReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, appReady]);
 
   useEffect(() => {
     trackView(pathname);
   }, [pathname]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || !appReady) {
     return null;
   }
 
