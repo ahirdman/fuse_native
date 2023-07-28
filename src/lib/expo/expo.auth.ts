@@ -3,8 +3,8 @@ import * as AuthSession from 'expo-auth-session';
 import { catchException } from '../sentry/sentry.exceptions';
 import { assertIsDefined } from '../util/assert';
 import { generateShortUUID } from '../util';
+import { updateUserSpotifyData } from '../supabase/supabase.queries';
 
-import { setSecureItem } from './expo.secure';
 import { redirectUri } from './expo.linking';
 
 import { store } from '@/store/store';
@@ -12,7 +12,7 @@ import { setToken } from '@/store/user/user.slice';
 
 const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID;
 
-export async function authorizeSpotify() {
+export async function authorizeSpotify(userId: string) {
   try {
     const state = generateShortUUID();
 
@@ -47,7 +47,7 @@ export async function authorizeSpotify() {
         discovery,
       );
 
-      persistTokenData(tokenResult);
+      await persistTokenData({ data: tokenResult, userId });
     } else {
       //TODO: Show user error
     }
@@ -56,17 +56,23 @@ export async function authorizeSpotify() {
   }
 }
 
-function persistTokenData(data: AuthSession.TokenResponse) {
+interface PersistTokenDataArgs {
+  data: AuthSession.TokenResponse;
+  userId: string;
+}
+
+async function persistTokenData({ data, userId }: PersistTokenDataArgs) {
   assertIsDefined(data.refreshToken);
 
-  void setSecureItem({
-    key: 'SPOTIFY_REFRESH_TOKEN',
-    value: data.refreshToken,
+  const { accessToken, tokenType, expiresIn, scope, issuedAt } = data;
+
+  await updateUserSpotifyData({
+    tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
+    refreshToken: data.refreshToken,
+    id: userId,
   });
 
-  const { accessToken, tokenType, expiresIn, scope, idToken, issuedAt } = data;
-
   store.dispatch(
-    setToken({ accessToken, tokenType, expiresIn, scope, idToken, issuedAt }),
+    setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }),
   );
 }

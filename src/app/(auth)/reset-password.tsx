@@ -4,10 +4,10 @@ import { Heading, Text } from 'native-base';
 import PageView from '@/components/atoms/PageView';
 import Input from '@/components/atoms/Input';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
-import { useResetPasswordMutation } from '@/services/supabase/auth/supabase.auth';
-import { CustomerQueryError } from '@/services/supabase/auth/supabase.interface';
+import { useResetPasswordMutation } from '@/services/auth/auth.endpoints';
+import { CustomerQueryError } from '@/services/auth/auth.interface';
 
-import type { ResetPasswordInput } from '@/services/supabase/auth/supabase.interface';
+import type { ResetPasswordInput } from '@/services/auth/auth.interface';
 
 function ResetPasswordView() {
   const { control, handleSubmit, setError } = useForm<ResetPasswordInput>({

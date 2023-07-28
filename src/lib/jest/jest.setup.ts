@@ -1,4 +1,5 @@
 import '@testing-library/jest-native/extend-expect';
+import { server } from '../msw/node.server';
 
 jest.mock('expo-router', () => {
   return {
@@ -13,8 +14,17 @@ jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
-beforeAll(() => {});
+jest.mock('@sentry/react-native', () => ({ init: () => jest.fn() }));
 
-afterEach(() => {});
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'warn' });
+  server.printHandlers();
+});
 
-afterAll(() => {});
+afterEach(() => {
+  server.resetHandlers();
+});
+
+afterAll(() => {
+  server.close();
+});

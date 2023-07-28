@@ -1,23 +1,25 @@
-import { supabaseApi } from '../supabase.api';
+import { api } from '../api';
 
-import { AuthError } from './supabase.model';
+import { AuthError } from './auth.model';
 
 import { supabase } from '@/lib/supabase/supabase.init';
 import { catchException } from '@/lib/sentry/sentry.exceptions';
+import { setSubscription, setToken, signOut } from '@/store/user/user.slice';
+import { selectUserData } from '@/lib/supabase/supabase.queries';
+import { isBoolean } from '@/lib/util/assert';
 
+import type { SpotifyToken } from '@/store/user/user.interface';
 import type {
   ResetPasswordInput,
   SignInInput,
   SignUpRequest,
   SupaBaseAuthRes,
-} from './supabase.interface';
-import { signOut } from '@/store/user/user.slice';
-import { clearSecureItem } from '@/lib/expo/expo.secure';
+} from './auth.interface';
 
-export const authApi = supabaseApi.injectEndpoints({
+export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     signIn: builder.mutation<SupaBaseAuthRes, SignInInput>({
-      async queryFn({ email, password }) {
+      async queryFn({ email, password }, baseQueryApi) {
         const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -30,11 +32,24 @@ export const authApi = supabaseApi.injectEndpoints({
           }).toJSON();
         }
 
+        const userData = await selectUserData();
+
+        if (userData && isBoolean(userData.is_subscribed)) {
+          baseQueryApi.dispatch(
+            setSubscription({ subscribed: userData.is_subscribed }),
+          );
+        }
+
+        if (userData && isBoolean(userData.is_subscribed)) {
+          const tokenData = userData.spotify_token_data as SpotifyToken;
+          baseQueryApi.dispatch(setToken(tokenData));
+        }
+
         return { data };
       },
     }),
     signOut: builder.query({
-      async queryFn(_arg, api) {
+      async queryFn(_, baseQueryApi) {
         const { error } = await supabase.auth.signOut();
 
         if (error) {
@@ -46,8 +61,7 @@ export const authApi = supabaseApi.injectEndpoints({
           }).toJSON();
         }
 
-        api.dispatch(signOut())
-        await clearSecureItem("SPOTIFY_REFRESH_TOKEN")
+        baseQueryApi.dispatch(signOut());
 
         return { data: 'OK' };
       },

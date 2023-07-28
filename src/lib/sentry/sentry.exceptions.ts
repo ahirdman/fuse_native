@@ -1,5 +1,5 @@
-import * as Sentry from 'sentry-expo';
+import { Native } from 'sentry-expo';
 
 export function catchException(error: unknown) {
-  Sentry.Native.captureException(error);
+  Native.captureException(error);
 }

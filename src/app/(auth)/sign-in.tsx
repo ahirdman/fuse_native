@@ -9,13 +9,13 @@ import PrimaryButton from '@/components/atoms/PrimaryButton';
 import HorizontalDivider from '@/components/atoms/Divider';
 import Input from '@/components/atoms/Input';
 import SecondaryButton from '@/components/atoms/SecondaryButton';
-import { useSignInMutation } from '@/services/supabase/auth/supabase.auth';
+import { useSignInMutation } from '@/services/auth/auth.endpoints';
 import {
   CustomerQueryError,
   signInInputSchema,
-} from '@/services/supabase/auth/supabase.interface';
+} from '@/services/auth/auth.interface';
 
-import type { SignInInput } from '@/services/supabase/auth/supabase.interface';
+import type { SignInInput } from '@/services/auth/auth.interface';
 
 function SignInView() {
   const router = useRouter();

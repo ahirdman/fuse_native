@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import SecondaryButton from '@/components/atoms/SecondaryButton';
 import { useAuth } from '@/providers/auth.provider';
 import { setSubscription } from '@/store/user/user.slice';
+import { updateUserSubscriptionData } from '@/lib/supabase/supabase.queries';
 
 const COLLAPSED_HEIGHT = 80;
 const EXPANDED_HEIGHT = 400;
@@ -18,6 +19,8 @@ const EXPANDED_HEIGHT = 400;
 function SignUpView() {
   const [activeAccordion, setActiveAccordion] = useState<number>(0);
   const session = useAuth();
+
+  const userId = session?.session?.user.id;
 
   const { token, subscription } = useAppSelector((state) => state.user);
 
@@ -72,7 +75,7 @@ function SignUpView() {
           ) : null
         }
       >
-        <AuthorizeSpotify />
+        <AuthorizeSpotify userId={userId} />
       </Accordion>
 
       <Spacer />
@@ -84,7 +87,7 @@ function SignUpView() {
         index={2}
         activeAccordion={activeAccordion}
       >
-        <PickSubscription />
+        <PickSubscription userId={userId} />
       </Accordion>
 
       <Spacer />
@@ -94,26 +97,36 @@ function SignUpView() {
 
 export default SignUpView;
 
-function AuthorizeSpotify() {
+function AuthorizeSpotify({ userId }: { userId: string | undefined }) {
+  function handlePress() {
+    if (!userId) return;
+
+    void authorizeSpotify(userId);
+  }
+
   return (
     <View size="full">
       <Heading mb="4">Connect to Spotify</Heading>
       <Text mb="4">
         In order to use FUSE, we need access to your spotify library
       </Text>
-      <PrimaryButton
-        label="Authorize Spotify"
-        onPress={() => authorizeSpotify()}
-      />
+      <PrimaryButton label="Authorize Spotify" onPress={handlePress} />
     </View>
   );
 }
 
-function PickSubscription() {
+function PickSubscription({ userId }: { userId: string | undefined }) {
   const dispatch = useAppDispatch();
 
-  function handleSkip() {
-    dispatch(setSubscription({ subscribed: false }));
+  async function handleSkip() {
+    if (!userId) return;
+
+    const subscriptionState = { subscribed: false };
+    await updateUserSubscriptionData({
+      isSubscribed: subscriptionState.subscribed,
+      id: userId,
+    });
+    dispatch(setSubscription(subscriptionState));
   }
 
   function handleSubscribe() {}

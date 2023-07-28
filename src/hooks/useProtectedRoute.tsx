@@ -4,26 +4,24 @@ import { useEffect } from 'react';
 
 import { useAppSelector } from '@/store/hooks';
 
-import type { User } from '@supabase/supabase-js';
-
-function useProtectedRoute(supabaseUser: User | undefined) {
+function useProtectedRoute() {
   const segments = useSegments();
   const rootNavState = useRootNavigationState();
-  const { token, subscription } = useAppSelector((state) => state.user);
+  const { token, subscription, user } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     if (!rootNavState.key) return;
 
     const inAuthGroup = segments[0] === '(auth)';
 
-    if (!supabaseUser && !inAuthGroup) {
+    if (!user && !inAuthGroup) {
       router.replace('/(auth)/sign-in');
     }
 
-    if (supabaseUser && inAuthGroup && token && subscription) {
+    if (user && inAuthGroup && token && subscription) {
       router.replace('/(tabs)');
     }
-  }, [supabaseUser, segments, token, subscription, rootNavState.key]);
+  }, [user, segments, token, subscription, rootNavState.key]);
 }
 
 export default useProtectedRoute;
