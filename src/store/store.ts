@@ -2,12 +2,12 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 import userReducer from './user/user.slice';
 
-import { supabaseApi } from '@/services/supabase/supabase.api';
+import { api } from '@/services/api';
 
 import type { PreloadedState } from '@reduxjs/toolkit';
 
 const rootReducer = combineReducers({
-  [supabaseApi.reducerPath]: supabaseApi.reducer,
+  [api.reducerPath]: api.reducer,
   user: userReducer,
 });
 
@@ -16,7 +16,7 @@ export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
     reducer: rootReducer,
     preloadedState,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(supabaseApi.middleware),
+      getDefaultMiddleware().concat(api.middleware),
   });
 };
 
