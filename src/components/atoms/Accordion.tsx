@@ -1,4 +1,4 @@
-import { Box, HStack, Pressable, Text } from 'native-base';
+import { Pressable } from 'native-base';
 import { useCallback, useEffect, useRef } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 
@@ -6,8 +6,6 @@ import type { ReactNode } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 
 interface IAccordionProps {
-  headerLeft?: ReactNode | null;
-  headerRight?: ReactNode | null;
   initial: 'COLLAPSED' | 'EXPANDED';
   collapsedHeight: number;
   expandedHeight: number;
@@ -15,7 +13,6 @@ interface IAccordionProps {
   style?: StyleProp<ViewStyle>;
   index: number;
   activeAccordion: number | null;
-  label?: string | null;
 }
 
 function Accordion({
@@ -26,9 +23,6 @@ function Accordion({
   initial,
   index,
   activeAccordion,
-  label,
-  headerLeft,
-  headerRight,
 }: IAccordionProps) {
   const animationRef = useRef(
     new Animated.Value(
@@ -79,20 +73,7 @@ function Accordion({
         alignItems="center"
         height="100%"
       >
-        {activeAccordion !== index ? (
-          <HStack
-            justifyContent="space-between"
-            alignItems="center"
-            w="100%"
-            h="100%"
-          >
-            <Box minW="4">{headerLeft}</Box>
-            <Box minW="4">{label && <Text>Label</Text>}</Box>
-            <Box minW="4">{headerRight}</Box>
-          </HStack>
-        ) : (
-          children
-        )}
+        {children}
       </Pressable>
     </Animated.View>
   );

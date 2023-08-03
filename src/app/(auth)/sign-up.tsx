@@ -1,6 +1,5 @@
-import { Heading, Icon, Spacer, Text, View } from 'native-base';
+import { Heading, Spacer, Text, View } from 'native-base';
 import { useEffect, useState } from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
 
 import PageView from '@/components/atoms/PageView';
 import SignUpForm from '@/components/organisms/sign-up-form';
@@ -12,6 +11,7 @@ import SecondaryButton from '@/components/atoms/SecondaryButton';
 import { useAuth } from '@/providers/auth.provider';
 import { setSubscription } from '@/store/user/user.slice';
 import { updateUserSubscriptionData } from '@/lib/supabase/supabase.queries';
+import AccordionHeader from '@/components/atoms/AccordionHeader';
 
 const COLLAPSED_HEIGHT = 80;
 const EXPANDED_HEIGHT = 400;
@@ -48,12 +48,15 @@ function SignUpView() {
         initial="EXPANDED"
         index={0}
         activeAccordion={activeAccordion}
-        headerLeft={<Text fontWeight="bold">Created Account</Text>}
-        headerRight={
-          <Text color="success.500">{session?.session?.user.email}</Text>
-        }
       >
-        <SignUpForm />
+        {activeAccordion === 0 ? (
+          <SignUpForm />
+        ) : (
+          <AccordionHeader
+            label="Account Created"
+            iconRight={session !== undefined}
+          />
+        )}
       </Accordion>
 
       <Spacer />
@@ -64,18 +67,15 @@ function SignUpView() {
         initial="COLLAPSED"
         index={1}
         activeAccordion={activeAccordion}
-        headerLeft={<Text fontWeight="bold">Connected to Spotify</Text>}
-        headerRight={
-          token ? (
-            <Icon
-              as={<Ionicons name="ios-checkmark-circle-outline" />}
-              size={5}
-              color="success.500"
-            />
-          ) : null
-        }
       >
-        <AuthorizeSpotify userId={userId} />
+        {activeAccordion === 1 ? (
+          <AuthorizeSpotify userId={userId} />
+        ) : (
+          <AccordionHeader
+            label={`${token ? 'Connected' : 'Connect'} to Spotify`}
+            iconRight={token !== null}
+          />
+        )}
       </Accordion>
 
       <Spacer />
@@ -87,7 +87,14 @@ function SignUpView() {
         index={2}
         activeAccordion={activeAccordion}
       >
-        <PickSubscription userId={userId} />
+        {activeAccordion === 2 ? (
+          <PickSubscription userId={userId} />
+        ) : (
+          <AccordionHeader
+            label={`${subscription ? 'Subscribe' : 'Subscribed'} to Fuse`}
+            iconRight={subscription !== null}
+          />
+        )}
       </Accordion>
 
       <Spacer />
