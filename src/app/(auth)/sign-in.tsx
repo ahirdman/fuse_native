@@ -1,8 +1,9 @@
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 
 import { Controller, useForm } from 'react-hook-form';
 import { Box, Heading } from 'native-base';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 
 import PageView from '@/components/atoms/PageView';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
@@ -14,11 +15,12 @@ import {
   CustomerQueryError,
   signInInputSchema,
 } from '@/services/auth/auth.interface';
+import { useAppSelector } from '@/store/hooks';
 
 import type { SignInInput } from '@/services/auth/auth.interface';
 
 function SignInView() {
-  const router = useRouter();
+  const { user, token, subscription } = useAppSelector((state) => state.user);
 
   const { control, handleSubmit, setError } = useForm<SignInInput>({
     defaultValues: {
@@ -39,6 +41,12 @@ function SignInView() {
       setError('email', { message });
     }
   }
+
+  useEffect(() => {
+    if (user && (!token || !subscription)) {
+      router.push('/sign-up');
+    }
+  }, [user, token, subscription]);
 
   return (
     <PageView justifyContent="space-between" paddingY="10">
