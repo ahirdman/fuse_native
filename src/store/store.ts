@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 import userReducer from './user/user.slice';
+import { userListener } from './listenerMiddleware';
 
 import { api } from '@/services/api';
 
@@ -16,7 +17,9 @@ export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
     reducer: rootReducer,
     preloadedState,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(api.middleware),
+      getDefaultMiddleware({ serializableCheck: { warnAfter: 160 } })
+        .prepend(userListener.middleware)
+        .concat(api.middleware),
   });
 };
 

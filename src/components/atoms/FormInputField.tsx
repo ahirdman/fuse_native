@@ -2,12 +2,12 @@ import { FormControl, Input as BaseInput } from 'native-base';
 
 import type { IInputProps as IBaseInputProps } from 'native-base';
 
-interface IInputProps extends IBaseInputProps {
+interface FormInputFieldProps extends IBaseInputProps {
   label?: string;
   error?: string | undefined;
 }
 
-function Input({ label, error, ...props }: IInputProps) {
+function FormInputField({ label, error, ...props }: FormInputFieldProps) {
   return (
     <FormControl m="2" isInvalid={error !== undefined}>
       {label && <FormControl.Label>{label}</FormControl.Label>}
@@ -17,4 +17,4 @@ function Input({ label, error, ...props }: IInputProps) {
   );
 }
 
-export default Input;
+export default FormInputField;

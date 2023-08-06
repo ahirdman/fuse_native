@@ -3,30 +3,29 @@ import * as AuthSession from 'expo-auth-session';
 import { catchException } from '../sentry/sentry.exceptions';
 import { assertIsDefined } from '../util/assert';
 import { generateShortUUID } from '../util';
-import { updateUserSpotifyData } from '../supabase/supabase.queries';
+import { selecteUserSpotifyRefreshToken } from '../supabase/supabase.queries';
 
 import { redirectUri } from './expo.linking';
 
-import { store } from '@/store/store';
-import { setToken } from '@/store/user/user.slice';
+import { config } from '@/config';
 
-const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID;
+const discovery = {
+  authorizationEndpoint: 'https://accounts.spotify.com/authorize',
+  tokenEndpoint: 'https://accounts.spotify.com/api/token',
+};
 
-export async function authorizeSpotify(userId: string) {
+export async function authorizeSpotify(): Promise<
+  AuthSession.TokenResponse | undefined
+> {
   try {
     const state = generateShortUUID();
 
-    const discovery = {
-      authorizationEndpoint: 'https://accounts.spotify.com/authorize',
-      tokenEndpoint: 'https://accounts.spotify.com/api/token',
-    };
-
     const authRequestOptions: AuthSession.AuthRequestConfig = {
       responseType: AuthSession.ResponseType.Code,
-      clientId: CLIENT_ID,
+      clientId: config.spotify.clientId,
       redirectUri,
       prompt: AuthSession.Prompt.Login,
-      scopes: ['user-read-email', 'playlist-modify-public'],
+      scopes: config.spotify.authScope,
       state: state,
     };
 
@@ -37,8 +36,8 @@ export async function authorizeSpotify(userId: string) {
     if (authorizeResult.type === 'success') {
       const tokenResult = await AuthSession.exchangeCodeAsync(
         {
-          code: authorizeResult.params.code,
-          clientId: CLIENT_ID,
+          code: authorizeResult.params.code ?? '', //TODO Fix
+          clientId: config.spotify.clientId,
           redirectUri,
           extraParams: {
             code_verifier: authRequest.codeVerifier || '',
@@ -47,32 +46,36 @@ export async function authorizeSpotify(userId: string) {
         discovery,
       );
 
-      await persistTokenData({ data: tokenResult, userId });
+      return tokenResult;
     } else {
+      return undefined;
       //TODO: Show user error
     }
   } catch (error) {
     catchException(error);
+    return undefined;
   }
 }
 
-interface PersistTokenDataArgs {
-  data: AuthSession.TokenResponse;
-  userId: string;
-}
+export async function refreshSpotifyToken(): Promise<
+  AuthSession.TokenResponse | undefined
+> {
+  try {
+    const refreshToken = await selecteUserSpotifyRefreshToken();
 
-async function persistTokenData({ data, userId }: PersistTokenDataArgs) {
-  assertIsDefined(data.refreshToken);
+    assertIsDefined(refreshToken);
 
-  const { accessToken, tokenType, expiresIn, scope, issuedAt } = data;
+    const request = await AuthSession.refreshAsync(
+      {
+        clientId: config.spotify.clientId,
+        refreshToken,
+      },
+      discovery,
+    );
 
-  await updateUserSpotifyData({
-    tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
-    refreshToken: data.refreshToken,
-    id: userId,
-  });
-
-  store.dispatch(
-    setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }),
-  );
+    return request;
+  } catch (error) {
+    catchException(error);
+    return undefined;
+  }
 }

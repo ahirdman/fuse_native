@@ -1,22 +1,22 @@
-import { View } from 'native-base';
+import { Box } from 'native-base';
 
-import type { IViewProps } from 'native-base/lib/typescript/components/basic/View/types';
+import type { IBoxProps } from 'native-base';
 
-interface PageViewProps extends IViewProps {
+interface PageViewProps extends IBoxProps {
   children: React.ReactNode;
 }
 
 export default function PageView({ children, ...props }: PageViewProps) {
   return (
-    <View
+    <Box
       flex={1}
       paddingX="4"
       justifyContent="center"
       alignItems="center"
-      backgroundColor="primary.700"
+      background="primary.700"
       {...props}
     >
       {children}
-    </View>
+    </Box>
   );
 }

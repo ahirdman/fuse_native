@@ -2,10 +2,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { Heading, Text } from 'native-base';
 
 import PageView from '@/components/atoms/PageView';
-import Input from '@/components/atoms/Input';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
 import { useResetPasswordMutation } from '@/services/auth/auth.endpoints';
 import { CustomerQueryError } from '@/services/auth/auth.interface';
+import FormInputField from '@/components/atoms/FormInputField';
 
 import type { ResetPasswordInput } from '@/services/auth/auth.interface';
 
@@ -42,7 +42,7 @@ function ResetPasswordView() {
           field: { onBlur, onChange, value },
           fieldState: { error },
         }) => (
-          <Input
+          <FormInputField
             onBlur={onBlur}
             value={value}
             onChangeText={(val) => onChange(val)}

@@ -27,6 +27,7 @@ function expoPlugins(env: string): ExpoPlugins {
 
 export default (): ExpoConfig => {
   const plugins = expoPlugins(process.env.EAS_ENV as string);
+  const backgroundColor = '#1C1C1C';
 
   return {
     name: 'Fuse',
@@ -39,7 +40,7 @@ export default (): ExpoConfig => {
     splash: {
       image: './assets/images/splash.png',
       resizeMode: 'contain',
-      backgroundColor: '#3d3e42',
+      backgroundColor,
     },
     assetBundlePatterns: ['**/*'],
     ios: {
@@ -49,7 +50,7 @@ export default (): ExpoConfig => {
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor: '#3d3e42',
+        backgroundColor,
       },
     },
     plugins,

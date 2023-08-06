@@ -8,6 +8,7 @@ export const ApplicationTheme = extendTheme({
       dark: '#F3640B',
     },
     primary: {
+      300: '#232323',
       400: '#505050',
       500: '#3d3e42',
       600: '#222222',

@@ -38,6 +38,7 @@ module.exports = {
     "@typescript-eslint/no-namespace": ["error", { "allowDeclarations": true }],
     "@typescript-eslint/consistent-type-definitions": "error",
     "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/member-ordering": [
       "error",
       { "interfaces": ["signature", "method", "constructor", "field"] },

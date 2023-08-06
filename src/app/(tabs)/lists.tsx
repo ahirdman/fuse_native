@@ -7,7 +7,7 @@ export default function Lists() {
   const [signOut] = useLazySignOutQuery();
 
   function handleOnPress() {
-    void signOut({});
+    void signOut();
   }
 
   return (
