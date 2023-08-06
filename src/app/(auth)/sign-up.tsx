@@ -9,9 +9,13 @@ import { authorizeSpotify } from '@/lib/expo/expo.auth';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import SecondaryButton from '@/components/atoms/SecondaryButton';
 import { useAuth } from '@/providers/auth.provider';
-import { setSubscription } from '@/store/user/user.slice';
-import { updateUserSubscriptionData } from '@/lib/supabase/supabase.queries';
+import { setSubscription, setToken } from '@/store/user/user.slice';
+import {
+  updateUserSpotifyData,
+  updateUserSubscriptionData,
+} from '@/lib/supabase/supabase.queries';
 import AccordionHeader from '@/components/atoms/AccordionHeader';
+import { assertIsDefined } from '@/lib/util/assert';
 
 const COLLAPSED_HEIGHT = 80;
 const EXPANDED_HEIGHT = 400;
@@ -105,10 +109,23 @@ function SignUpView() {
 export default SignUpView;
 
 function AuthorizeSpotify({ userId }: { userId: string | undefined }) {
-  function handlePress() {
+  const dispatch = useAppDispatch();
+  async function handlePress() {
     if (!userId) return;
 
-    void authorizeSpotify(userId);
+    const data = await authorizeSpotify();
+
+    assertIsDefined(data?.refreshToken);
+
+    const { accessToken, tokenType, expiresIn, scope, issuedAt } = data;
+
+    await updateUserSpotifyData({
+      tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
+      refreshToken: data.refreshToken,
+      id: userId,
+    });
+
+    dispatch(setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }));
   }
 
   return (

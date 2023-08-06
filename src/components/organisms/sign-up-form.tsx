@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 
-import Input from '@/components/atoms/Input';
+import FormInputField from '../atoms/FormInputField';
+
 import PrimaryButton from '@/components/atoms/PrimaryButton';
 import {
   CustomerQueryError,
@@ -45,7 +46,7 @@ function SignUpForm() {
           field: { onBlur, onChange, value },
           fieldState: { error },
         }) => (
-          <Input
+          <FormInputField
             onBlur={onBlur}
             value={value}
             onChangeText={(val) => onChange(val)}
@@ -63,7 +64,7 @@ function SignUpForm() {
           field: { onBlur, onChange, value },
           fieldState: { error },
         }) => (
-          <Input
+          <FormInputField
             onBlur={onBlur}
             value={value}
             onChangeText={(val) => onChange(val)}
@@ -81,7 +82,7 @@ function SignUpForm() {
           field: { onBlur, onChange, value },
           fieldState: { error },
         }) => (
-          <Input
+          <FormInputField
             onBlur={onBlur}
             value={value}
             onChangeText={(val) => onChange(val)}

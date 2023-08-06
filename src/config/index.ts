@@ -6,6 +6,11 @@ export interface ApplicationConfiguration {
     url: string;
     anonKey: string;
   };
+  spotify: {
+    clientId: string;
+    baseUrl: string;
+    authScope: string[];
+  };
 }
 
 const { NODE_ENV } = process.env;

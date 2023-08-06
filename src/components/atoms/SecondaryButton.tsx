@@ -15,7 +15,7 @@ function SecondaryButton({ label, onPress, ...props }: ISecondaryButtonProps) {
       borderColor="border.400"
       borderWidth="1"
       rounded="6"
-      width="100%"
+      width={props.w ?? '100%'}
       height="40px"
       marginY={props.marginY ?? '4'}
       justifyContent="center"

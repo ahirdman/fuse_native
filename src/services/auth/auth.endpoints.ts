@@ -1,9 +1,6 @@
 import { api } from '../api';
 
-import { AuthError } from './auth.model';
-
 import { supabase } from '@/lib/supabase/supabase.init';
-import { catchException } from '@/lib/sentry/sentry.exceptions';
 import { setSubscription, setToken, signOut } from '@/store/user/user.slice';
 import { selectUserData } from '@/lib/supabase/supabase.queries';
 import { isBoolean } from '@/lib/util/assert';
@@ -19,46 +16,84 @@ import type {
 export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     signIn: builder.mutation<SupaBaseAuthRes, SignInInput>({
-      async queryFn({ email, password }, baseQueryApi) {
+      async queryFn({ email, password }, queryApi) {
         const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
         if (error) {
-          return new AuthError({
-            status: error.status,
-            message: error.message,
-          }).toJSON();
+          return {
+            error: {
+              status: error.status ?? 500,
+              statusText: error.name,
+              data: error.message,
+            },
+          };
         }
 
         const userData = await selectUserData();
 
         if (userData && isBoolean(userData.is_subscribed)) {
-          baseQueryApi.dispatch(
+          queryApi.dispatch(
             setSubscription({ subscribed: userData.is_subscribed }),
           );
         }
 
         if (userData && isBoolean(userData.is_subscribed)) {
           const tokenData = userData.spotify_token_data as SpotifyToken;
-          baseQueryApi.dispatch(setToken(tokenData));
+          queryApi.dispatch(setToken(tokenData));
         }
 
         return { data };
       },
     }),
-    signOut: builder.query({
+
+    signUp: builder.mutation<SupaBaseAuthRes, SignUpRequest>({
+      async queryFn({ email, password }) {
+        const { error, data } = await supabase.auth.signUp({ email, password });
+
+        if (error) {
+          return {
+            error: {
+              status: error.status ?? 500,
+              statusText: error.name,
+              data: error.message,
+            },
+          };
+        }
+
+        if (data.session === null || data.user === null) {
+          return {
+            error: {
+              status: 500,
+              statusText: 'User data is null',
+              data: 'Null data returned',
+            },
+          };
+        }
+
+        return {
+          data: {
+            user: data.user,
+            session: data.session,
+          },
+        };
+      },
+    }),
+
+    signOut: builder.query<string, void>({
       async queryFn(_, baseQueryApi) {
         const { error } = await supabase.auth.signOut();
 
         if (error) {
-          catchException(error);
-
-          return new AuthError({
-            status: error.status,
-            message: error.message,
-          }).toJSON();
+          return {
+            error: {
+              status: error.status ?? 500,
+              statusText: error.name,
+              data: error.message,
+            },
+          };
         }
 
         baseQueryApi.dispatch(signOut());
@@ -66,35 +101,26 @@ export const authApi = api.injectEndpoints({
         return { data: 'OK' };
       },
     }),
-    signUp: builder.mutation<SupaBaseAuthRes, SignUpRequest>({
-      async queryFn({ email, password }) {
-        const { error, data } = await supabase.auth.signUp({ email, password });
 
-        if (error) {
-          return new AuthError({
-            status: error.status,
-            message: error.message,
-          }).toJSON();
-        }
-
-        return { data };
-      },
-    }),
     resetPassword: builder.mutation({
       async queryFn({ email }: ResetPasswordInput) {
         const { error } = await supabase.auth.resetPasswordForEmail(email);
 
         if (error) {
-          return new AuthError({
-            status: error.status,
-            message: error.message,
-          }).toJSON();
+          return {
+            error: {
+              status: error.status ?? 500,
+              statusText: error.name,
+              data: error.message,
+            },
+          };
         }
 
         return { data: 'OK' };
       },
     }),
   }),
+  overrideExisting: false,
 });
 
 export const {

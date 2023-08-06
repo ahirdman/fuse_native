@@ -40,8 +40,8 @@ export type SignUpRequest = Omit<SignUpInput, 'confirmPassword'>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordInputSchema>;
 
 export interface SupaBaseAuthRes {
-  user: SupabaseUser | null;
-  session: Session | null;
+  user: SupabaseUser;
+  session: Session;
 }
 
 export const CustomerQueryError = z.object({

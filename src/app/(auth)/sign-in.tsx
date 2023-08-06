@@ -8,7 +8,6 @@ import { useEffect } from 'react';
 import PageView from '@/components/atoms/PageView';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
 import HorizontalDivider from '@/components/atoms/Divider';
-import Input from '@/components/atoms/Input';
 import SecondaryButton from '@/components/atoms/SecondaryButton';
 import { useSignInMutation } from '@/services/auth/auth.endpoints';
 import {
@@ -16,6 +15,7 @@ import {
   signInInputSchema,
 } from '@/services/auth/auth.interface';
 import { useAppSelector } from '@/store/hooks';
+import FormInputField from '@/components/atoms/FormInputField';
 
 import type { SignInInput } from '@/services/auth/auth.interface';
 
@@ -67,7 +67,7 @@ function SignInView() {
             field: { onBlur, onChange, value },
             fieldState: { error },
           }) => (
-            <Input
+            <FormInputField
               label="Email"
               onBlur={onBlur}
               value={value}
@@ -86,7 +86,7 @@ function SignInView() {
             field: { onBlur, onChange, value },
             fieldState: { error },
           }) => (
-            <Input
+            <FormInputField
               label="Password"
               onBlur={onBlur}
               value={value}
