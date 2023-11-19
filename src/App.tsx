@@ -1,6 +1,6 @@
-import { SplashScreen, Stack, usePathname } from 'expo-router';
 import * as Sentry from 'sentry-expo';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 
 import {
   Mulish_200ExtraLight,
@@ -18,28 +18,20 @@ import { useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { init } from '@aptabase/react-native';
 
-import { trackView } from '@/lib/aptabase/aptabase';
+import RootNavigationStack from './navigation';
+
 import { sentryInitOptions } from '@/lib/sentry/sentry.init';
 import { store } from '@/store/store';
 import { ApplicationTheme } from '@/style/theme';
-import AuthProvider from '@/providers/auth.provider';
-import 'react-native-url-polyfill/auto';
 import useAppDataLoader from '@/hooks/useAppDataLoader';
 
+import 'react-native-url-polyfill/auto';
+
 init(process.env.EXPO_PUBLIC_APTABASE_KEY);
-Sentry.init(sentryInitOptions());
+void Sentry.init(sentryInitOptions());
+void SplashScreen.preventAutoHideAsync();
 
-export const unstable_settings = {
-  initialRouteName: '/(auth)/sign-in',
-};
-
-export { ErrorBoundary } from 'expo-router';
-
-SplashScreen.preventAutoHideAsync();
-
-export default function RootLayout() {
-  const pathname = usePathname();
-
+export default function App() {
   const [appReady] = useAppDataLoader();
 
   const [fontsLoaded, fontsError] = useFonts({
@@ -61,32 +53,19 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (fontsLoaded && appReady) {
-      SplashScreen.hideAsync();
+      void SplashScreen.hideAsync();
     }
   }, [fontsLoaded, appReady]);
-
-  useEffect(() => {
-    trackView(pathname);
-  }, [pathname]);
 
   if (!fontsLoaded || !appReady) {
     return null;
   }
 
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
   return (
     <ReduxProvider store={store}>
       <NativeBaseProvider theme={ApplicationTheme}>
-        <AuthProvider>
-          <StatusBar style="light" />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(tabs)" />
-          </Stack>
-        </AuthProvider>
+        <StatusBar style="light" />
+        <RootNavigationStack />
       </NativeBaseProvider>
     </ReduxProvider>
   );

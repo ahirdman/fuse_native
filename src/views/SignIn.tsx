@@ -1,9 +1,6 @@
-import { router } from 'expo-router';
-
 import { Controller, useForm } from 'react-hook-form';
 import { Box, Heading } from 'native-base';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
 
 import PageView from '@/components/atoms/PageView';
 import PrimaryButton from '@/components/atoms/PrimaryButton';
@@ -14,14 +11,12 @@ import {
   CustomerQueryError,
   signInInputSchema,
 } from '@/services/auth/auth.interface';
-import { useAppSelector } from '@/store/hooks';
 import FormInputField from '@/components/atoms/FormInputField';
 
+import type { RootStackScreenProps } from '@/navigation.types';
 import type { SignInInput } from '@/services/auth/auth.interface';
 
-function SignInView() {
-  const { user, token, subscription } = useAppSelector((state) => state.user);
-
+function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   const { control, handleSubmit, setError } = useForm<SignInInput>({
     defaultValues: {
       email: '',
@@ -41,12 +36,6 @@ function SignInView() {
       setError('email', { message });
     }
   }
-
-  useEffect(() => {
-    if (user && (!token || !subscription)) {
-      router.push('/sign-up');
-    }
-  }, [user, token, subscription]);
 
   return (
     <PageView justifyContent="space-between" paddingY="10">
@@ -110,11 +99,11 @@ function SignInView() {
 
         <SecondaryButton
           label="Sign Up Now"
-          onPress={() => router.push('/sign-up')}
+          onPress={() => navigation.push('SignUp')}
         />
       </Box>
     </PageView>
   );
 }
 
-export default SignInView;
+export default SignIn;
