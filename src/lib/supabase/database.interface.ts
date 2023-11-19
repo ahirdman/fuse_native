@@ -34,6 +34,102 @@ export interface Database {
   };
   public: {
     Tables: {
+      tags: {
+        Row: {
+          color: string;
+          created_at: string;
+          id: number;
+          name: string;
+          user_id: string | null;
+        };
+        Insert: {
+          color: string;
+          created_at?: string;
+          id?: number;
+          name: string;
+          user_id?: string | null;
+        };
+        Update: {
+          color?: string;
+          created_at?: string;
+          id?: number;
+          name?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'tags_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      tracks: {
+        Row: {
+          artist: string | null;
+          id: string;
+          title: string | null;
+        };
+        Insert: {
+          artist?: string | null;
+          id: string;
+          title?: string | null;
+        };
+        Update: {
+          artist?: string | null;
+          id?: string;
+          title?: string | null;
+        };
+        Relationships: [];
+      };
+      trackTags: {
+        Row: {
+          created_at: string;
+          id: number;
+          tag_id: number;
+          track_id: string;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          tag_id: number;
+          track_id: string;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          tag_id?: number;
+          track_id?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'trackTags_tag_id_fkey';
+            columns: ['tag_id'];
+            isOneToOne: false;
+            referencedRelation: 'tags';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trackTags_track_id_fkey';
+            columns: ['track_id'];
+            isOneToOne: false;
+            referencedRelation: 'tracks';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'trackTags_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       users: {
         Row: {
           id: string;
@@ -43,7 +139,7 @@ export interface Database {
           updated_at: string | null;
         };
         Insert: {
-          id: string;
+          id?: string;
           is_subscribed?: boolean | null;
           spotify_refresh_token?: string | null;
           spotify_token_data?: Json | null;
@@ -60,6 +156,7 @@ export interface Database {
           {
             foreignKeyName: 'users_id_fkey';
             columns: ['id'];
+            isOneToOne: true;
             referencedRelation: 'users';
             referencedColumns: ['id'];
           },
@@ -90,6 +187,7 @@ export interface Database {
           id: string;
           name: string;
           owner: string | null;
+          owner_id: string | null;
           public: boolean | null;
           updated_at: string | null;
         };
@@ -101,6 +199,7 @@ export interface Database {
           id: string;
           name: string;
           owner?: string | null;
+          owner_id?: string | null;
           public?: boolean | null;
           updated_at?: string | null;
         };
@@ -112,17 +211,11 @@ export interface Database {
           id?: string;
           name?: string;
           owner?: string | null;
+          owner_id?: string | null;
           public?: boolean | null;
           updated_at?: string | null;
         };
-        Relationships: [
-          {
-            foreignKeyName: 'buckets_owner_fkey';
-            columns: ['owner'];
-            referencedRelation: 'users';
-            referencedColumns: ['id'];
-          },
-        ];
+        Relationships: [];
       };
       migrations: {
         Row: {
@@ -154,6 +247,7 @@ export interface Database {
           metadata: Json | null;
           name: string | null;
           owner: string | null;
+          owner_id: string | null;
           path_tokens: string[] | null;
           updated_at: string | null;
           version: string | null;
@@ -166,6 +260,7 @@ export interface Database {
           metadata?: Json | null;
           name?: string | null;
           owner?: string | null;
+          owner_id?: string | null;
           path_tokens?: string[] | null;
           updated_at?: string | null;
           version?: string | null;
@@ -178,6 +273,7 @@ export interface Database {
           metadata?: Json | null;
           name?: string | null;
           owner?: string | null;
+          owner_id?: string | null;
           path_tokens?: string[] | null;
           updated_at?: string | null;
           version?: string | null;
@@ -186,13 +282,8 @@ export interface Database {
           {
             foreignKeyName: 'objects_bucketId_fkey';
             columns: ['bucket_id'];
+            isOneToOne: false;
             referencedRelation: 'buckets';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'objects_owner_fkey';
-            columns: ['owner'];
-            referencedRelation: 'users';
             referencedColumns: ['id'];
           },
         ];

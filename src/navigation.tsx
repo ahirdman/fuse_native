@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect } from 'react';
 
-import Home from './views/Home';
+import Tracks from './views/Tracks';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import SignIn from './views/SignIn';
 import SignUpView from './views/SignUp';
@@ -15,8 +15,9 @@ import { supabase } from './lib/supabase/supabase.init';
 import { selectUserData } from './lib/supabase/supabase.queries';
 import { setSubscription, setToken, signIn } from './store/user/user.slice';
 import { isBoolean } from './lib/util/assert';
+import Track from './views/Track';
 
-import type { RootStackParamList } from './navigation.types';
+import type { RootStackParamList, RootTabParamList } from './navigation.types';
 import type { SpotifyToken } from './store/user/user.interface';
 
 interface TabBarIconProps {
@@ -31,13 +32,13 @@ function TabBarIcon({ name, color }: TabBarIconProps) {
 }
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootTabParamList>();
 
 // TODO: TrackView
 
 function RootNavigationStack() {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.user);
+  const { user, token } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -67,9 +68,14 @@ function RootNavigationStack() {
   return (
     <NavigationContainer>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
+        {user && token ? (
           <>
-            <RootStack.Screen name="Main" component={RootTabStack} />
+            <RootStack.Screen name="Root" component={RootTabStack} />
+            <RootStack.Screen
+              name="Track"
+              component={Track}
+              options={{ presentation: 'modal' }}
+            />
           </>
         ) : (
           <>
@@ -105,8 +111,8 @@ function RootTabStack() {
       }}
     >
       <Tab.Screen
-        name="Home"
-        component={Home}
+        name="Tracks"
+        component={Tracks}
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
