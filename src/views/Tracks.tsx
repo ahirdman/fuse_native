@@ -1,51 +1,53 @@
-import { Image } from 'expo-image';
-
-import { Alert, Box, HStack, Icon, Spinner, Text, VStack } from 'native-base';
+import { Alert, Box, Icon, Spinner } from 'native-base';
 import { StyleSheet } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useMemo, useState } from 'react';
 
-import InputField from '@/components/atoms/InputField';
-import SecondaryButton from '@/components/atoms/SecondaryButton';
-import {
-  useGetUserSavedTracksQuery,
-  userTracksAdapter,
-  userTracksSelector,
-} from '@/services/tracks/tracks.endpoints';
+import InputField from '@Atoms/InputField';
+import SecondaryButton from '@Atoms/SecondaryButton';
+import { useGetUserSavedTracksQuery } from '@/services/tracks/tracks.endpoints';
+import TrackRow from '@Molecules/TrackRow';
 
-import type { SavedTrack, Track } from '@/services/tracks/tracks.interface';
+import type { RootTabScreenProps } from '@/navigation.types';
+import type { SpotifyTrack } from '@/services/tracks/tracks.interface';
 
 const ITEM_HEIGHT = 40;
 const TRACK_REQ_LIMIT = 50;
 
-export default function Home() {
+function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
   const [offset, setOffset] = useState<number>(0);
   const [trackFilter, setTrackFilter] = useState<string>('');
+
+  const reqArgs = {
+    offset,
+    limit: TRACK_REQ_LIMIT,
+  };
+
   const {
-    data: savedTracks,
+    data: savedTracks = [],
     error,
     isFetching,
-  } = useGetUserSavedTracksQuery(
-    {
-      offset,
-      limit: TRACK_REQ_LIMIT,
-    },
-    {
-      selectFromResult: ({ data, ...props }) => ({
-        data: userTracksSelector.selectAll(
-          data ?? userTracksAdapter.getInitialState(),
-        ),
-        ...props,
-      }),
-    },
-  );
+  } = useGetUserSavedTracksQuery(reqArgs);
 
-  const renderItem = useCallback(({ item }: { item: SavedTrack }) => {
-    return <TrackRow track={item.track} height={ITEM_HEIGHT} />;
-  }, []);
+  function handleTrackPress(trackId: string) {
+    navigation.push('Track', {
+      trackId,
+      originalArgs: reqArgs,
+    });
+  }
 
-  const keyExtractor = (item: SavedTrack) => item.track.id;
+  const renderItem = ({ item }: { item: SpotifyTrack }) => {
+    return (
+      <TrackRow
+        track={item}
+        height={ITEM_HEIGHT}
+        onPress={() => handleTrackPress(item.id)}
+      />
+    );
+  };
+
+  const keyExtractor = (item: SpotifyTrack) => item.id;
 
   function fetchMoreTracks() {
     const newOffset = offset + TRACK_REQ_LIMIT;
@@ -53,25 +55,25 @@ export default function Home() {
   }
 
   interface FilterTracksArgs {
-    tracks: SavedTrack[];
+    tracks: SpotifyTrack[];
     filter: string;
   }
 
   const filterTracks = useCallback(
-    ({ tracks, filter }: FilterTracksArgs): SavedTrack[] => {
-      const fieldsToMatch = ['albumName', 'name', 'mainArtist'] as const;
+    ({ tracks, filter }: FilterTracksArgs): SpotifyTrack[] => {
+      const fieldsToMatch = ['albumName', 'name', 'artist'] as const;
 
       return tracks.filter((trackObj) =>
         fieldsToMatch.some(
           (field) =>
-            trackObj.track[field]?.toLowerCase().includes(filter.toLowerCase()),
+            trackObj[field]?.toLowerCase().includes(filter.toLowerCase()),
         ),
       );
     },
     [],
   );
 
-  const data: SavedTrack[] = useMemo(
+  const data: SpotifyTrack[] = useMemo(
     () => filterTracks({ tracks: savedTracks, filter: trackFilter }),
     [savedTracks, trackFilter, filterTracks],
   );
@@ -123,44 +125,10 @@ export default function Home() {
   );
 }
 
-interface TrackRowProps {
-  track: Track;
-  height: number;
-}
-
-function TrackRow({ track, height }: TrackRowProps) {
-  const rowHeight = `${height}px`;
-
-  return (
-    <HStack my="1" h={rowHeight}>
-      <Box h={rowHeight} w={rowHeight} mr="2">
-        <Image
-          source={track.albumImageUrl}
-          alt="album-image"
-          accessibilityIgnoresInvertColors
-          style={styles.image}
-        />
-      </Box>
-      <VStack justifyContent="center" maxW="80%">
-        <Text color="singelton.white" fontSize="sm" noOfLines={1}>
-          {track.name}
-        </Text>
-        <HStack>
-          <Text fontSize="xs" noOfLines={1}>
-            {`${track.mainArtist ?? 'NA'} - ${track.albumName}`}
-          </Text>
-        </HStack>
-      </VStack>
-    </HStack>
-  );
-}
-
 const styles = StyleSheet.create({
-  image: {
-    flex: 1,
-    width: '100%',
-  },
   flashList: {
     padding: 8,
   },
 });
+
+export default Tracks;
