@@ -4,7 +4,7 @@ import type { ExpoConfig } from 'expo/config';
 type ExpoPlugins = (string | [] | [string] | [string, any])[];
 
 function expoPlugins(env: string): ExpoPlugins {
-  const common = ['expo-router', 'sentry-expo'];
+  const common = ['sentry-expo'];
 
   switch (env) {
     case 'development':
@@ -67,12 +67,8 @@ export default (): ExpoConfig => {
     },
     experiments: {
       tsconfigPaths: true,
-      typedRoutes: true,
     },
     extra: {
-      router: {
-        origin: false,
-      },
       eas: {
         projectId: 'deeb4c71-d291-4e30-b509-43b38582400a',
       },

@@ -24,9 +24,9 @@ const User = z.object({
 export type User = z.infer<typeof User>;
 
 const UserState = z.object({
-  user: User.nullable(),
-  token: SpotifyToken.nullable(),
-  subscription: Subscription.nullable(),
+  user: User.optional(),
+  token: SpotifyToken.optional(),
+  subscription: Subscription.optional(),
 });
 
 export type UserState = z.infer<typeof UserState>;

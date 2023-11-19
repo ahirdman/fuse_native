@@ -8,7 +8,6 @@ import PrimaryButton from '@/components/atoms/PrimaryButton';
 import { authorizeSpotify } from '@/lib/expo/expo.auth';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import SecondaryButton from '@/components/atoms/SecondaryButton';
-import { useAuth } from '@/providers/auth.provider';
 import { setSubscription, setToken } from '@/store/user/user.slice';
 import {
   updateUserSpotifyData,
@@ -22,14 +21,11 @@ const EXPANDED_HEIGHT = 400;
 
 function SignUpView() {
   const [activeAccordion, setActiveAccordion] = useState<number>(0);
-  const session = useAuth();
 
-  const userId = session?.session?.user.id;
-
-  const { token, subscription } = useAppSelector((state) => state.user);
+  const { user, token, subscription } = useAppSelector((state) => state.user);
 
   useEffect(() => {
-    if (session?.session?.user) {
+    if (user) {
       setActiveAccordion(1);
     }
 
@@ -40,7 +36,7 @@ function SignUpView() {
     if (subscription) {
       setActiveAccordion(-1);
     }
-  }, [session, token, subscription]);
+  }, [user, token, subscription]);
 
   return (
     <PageView justifyContent="start">
@@ -58,7 +54,7 @@ function SignUpView() {
         ) : (
           <AccordionHeader
             label="Account Created"
-            iconRight={session !== undefined}
+            iconRight={user !== undefined}
           />
         )}
       </Accordion>
@@ -73,11 +69,11 @@ function SignUpView() {
         activeAccordion={activeAccordion}
       >
         {activeAccordion === 1 ? (
-          <AuthorizeSpotify userId={userId} />
+          <AuthorizeSpotify userId={user?.id} />
         ) : (
           <AccordionHeader
             label={`${token ? 'Connected' : 'Connect'} to Spotify`}
-            iconRight={token !== null}
+            iconRight={token !== undefined}
           />
         )}
       </Accordion>
@@ -92,11 +88,11 @@ function SignUpView() {
         activeAccordion={activeAccordion}
       >
         {activeAccordion === 2 ? (
-          <PickSubscription userId={userId} />
+          <PickSubscription userId={user?.id} />
         ) : (
           <AccordionHeader
             label={`${subscription ? 'Subscribe' : 'Subscribed'} to Fuse`}
-            iconRight={subscription !== null}
+            iconRight={subscription !== undefined}
           />
         )}
       </Accordion>

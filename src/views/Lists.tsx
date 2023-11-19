@@ -2,12 +2,16 @@ import { Button, Text } from 'native-base';
 
 import PageView from '@/components/atoms/PageView';
 import { useLazySignOutQuery } from '@/services/auth/auth.endpoints';
+import { useAppDispatch } from '@/store/hooks';
+import { signOut } from '@/store/user/user.slice';
 
 export default function Lists() {
-  const [signOut] = useLazySignOutQuery();
+  const [signOutQuery] = useLazySignOutQuery();
+  const dispatch = useAppDispatch();
 
   function handleOnPress() {
-    void signOut();
+    void signOutQuery();
+    dispatch(signOut());
   }
 
   return (

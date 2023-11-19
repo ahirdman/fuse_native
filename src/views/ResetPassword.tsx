@@ -9,7 +9,7 @@ import FormInputField from '@/components/atoms/FormInputField';
 
 import type { ResetPasswordInput } from '@/services/auth/auth.interface';
 
-function ResetPasswordView() {
+function ResetPassword() {
   const { control, handleSubmit, setError } = useForm<ResetPasswordInput>({
     defaultValues: { email: '' },
   });
@@ -62,4 +62,4 @@ function ResetPasswordView() {
   );
 }
 
-export default ResetPasswordView;
+export default ResetPassword;
