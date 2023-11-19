@@ -88,6 +88,15 @@ module.exports = {
     "test-results",
     "metro.config.js",
     "babel.config.js",
+    "index.js",
+  ],
+  overrides: [
+    {
+      files: ["navigation.types.ts"],
+      rules: {
+        "@typescript-eslint/consistent-type-definitions": "off",
+      },
+    },
   ],
   env: {
     "jest/globals": true,

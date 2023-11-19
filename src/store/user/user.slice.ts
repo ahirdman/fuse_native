@@ -14,9 +14,9 @@ import type {
 } from './user.interface';
 
 const initialState: UserState = {
-  user: null,
-  token: null,
-  subscription: null,
+  user: undefined,
+  token: undefined,
+  subscription: undefined,
 };
 
 export const userSlice = createSlice({
@@ -28,11 +28,7 @@ export const userSlice = createSlice({
         state.user = action.payload;
       }
     },
-    signOut: (state) => {
-      state.user = null;
-      state.token = null;
-      state.subscription = null;
-    },
+    signOut: () => initialState,
     setToken: (state, action: PayloadAction<SpotifyToken>) => {
       state.token = action.payload;
     },
@@ -54,7 +50,7 @@ export const addExpiredSpotifyTokenListener = (
       const tokenExpired =
         // @ts-ignore
         isRejectedWithValue(action) && action.payload.status === 401;
-      const signedIn = currentState.user.user !== null;
+      const signedIn = currentState.user.user !== undefined;
 
       return signedIn && tokenExpired;
     },
