@@ -13,7 +13,7 @@ export default function PageView({ children, ...props }: PageViewProps) {
       paddingX="4"
       justifyContent="center"
       alignItems="center"
-      background="primary.700"
+      bg="primary.700"
       {...props}
     >
       {children}
