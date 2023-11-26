@@ -1,15 +1,15 @@
 export function assertIsDefined<T>(data: T): asserts data is NonNullable<T> {
-  if (data === undefined || data === null) {
-    throw new Error('Expected data to be defined');
-  }
+	if (data === undefined || data === null) {
+		throw new Error("Expected data to be defined");
+	}
 }
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
+// biome-ignore lint/suspicious/noExplicitAny: reason
 export function isBoolean(value: any): value is NonNullable<boolean> {
-  return value !== undefined && value !== null && typeof value === 'boolean';
+	return value !== undefined && value !== null && typeof value === "boolean";
 }
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
+// biome-ignore lint/suspicious/noExplicitAny: reason
 export function isDefined(value: any): boolean {
-  return value !== undefined && value !== null;
+	return value !== undefined && value !== null;
 }

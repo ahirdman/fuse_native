@@ -1,162 +1,159 @@
-import { Heading, Spacer, Text, View } from 'native-base';
-import { useEffect, useState } from 'react';
+import { Heading, Spacer, Text, VStack, View } from "native-base";
+import { useEffect, useState } from "react";
 
-import PageView from '@/components/atoms/PageView';
-import SignUpForm from '@/components/organisms/sign-up-form';
-import Accordion from '@/components/atoms/Accordion';
-import PrimaryButton from '@/components/atoms/PrimaryButton';
-import { authorizeSpotify } from '@/lib/expo/expo.auth';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import SecondaryButton from '@/components/atoms/SecondaryButton';
-import { setSubscription, setToken } from '@/store/user/user.slice';
+import Accordion from "@/components/atoms/Accordion";
+import AccordionHeader from "@/components/atoms/AccordionHeader";
+import Button from "@/components/atoms/Button";
+import PageView from "@/components/atoms/PageView";
+import SignUpForm from "@/components/organisms/sign-up-form";
+import { authorizeSpotify } from "@/lib/expo/expo.auth";
 import {
-  updateUserSpotifyData,
-  updateUserSubscriptionData,
-} from '@/lib/supabase/supabase.queries';
-import AccordionHeader from '@/components/atoms/AccordionHeader';
-import { assertIsDefined } from '@/lib/util/assert';
+	updateUserSpotifyData,
+	updateUserSubscriptionData,
+} from "@/lib/supabase/supabase.queries";
+import { assertIsDefined } from "@/lib/util/assert";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { setSubscription, setToken } from "@/store/user/user.slice";
 
 const COLLAPSED_HEIGHT = 80;
 const EXPANDED_HEIGHT = 400;
 
 function SignUpView() {
-  const [activeAccordion, setActiveAccordion] = useState<number>(0);
+	const [activeAccordion, setActiveAccordion] = useState<number>(0);
 
-  const { user, token, subscription } = useAppSelector((state) => state.user);
+	const { user, token, subscription } = useAppSelector((state) => state.user);
 
-  useEffect(() => {
-    if (user) {
-      setActiveAccordion(1);
-    }
+	useEffect(() => {
+		if (user) {
+			setActiveAccordion(1);
+		}
 
-    if (token) {
-      setActiveAccordion(2);
-    }
+		if (token) {
+			setActiveAccordion(2);
+		}
 
-    if (subscription) {
-      setActiveAccordion(-1);
-    }
-  }, [user, token, subscription]);
+		if (subscription) {
+			setActiveAccordion(-1);
+		}
+	}, [user, token, subscription]);
 
-  return (
-    <PageView justifyContent="start">
-      <Spacer />
+	return (
+		<PageView justifyContent="start">
+			<Spacer />
 
-      <Accordion
-        collapsedHeight={COLLAPSED_HEIGHT}
-        expandedHeight={450}
-        initial="EXPANDED"
-        index={0}
-        activeAccordion={activeAccordion}
-      >
-        {activeAccordion === 0 ? (
-          <SignUpForm />
-        ) : (
-          <AccordionHeader
-            label="Account Created"
-            iconRight={user !== undefined}
-          />
-        )}
-      </Accordion>
+			<Accordion
+				collapsedHeight={COLLAPSED_HEIGHT}
+				expandedHeight={450}
+				initial="EXPANDED"
+				index={0}
+				activeAccordion={activeAccordion}
+			>
+				{activeAccordion === 0 ? (
+					<SignUpForm />
+				) : (
+					<AccordionHeader
+						label="Account Created"
+						iconRight={user !== undefined}
+					/>
+				)}
+			</Accordion>
 
-      <Spacer />
+			<Spacer />
 
-      <Accordion
-        collapsedHeight={COLLAPSED_HEIGHT}
-        expandedHeight={200}
-        initial="COLLAPSED"
-        index={1}
-        activeAccordion={activeAccordion}
-      >
-        {activeAccordion === 1 ? (
-          <AuthorizeSpotify userId={user?.id} />
-        ) : (
-          <AccordionHeader
-            label={`${token ? 'Connected' : 'Connect'} to Spotify`}
-            iconRight={token !== undefined}
-          />
-        )}
-      </Accordion>
+			<Accordion
+				collapsedHeight={COLLAPSED_HEIGHT}
+				expandedHeight={200}
+				initial="COLLAPSED"
+				index={1}
+				activeAccordion={activeAccordion}
+			>
+				{activeAccordion === 1 ? (
+					<AuthorizeSpotify userId={user?.id} />
+				) : (
+					<AccordionHeader
+						label={`${token ? "Connected" : "Connect"} to Spotify`}
+						iconRight={token !== undefined}
+					/>
+				)}
+			</Accordion>
 
-      <Spacer />
+			<Spacer />
 
-      <Accordion
-        collapsedHeight={COLLAPSED_HEIGHT}
-        expandedHeight={EXPANDED_HEIGHT}
-        initial="COLLAPSED"
-        index={2}
-        activeAccordion={activeAccordion}
-      >
-        {activeAccordion === 2 ? (
-          <PickSubscription userId={user?.id} />
-        ) : (
-          <AccordionHeader
-            label={`${subscription ? 'Subscribe' : 'Subscribed'} to Fuse`}
-            iconRight={subscription !== undefined}
-          />
-        )}
-      </Accordion>
+			<Accordion
+				collapsedHeight={COLLAPSED_HEIGHT}
+				expandedHeight={EXPANDED_HEIGHT}
+				initial="COLLAPSED"
+				index={2}
+				activeAccordion={activeAccordion}
+			>
+				{activeAccordion === 2 ? (
+					<PickSubscription userId={user?.id} />
+				) : (
+					<AccordionHeader
+						label={`${subscription ? "Subscribe" : "Subscribed"} to Fuse`}
+						iconRight={subscription !== undefined}
+					/>
+				)}
+			</Accordion>
 
-      <Spacer />
-    </PageView>
-  );
+			<Spacer />
+		</PageView>
+	);
 }
 
 export default SignUpView;
 
 function AuthorizeSpotify({ userId }: { userId: string | undefined }) {
-  const dispatch = useAppDispatch();
-  async function handlePress() {
-    if (!userId) return;
+	const dispatch = useAppDispatch();
+	async function handlePress() {
+		if (!userId) return;
 
-    const data = await authorizeSpotify();
+		const data = await authorizeSpotify();
 
-    assertIsDefined(data?.refreshToken);
+		assertIsDefined(data?.refreshToken);
 
-    const { accessToken, tokenType, expiresIn, scope, issuedAt } = data;
+		const { accessToken, tokenType, expiresIn, scope, issuedAt } = data;
 
-    await updateUserSpotifyData({
-      tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
-      refreshToken: data.refreshToken,
-      id: userId,
-    });
+		await updateUserSpotifyData({
+			tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
+			refreshToken: data.refreshToken,
+			id: userId,
+		});
 
-    dispatch(setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }));
-  }
+		dispatch(setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }));
+	}
 
-  return (
-    <View size="full">
-      <Heading mb="4">Connect to Spotify</Heading>
-      <Text mb="4">
-        In order to use FUSE, we need access to your spotify library
-      </Text>
-      <PrimaryButton label="Authorize Spotify" onPress={handlePress} />
-    </View>
-  );
+	return (
+		<VStack space="4" w="full">
+			<Heading>Connect to Spotify</Heading>
+			<Text>In order to use FUSE, we need access to your spotify library</Text>
+			<Button w="full" label="Authorize Spotify" onPress={handlePress} />
+		</VStack>
+	);
 }
 
 function PickSubscription({ userId }: { userId: string | undefined }) {
-  const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 
-  async function handleSkip() {
-    if (!userId) return;
+	async function handleSkip() {
+		if (!userId) return;
 
-    const subscriptionState = { subscribed: false };
-    await updateUserSubscriptionData({
-      isSubscribed: subscriptionState.subscribed,
-      id: userId,
-    });
-    dispatch(setSubscription(subscriptionState));
-  }
+		const subscriptionState = { subscribed: false };
+		await updateUserSubscriptionData({
+			isSubscribed: subscriptionState.subscribed,
+			id: userId,
+		});
+		dispatch(setSubscription(subscriptionState));
+	}
 
-  function handleSubscribe() {}
+	function handleSubscribe() {}
 
-  return (
-    <View size="full">
-      <Heading mb="4">Pick a Subscription</Heading>
-      <Text>Subscribe for better things</Text>
-      <PrimaryButton label="Subscribe" onPress={handleSubscribe} />
-      <SecondaryButton label="Skip" onPress={handleSkip} />
-    </View>
-  );
+	return (
+		<View size="full">
+			<Heading mb="4">Pick a Subscription</Heading>
+			<Text>Subscribe for better things</Text>
+			<Button label="Subscribe" my="4" onPress={handleSubscribe} />
+			<Button label="Skip" type="secondary" my="4" onPress={handleSkip} />
+		</View>
+	);
 }
