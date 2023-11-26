@@ -1,19 +1,20 @@
-import { api } from '../api';
+import { supabaseApi } from "../supabase.api";
 
-import { supabase } from '@/lib/supabase/supabase.init';
-import { setSubscription, setToken, signOut } from '@/store/user/user.slice';
-import { selectUserData } from '@/lib/supabase/supabase.queries';
-import { isBoolean } from '@/lib/util/assert';
+import { supabase } from "@/lib/supabase/supabase.init";
+import { setSubscription, setToken, signOut } from "@/store/user/user.slice";
+import { selectUserData } from "@/lib/supabase/supabase.queries";
+import { isBoolean } from "@/lib/util/assert";
 
-import type { SpotifyToken } from '@/store/user/user.interface';
+import type { SpotifyToken } from "@/store/user/user.interface";
 import type {
   ResetPasswordInput,
   SignInInput,
   SignUpRequest,
   SupaBaseAuthRes,
-} from './auth.interface';
+} from "./auth.interface";
+import { AuthError } from "@supabase/supabase-js";
 
-export const authApi = api.injectEndpoints({
+export const authApi = supabaseApi.injectEndpoints({
   endpoints: (builder) => ({
     signIn: builder.mutation<SupaBaseAuthRes, SignInInput>({
       async queryFn({ email, password }, queryApi) {
@@ -23,13 +24,7 @@ export const authApi = api.injectEndpoints({
         });
 
         if (error) {
-          return {
-            error: {
-              status: error.status ?? 500,
-              statusText: error.name,
-              data: error.message,
-            },
-          };
+          return { error };
         }
 
         const userData = await selectUserData();
@@ -54,22 +49,12 @@ export const authApi = api.injectEndpoints({
         const { error, data } = await supabase.auth.signUp({ email, password });
 
         if (error) {
-          return {
-            error: {
-              status: error.status ?? 500,
-              statusText: error.name,
-              data: error.message,
-            },
-          };
+          return { error };
         }
 
         if (data.session === null || data.user === null) {
           return {
-            error: {
-              status: 500,
-              statusText: 'User data is null',
-              data: 'Null data returned',
-            },
+            error: new AuthError("", 500),
           };
         }
 
@@ -88,17 +73,13 @@ export const authApi = api.injectEndpoints({
 
         if (error) {
           return {
-            error: {
-              status: error.status ?? 500,
-              statusText: error.name,
-              data: error.message,
-            },
+            error,
           };
         }
 
         baseQueryApi.dispatch(signOut());
 
-        return { data: 'OK' };
+        return { data: "OK" };
       },
     }),
 
@@ -108,15 +89,11 @@ export const authApi = api.injectEndpoints({
 
         if (error) {
           return {
-            error: {
-              status: error.status ?? 500,
-              statusText: error.name,
-              data: error.message,
-            },
+            error,
           };
         }
 
-        return { data: 'OK' };
+        return { data: "OK" };
       },
     }),
   }),
