@@ -1,0 +1,37 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.4.0/schema.json",
+	"organizeImports": {
+		"enabled": true
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"suspicious": {
+				"noEmptyInterface": "off"
+			}
+		}
+	},
+	"files": {
+		"ignore": [
+			".expo",
+			"scripts/",
+			"supabase/",
+			"dist",
+			"build",
+			"node_modules",
+			"coverage",
+			"test-results",
+			"metro.config.js",
+			"babel.config.js",
+			"index.js"
+		]
+	},
+	"formatter": {
+		"formatWithErrors": false,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineWidth": 80,
+		"ignore": []
+	}
+}
