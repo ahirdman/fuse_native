@@ -84,16 +84,13 @@ function RootNavigationStack() {
 							component={SignIn}
 							options={{ animationTypeForReplace: "pop" }}
 						/>
-						<RootStack.Screen
-							name="SignUp"
-							component={SignUpView}
-							options={{ presentation: "modal" }}
-						/>
-						<RootStack.Screen
-							name="ResetPassword"
-							component={ResetPassword}
-							options={{ presentation: "modal" }}
-						/>
+						<RootStack.Group screenOptions={{ presentation: "modal" }}>
+							<RootStack.Screen name="SignUp" component={SignUpView} />
+							<RootStack.Screen
+								name="ResetPassword"
+								component={ResetPassword}
+							/>
+						</RootStack.Group>
 					</>
 				)}
 			</RootStack.Navigator>

@@ -4,6 +4,11 @@ export interface UserTracksReq {
 	offset: number;
 }
 
+export interface UserSavedTracksRes {
+	total: number;
+	items: SpotifyTrack[];
+}
+
 export interface SpotifyTrack {
 	id: string;
 	addedAt?: string | undefined;

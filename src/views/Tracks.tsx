@@ -1,34 +1,64 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { FlashList } from "@shopify/flash-list";
-import { Alert, Box, Icon, Spinner } from "native-base";
+import { Box, Icon, ScrollView } from "native-base";
 import { useCallback, useMemo, useState } from "react";
-import { StyleSheet } from "react-native";
 
 import Button from "@/components/atoms/Button";
 import { useGetUserSavedTracksQuery } from "@/services/spotify/tracks/tracks.endpoints";
 import InputField from "@Atoms/InputField";
-import TrackRow from "@Molecules/TrackRow";
 
+import Alert from "@/components/molecules/Alert";
+import TracksList from "@/components/organisms/TrackList";
+import useDebounce from "@/hooks/useDebounce";
 import type { RootTabScreenProps } from "@/navigation.types";
 import type { SpotifyTrack } from "@/services/spotify/tracks/tracks.interface";
+import { RefreshControl } from "react-native";
 
-const ITEM_HEIGHT = 40;
+interface FilterTracksArgs {
+	tracks: SpotifyTrack[];
+	filter: string;
+}
+
 const TRACK_REQ_LIMIT = 50;
 
 function Tracks({ navigation }: RootTabScreenProps<"Tracks">) {
 	const [offset, setOffset] = useState<number>(0);
 	const [trackFilter, setTrackFilter] = useState<string>("");
+	const debouncedTrackFilter = useDebounce(trackFilter, 300);
 
-	const reqArgs = {
-		offset,
-		limit: TRACK_REQ_LIMIT,
-	};
+	const reqArgs = useMemo(
+		() => ({
+			offset,
+			limit: TRACK_REQ_LIMIT,
+		}),
+		[offset],
+	);
 
-	const {
-		data: savedTracks = [],
-		error,
-		isFetching,
-	} = useGetUserSavedTracksQuery(reqArgs);
+	const { data, error, isFetching, refetch, isLoading } =
+		useGetUserSavedTracksQuery(reqArgs);
+
+	const filterTracks = useCallback(
+		({ tracks, filter }: FilterTracksArgs): SpotifyTrack[] => {
+			const fieldsToMatch = ["albumName", "name", "artist"] as const;
+
+			const res = tracks.filter((trackObj) =>
+				fieldsToMatch.some((field) =>
+					trackObj[field]?.toLowerCase().includes(filter),
+				),
+			);
+
+			return res;
+		},
+		[],
+	);
+
+	const tracks: SpotifyTrack[] = useMemo(() => {
+		return !debouncedTrackFilter.length
+			? data?.items ?? []
+			: filterTracks({
+					tracks: data?.items ?? [],
+					filter: debouncedTrackFilter.toLowerCase(),
+			  });
+	}, [data?.items, debouncedTrackFilter, filterTracks]);
 
 	function handleTrackPress(trackId: string) {
 		navigation.push("Track", {
@@ -37,52 +67,15 @@ function Tracks({ navigation }: RootTabScreenProps<"Tracks">) {
 		});
 	}
 
-	const renderItem = ({ item }: { item: SpotifyTrack }) => {
-		return (
-			<TrackRow
-				track={item}
-				height={ITEM_HEIGHT}
-				onPress={() => handleTrackPress(item.id)}
-			/>
-		);
-	};
-
-	const keyExtractor = (item: SpotifyTrack) => item.id;
-
-	function fetchMoreTracks() {
-		const newOffset = offset + TRACK_REQ_LIMIT;
-		setOffset(newOffset);
+	function handleEndReached() {
+		if (data && data.items.length < data.total) {
+			const newOffset = offset + TRACK_REQ_LIMIT;
+			setOffset(newOffset);
+		}
 	}
 
-	interface FilterTracksArgs {
-		tracks: SpotifyTrack[];
-		filter: string;
-	}
-
-	const filterTracks = useCallback(
-		({ tracks, filter }: FilterTracksArgs): SpotifyTrack[] => {
-			const fieldsToMatch = ["albumName", "name", "artist"] as const;
-
-			return tracks.filter((trackObj) =>
-				fieldsToMatch.some((field) =>
-					trackObj[field]?.toLowerCase().includes(filter.toLowerCase()),
-				),
-			);
-		},
-		[],
-	);
-
-	const data: SpotifyTrack[] = useMemo(
-		() => filterTracks({ tracks: savedTracks, filter: trackFilter }),
-		[savedTracks, trackFilter, filterTracks],
-	);
-
-	function ListFooterComponent() {
-		return (
-			<Box w="full" h="10">
-				{isFetching && <Spinner color="white" />}
-			</Box>
-		);
+	function handleRefetch() {
+		void refetch();
 	}
 
 	return (
@@ -103,35 +96,41 @@ function Tracks({ navigation }: RootTabScreenProps<"Tracks">) {
 					w="72"
 					size="md"
 					rounded="6"
+					autoCorrect={false}
+					autoCapitalize="none"
 					InputLeftElement={<Icon as={<Ionicons name="search" />} ml="3" />}
 					value={trackFilter}
 					onChangeText={setTrackFilter}
 				/>
 				<Button type="secondary" label="Filter" w="20" onPress={() => {}} />
 			</Box>
+
 			{error && (
-				<Alert status="error" bg="error.500">
-					Error loading data
-				</Alert>
+				<ScrollView
+					bg="primary.700"
+					h="full"
+					p="4"
+					refreshControl={
+						<RefreshControl
+							refreshing={isFetching}
+							onRefresh={handleRefetch}
+							tintColor="#F07123"
+						/>
+					}
+				>
+					<Alert label="Error fetching tracks" />
+				</ScrollView>
 			)}
-			<FlashList
-				data={data}
-				renderItem={renderItem}
-				keyExtractor={keyExtractor}
-				onEndReached={fetchMoreTracks}
-				onEndReachedThreshold={0.3}
-				ListFooterComponent={ListFooterComponent}
-				estimatedItemSize={ITEM_HEIGHT}
-				contentContainerStyle={styles.flashList}
+
+			<TracksList
+				tracks={tracks}
+				isRefreshing={isLoading}
+				onTrackPress={handleTrackPress}
+				onEndReached={handleEndReached}
+				onRefetch={handleRefetch}
 			/>
 		</Box>
 	);
 }
-
-const styles = StyleSheet.create({
-	flashList: {
-		padding: 8,
-	},
-});
 
 export default Tracks;

@@ -1,5 +1,5 @@
 import { Tables } from "@/lib/supabase/database.interface";
-import { hexToRGBA } from "@/utils/color";
+import { hexToRGBA } from "@/lib/util/color";
 import { Box, IPressableProps, Pressable } from "native-base";
 
 interface TagProps extends IPressableProps {

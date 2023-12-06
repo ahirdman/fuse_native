@@ -15,18 +15,28 @@ export const ApplicationTheme = extendTheme({
 			700: "#1C1C1C",
 		},
 		success: {
-			500: "#10B981",
+			500: "#54976F",
+			600: "#6CCC93",
 		},
 		error: {
 			400: "#1D1415",
+			777: "#261515",
 			500: "#5F2324",
 			600: "#772829",
 			700: "#D45453",
+		},
+		warning: {
+			500: "#E5A43B",
+			600: "#FFCA75",
 		},
 		border: {
 			300: "#707070",
 			400: "#505050",
 			500: "#3E3E3E",
+		},
+		base: {
+			10: "#000000",
+			100: "#FFFFFF",
 		},
 		singelton: {
 			white: "#FFFFFF",

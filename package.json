@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "scripts": {
     "start": "expo start --dev-client",
-    "ios": "expo start --ios",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
     "test": "jest",
     "biome": "biome check .",
     "type-check": "npx tsc --noEmit",
