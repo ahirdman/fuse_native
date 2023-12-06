@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 
 import { Feather } from "@expo/vector-icons";
-import { Alert, Box, Icon, Pressable, VStack } from "native-base";
+import { Box, Icon, Pressable, VStack } from "native-base";
 import { StyleSheet } from "react-native";
 
 import PageView from "@/components/atoms/PageView";
@@ -11,10 +11,12 @@ import {
 	useGetTagsForTrackQuery,
 } from "@/services/supabase/tags/tags.endpoints";
 
+import Alert from "@/components/molecules/Alert";
 import TagSection from "@/components/molecules/TagSection";
 import TrackDetails from "@/components/molecules/TrackDetails";
 import TagFormFooter from "@/components/organisms/tag-form-footer";
 import type { RootStackScreenProps } from "@/navigation.types";
+import * as Burnt from "burnt";
 
 function Track({ route, navigation }: RootStackScreenProps<"Track">) {
 	const {
@@ -26,7 +28,7 @@ function Track({ route, navigation }: RootStackScreenProps<"Track">) {
 		},
 		{
 			selectFromResult: ({ data, ...props }) => ({
-				data: data?.find((track) => track.id === trackId),
+				data: data?.items.find((track) => track.id === trackId),
 				...props,
 			}),
 		},
@@ -34,7 +36,7 @@ function Track({ route, navigation }: RootStackScreenProps<"Track">) {
 
 	const {
 		data: trackTags,
-		isFetching: trackTagsLoading,
+		isLoading: trackTagsLoading,
 		isError: trackTagsError,
 	} = useGetTagsForTrackQuery({
 		trackId,
@@ -45,13 +47,21 @@ function Track({ route, navigation }: RootStackScreenProps<"Track">) {
 	if (!userSavedTrack) {
 		return (
 			<PageView>
-				<Alert />
+				<Alert label="Error finding track" />
 			</PageView>
 		);
 	}
 
-	function handleTrackTagPress(tagId: number) {
-		void deleteTag({ tagId });
+	async function handleTrackTagPress(tagId: number) {
+		const result = await deleteTag({ tagId });
+
+		if ("error" in result) {
+			Burnt.toast({
+				title: "Something went wrong",
+				preset: "error",
+				message: "Could not delete tag",
+			});
+		}
 	}
 
 	function handleClosePress() {
@@ -72,15 +82,16 @@ function Track({ route, navigation }: RootStackScreenProps<"Track">) {
 					onPress={handleClosePress}
 				>
 					{({ isPressed }) => (
-						<Box rounded="full" bg="rgba(187, 187, 187, 0.5)" p="1">
+						<Box rounded="full" bg="primary.600" p="1" shadow={4}>
 							<Icon
 								as={<Feather name="x" />}
 								size="lg"
-								color={isPressed ? "border.500" : "primary.700"}
+								color={isPressed ? "singelton.white" : "border.300"}
 							/>
 						</Box>
 					)}
 				</Pressable>
+
 				<Image
 					source={albumCover?.url}
 					alt="album-image"
@@ -105,6 +116,7 @@ function Track({ route, navigation }: RootStackScreenProps<"Track">) {
 					isLoading={trackTagsLoading}
 					isError={trackTagsError}
 					onTagPress={handleTrackTagPress}
+					emptyListLabel="No tags for this track yet..."
 				/>
 
 				<TagFormFooter track={userSavedTrack} />

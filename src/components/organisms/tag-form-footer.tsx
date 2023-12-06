@@ -5,6 +5,7 @@ import {
 	useCreateTagMutation,
 	useGetAllTagsQuery,
 } from "@/services/supabase/tags/tags.endpoints";
+import * as Burnt from "burnt";
 import { HStack, VStack } from "native-base";
 import { IVStackProps } from "native-base/lib/typescript/components/primitives/Stack/VStack";
 import { useState } from "react";
@@ -29,24 +30,40 @@ function TagFormFooter({ track, ...props }: CreateTagFormProps) {
 	const [addTagToTrack] = useAddTagToTrackMutation();
 	const { data } = useGetAllTagsQuery({ exclude: { trackId: track.id } });
 
-	function handlePress() {
+	async function handlePress() {
 		assertIsDefined(tagColor);
 
-		setTagName("");
-
-		void tagTrack({
+		const result = await tagTrack({
 			color: tagColor,
 			name: tagName,
 			track,
 		});
+
+		if ("error" in result) {
+			Burnt.toast({
+				title: "Something went wrong",
+				preset: "error",
+				message: "Could not create tag",
+			});
+		}
+
+		setTagName("");
 	}
 
 	function onSelectColor(colors: returnedResults) {
 		setTagColor(colors.hex);
 	}
 
-	function handleTagPress(tagId: number) {
-		void addTagToTrack({ tagId, track });
+	async function handleTagPress(tagId: number) {
+		const result = await addTagToTrack({ tagId, track });
+
+		if ("error" in result) {
+			Burnt.toast({
+				title: "Something went wrong",
+				preset: "error",
+				message: "Could not add tag to track",
+			});
+		}
 	}
 
 	return (
@@ -97,7 +114,11 @@ function TagFormFooter({ track, ...props }: CreateTagFormProps) {
 					</>
 				)}
 				{tagAddView === "existing" && (
-					<TagSection tags={data} onTagPress={handleTagPress} />
+					<TagSection
+						tags={data}
+						onTagPress={handleTagPress}
+						emptyListLabel="All tags added to track"
+					/>
 				)}
 			</VStack>
 		</VStack>

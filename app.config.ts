@@ -34,7 +34,7 @@ export default (): ExpoConfig => {
 		slug: "fuse",
 		version: "0.0.1",
 		orientation: "portrait",
-		icon: "./assets/images/icon.png",
+		icon: "./assets/icons/app_icon.png",
 		scheme: "fuse",
 		userInterfaceStyle: "automatic",
 		splash: {
