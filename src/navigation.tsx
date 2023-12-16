@@ -1,4 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -10,24 +9,26 @@ import { selectUserData } from "./lib/supabase/supabase.queries";
 import { isBoolean } from "./lib/util/assert";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { setSubscription, setToken, signIn } from "./store/user/user.slice";
-import Lists from "./views/Lists";
 import ResetPassword from "./views/ResetPassword";
 import SignIn from "./views/SignIn";
 import SignUpView from "./views/SignUp";
 import Track from "./views/Track";
 import Tracks from "./views/Tracks";
 
+import { Feather } from "@expo/vector-icons";
 import type { RootStackParamList, RootTabParamList } from "./navigation.types";
 import type { SpotifyToken } from "./store/user/user.interface";
+import Profile from "./views/Profile";
+import TagList from "./views/Tags";
 
 interface TabBarIconProps {
-	name: React.ComponentProps<typeof Ionicons>["name"];
+	name: React.ComponentProps<typeof Feather>["name"];
 	color: string;
 }
 
 function TabBarIcon({ name, color }: TabBarIconProps) {
 	return (
-		<Ionicons size={28} style={styles.tabBarIcon} color={color} name={name} />
+		<Feather size={28} style={styles.tabBarIcon} color={color} name={name} />
 	);
 }
 
@@ -105,6 +106,7 @@ function RootTabStack() {
 				tabBarActiveTintColor: "white",
 				headerShown: false,
 				tabBarStyle: { backgroundColor: "black" },
+				tabBarShowLabel: false,
 			}}
 		>
 			<Tab.Screen
@@ -117,10 +119,18 @@ function RootTabStack() {
 			/>
 			<Tab.Screen
 				name="Lists"
-				component={Lists}
+				component={TagList}
 				options={{
 					title: "Lists",
 					tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
+				}}
+			/>
+			<Tab.Screen
+				name="Profile"
+				component={Profile}
+				options={{
+					title: "Profile",
+					tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
 				}}
 			/>
 		</Tab.Navigator>
