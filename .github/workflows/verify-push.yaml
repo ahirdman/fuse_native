@@ -24,11 +24,5 @@ jobs:
         with:
           version: 1.4.0
 
-      - name: Run Biome
-        run: biome ci .
-
-      - name: Run type checker
-        run: npm run type-check
-
-      - name: 🧪 Run Tests
-        run: npm run test
+      - name: Run verify
+        run: npm run verify

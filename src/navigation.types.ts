@@ -23,6 +23,7 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 export type RootTabParamList = {
 	Tracks: undefined;
 	Lists: undefined;
+	Profile: undefined;
 };
 
 export type RootTabScreenProps<T extends keyof RootTabParamList> =
