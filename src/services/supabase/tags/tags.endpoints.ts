@@ -72,14 +72,12 @@ export const tagsApi = supabaseApi.injectEndpoints({
 
         if ((data !== null && data.length > 0) || error) {
           return {
-            error: error
-              ? error
-              : {
-                  code: "",
-                  hint: "",
-                  details: "tag already exists",
-                  message: "",
-                },
+            error: error ? error : {
+              code: "",
+              hint: "",
+              details: "tag already exists",
+              message: "",
+            },
           };
         }
 
@@ -94,13 +92,20 @@ export const tagsApi = supabaseApi.injectEndpoints({
           return { error: tagError };
         }
 
+        const albumCoversUrls = track.albumCovers.map((cover) => cover.url);
+
         const { data: trackData, error: trackError } = await supabase // Add track to Track table if not needed
           .from("tracks")
           .upsert(
             {
               id: track.id,
               artist: track.artist,
-              title: track.name,
+              name: track.name,
+              explicit: track.explicit,
+              duration: track.duration,
+              album: track.album,
+              album_covers: albumCoversUrls,
+              uri: track.uri,
             },
             { onConflict: "id" },
           )
@@ -128,13 +133,20 @@ export const tagsApi = supabaseApi.injectEndpoints({
     }),
     addTagToTrack: builder.mutation<string, AddTagToTrackArgs>({
       async queryFn({ track, tagId }) {
+        const albumCoversUrls = track.albumCovers.map((cover) => cover.url);
+
         const { data: trackData, error: trackError } = await supabase
           .from("tracks")
           .upsert(
             {
               id: track.id,
               artist: track.artist,
-              title: track.name,
+              name: track.name,
+              explicit: track.explicit,
+              duration: track.duration,
+              album: track.album,
+              album_covers: albumCoversUrls,
+              uri: track.uri,
             },
             { onConflict: "id" },
           )
@@ -156,7 +168,7 @@ export const tagsApi = supabaseApi.injectEndpoints({
 
         return error ? { error } : { data: "ok" };
       },
-      invalidatesTags: ["Tag"],
+      invalidatesTags: ["Tag", "Track"],
     }),
     deleteTagFromTrack: builder.mutation<string, DeleteTagArgs>({
       async queryFn({ tagId }) {
@@ -169,10 +181,32 @@ export const tagsApi = supabaseApi.injectEndpoints({
       },
       invalidatesTags: ["Tag"],
     }),
-    updateTag: builder.mutation<void, UpdateTagArgs>({
-      async queryFn() {
-        return Promise.reject({ error: { data: "ouch" } });
+    updateTag: builder.mutation<string, UpdateTagArgs>({
+      async queryFn({ name, color, tagId }) {
+        const updateObj: Partial<Tables<"tags">> = {};
+
+        if (name) {
+          updateObj.name = name;
+        }
+
+        if (color) {
+          updateObj.color = color;
+        }
+
+        const { error } = await supabase.from("tags").update({ ...updateObj }).eq(
+          "id",
+          tagId,
+        );
+
+        if (error) {
+          return { error };
+        }
+
+        return {
+          data: "ok",
+        };
       },
+      invalidatesTags: ["Tag"],
     }),
   }),
   overrideExisting: false,
@@ -184,4 +218,5 @@ export const {
   useCreateTagMutation,
   useDeleteTagFromTrackMutation,
   useAddTagToTrackMutation,
+  useUpdateTagMutation,
 } = tagsApi;

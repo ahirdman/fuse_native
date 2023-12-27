@@ -10,7 +10,7 @@ function InputField({ ...props }: InputFieldProps) {
 			h="40px"
 			size={props.size ?? "lg"}
 			focusOutlineColor="border.300"
-			borderColor="border.500"
+			borderColor={props.borderColor ?? "border.500"}
 			placeholderTextColor="#505050"
 			bg="primary.600"
 			_focus={{

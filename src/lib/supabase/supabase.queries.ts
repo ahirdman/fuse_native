@@ -7,13 +7,21 @@ import type { SpotifyToken } from '@/store/user/user.interface';
 interface InsertUserDataArgs {
   tokenData: SpotifyToken;
   refreshToken?: string;
-  id: string;
+  spotifyUserId?: string | undefined;
 }
 
-export async function updateUserSpotifyData({
+export async function setSpotifyUserId({ id }: { id: string }) {
+  const { error } = await supabase.from("users").upsert({"spotify_user_id": id})
+
+  if (error) {
+    throw new Error("Could not upster spotify user id")
+  }
+}
+
+export async function upsertUserSpotifyData({
   tokenData,
   refreshToken,
-  id,
+  spotifyUserId
 }: InsertUserDataArgs) {
   //TOD: verify that undefined refresh token does not overwrite an existing refresh token
   const { data, error } = await supabase
@@ -21,8 +29,8 @@ export async function updateUserSpotifyData({
     .update({
       spotify_token_data: tokenData,
       spotify_refresh_token: refreshToken,
+      spotify_user_id: spotifyUserId
     })
-    .eq('id', id)
     .select();
 
   if (error) {
@@ -39,14 +47,12 @@ interface UpdateUserSubscriptionDataArgs {
 
 export async function updateUserSubscriptionData({
   isSubscribed,
-  id,
 }: UpdateUserSubscriptionDataArgs) {
   const { data, error } = await supabase
     .from('users')
     .update({
       is_subscribed: isSubscribed,
     })
-    .eq('id', id)
     .select();
 
   if (error) {
@@ -57,17 +63,13 @@ export async function updateUserSubscriptionData({
 }
 
 export async function selectUserData() {
-  const { data, error } = await supabase.from('users').select('*');
+  const { data, error } = await supabase.from('users').select('*').single()
 
   if (error) {
     throw new Error('No data');
   }
 
-  if (!data.length) {
-    return null;
-  }
-
-  return data[0];
+  return data;
 }
 
 export async function selecteUserSpotifyRefreshToken() {

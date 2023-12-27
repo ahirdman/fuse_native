@@ -10,8 +10,10 @@ export const applicationConfiguration: ApplicationConfiguration = {
 		baseUrl: "https://api.spotify.com/v1",
 		authScope: [
 			"user-read-email",
-			"playlist-modify-public",
+			"user-read-private",
 			"user-library-read",
+			"playlist-modify-public",
+			"playlist-modify-private",
 		],
 	},
 };

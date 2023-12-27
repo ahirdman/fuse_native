@@ -3,7 +3,7 @@ import { Box, Icon } from "native-base";
 import InputField from "@/components/atoms/InputField";
 import TagRow from "@/components/molecules/TagRow";
 import useDebounce from "@/hooks/useDebounce";
-import { Tables } from "@/lib/supabase/database-generated.types";
+import { TagListScreenProps } from "@/navigation.types";
 import { useGetAllTagsQuery } from "@/services/supabase/tags/tags.endpoints";
 import { TagsWithTrackIdsQuery } from "@/services/supabase/tags/tags.interface";
 import { Feather } from "@expo/vector-icons";
@@ -16,13 +16,17 @@ interface FilterTagsArgs {
 	filter: string;
 }
 
-export default function TagList() {
+export default function TagList({ navigation }: TagListScreenProps<"TagList">) {
 	const { data, refetch, isFetching } = useGetAllTagsQuery({});
 	const [tagFilter, setTagFilter] = useState<string>("");
 	const debouncedTrackFilter = useDebounce(tagFilter, 300);
 
 	function handleRefetch() {
 		void refetch();
+	}
+
+	function handleTagRowPress(tag: TagsWithTrackIdsQuery) {
+		navigation.navigate("Tag", { id: tag.id, name: tag.name });
 	}
 
 	const filterTags = useCallback(
@@ -49,10 +53,16 @@ export default function TagList() {
 			  });
 	}, [data, debouncedTrackFilter, filterTags]);
 
-	const keyExtractor = (item: Tables<"tags">) => item.id.toString();
+	const keyExtractor = (item: TagsWithTrackIdsQuery) => item.id.toString();
 
-	const renderItem = ({ item }: { item: Tables<"tags"> }) => {
-		return <TagRow tag={item} />;
+	const renderItem = ({ item }: { item: TagsWithTrackIdsQuery }) => {
+		return (
+			<TagRow
+				tagName={item.name}
+				tagColor={item.color}
+				onPress={() => handleTagRowPress(item)}
+			/>
+		);
 	};
 
 	const ItemSeparatorComponent = () => <Box h="2" />;

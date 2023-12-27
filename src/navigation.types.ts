@@ -6,6 +6,10 @@ import type {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { UserTracksReq } from "./services/spotify/tracks/tracks.interface";
 
+/*
+ *  Root Stack
+ * */
+
 export type RootStackParamList = {
 	SignIn: undefined;
 	SignUp: undefined;
@@ -20,9 +24,13 @@ export type RootStackParamList = {
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
 	NativeStackScreenProps<RootStackParamList, T>;
 
+/*
+ *  Tab Navigator Root
+ * */
+
 export type RootTabParamList = {
 	Tracks: undefined;
-	Lists: undefined;
+	Lists: NavigatorScreenParams<TagListParamList>;
 	Profile: undefined;
 };
 
@@ -30,6 +38,24 @@ export type RootTabScreenProps<T extends keyof RootTabParamList> =
 	CompositeScreenProps<
 		BottomTabScreenProps<RootTabParamList, T>,
 		RootStackScreenProps<keyof RootStackParamList>
+	>;
+
+/*
+ * Tag List Navigatior Stack
+ * */
+
+export type TagListParamList = {
+	TagList: undefined;
+	Tag: {
+		id: number;
+		name: string;
+	};
+};
+
+export type TagListScreenProps<T extends keyof TagListParamList> =
+	CompositeScreenProps<
+		NativeStackScreenProps<TagListParamList, T>,
+		RootTabScreenProps<keyof RootTabParamList>
 	>;
 
 declare global {

@@ -1,7 +1,7 @@
 import { supabaseApi } from "../supabase.api";
 
 import { supabase } from "@/lib/supabase/supabase.init";
-import { setSubscription, setToken, signOut } from "@/store/user/user.slice";
+import { setSpotifyUserId, setSubscription, setToken, signOut } from "@/store/user/user.slice";
 import { selectUserData } from "@/lib/supabase/supabase.queries";
 import { isBoolean } from "@/lib/util/assert";
 
@@ -17,7 +17,7 @@ import { AuthError } from "@supabase/supabase-js";
 export const authApi = supabaseApi.injectEndpoints({
   endpoints: (builder) => ({
     signIn: builder.mutation<SupaBaseAuthRes, SignInInput>({
-      async queryFn({ email, password }, queryApi) {
+      async queryFn({ email, password }, api) {
         const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -30,14 +30,18 @@ export const authApi = supabaseApi.injectEndpoints({
         const userData = await selectUserData();
 
         if (userData && isBoolean(userData.is_subscribed)) {
-          queryApi.dispatch(
+          api.dispatch(
             setSubscription({ subscribed: userData.is_subscribed }),
           );
         }
 
+        if (userData.spotify_user_id) {
+          api.dispatch(setSpotifyUserId({ id: userData.spotify_user_id }))
+        }
+
         if (userData && isBoolean(userData.is_subscribed)) {
           const tokenData = userData.spotify_token_data as SpotifyToken;
-          queryApi.dispatch(setToken(tokenData));
+          api.dispatch(setToken(tokenData));
         }
 
         return { data };
@@ -68,7 +72,7 @@ export const authApi = supabaseApi.injectEndpoints({
     }),
 
     signOut: builder.query<string, void>({
-      async queryFn(_, baseQueryApi) {
+      async queryFn(_, api) {
         const { error } = await supabase.auth.signOut();
 
         if (error) {
@@ -77,7 +81,7 @@ export const authApi = supabaseApi.injectEndpoints({
           };
         }
 
-        baseQueryApi.dispatch(signOut());
+        api.dispatch(signOut());
 
         return { data: "OK" };
       },

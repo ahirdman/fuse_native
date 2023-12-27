@@ -39,21 +39,33 @@ export interface Database {
           color: string
           created_at: string
           id: number
+          latest_snapshot_id: string | null
           name: string
+          spotify_playlist_id: string | null
+          spotify_playlist_uri: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
           color: string
           created_at?: string
           id?: number
+          latest_snapshot_id?: string | null
           name: string
+          spotify_playlist_id?: string | null
+          spotify_playlist_uri?: string | null
+          updated_at?: string
           user_id?: string
         }
         Update: {
           color?: string
           created_at?: string
           id?: number
+          latest_snapshot_id?: string | null
           name?: string
+          spotify_playlist_id?: string | null
+          spotify_playlist_uri?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -68,19 +80,34 @@ export interface Database {
       }
       tracks: {
         Row: {
+          album: string | null
+          album_covers: string[] | null
           artist: string | null
+          duration: number
+          explicit: boolean
           id: string
-          title: string | null
+          name: string | null
+          uri: string
         }
         Insert: {
+          album?: string | null
+          album_covers?: string[] | null
           artist?: string | null
+          duration: number
+          explicit?: boolean
           id: string
-          title?: string | null
+          name?: string | null
+          uri?: string
         }
         Update: {
+          album?: string | null
+          album_covers?: string[] | null
           artist?: string | null
+          duration?: number
+          explicit?: boolean
           id?: string
-          title?: string | null
+          name?: string | null
+          uri?: string
         }
         Relationships: []
       }
@@ -143,21 +170,24 @@ export interface Database {
           is_subscribed: boolean | null
           spotify_refresh_token: string | null
           spotify_token_data: Json | null
-          updated_at: string | null
+          spotify_user_id: string | null
+          updated_at: string
         }
         Insert: {
           id?: string
           is_subscribed?: boolean | null
           spotify_refresh_token?: string | null
           spotify_token_data?: Json | null
-          updated_at?: string | null
+          spotify_user_id?: string | null
+          updated_at?: string
         }
         Update: {
           id?: string
           is_subscribed?: boolean | null
           spotify_refresh_token?: string | null
           spotify_token_data?: Json | null
-          updated_at?: string | null
+          spotify_user_id?: string | null
+          updated_at?: string
         }
         Relationships: [
           {

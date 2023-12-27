@@ -35,7 +35,7 @@ function TrackRow({ track, height, onPress, tagged }: TrackRowProps) {
 						</Text>
 
 						<Text fontSize="xs" noOfLines={1}>
-							{`${track.artist ?? "NA"} - ${track.albumName}`}
+							{`${track.artist ?? "NA"} - ${track.album}`}
 						</Text>
 					</VStack>
 

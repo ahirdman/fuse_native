@@ -4,9 +4,14 @@ import { supabase } from "@/lib/supabase/supabase.init";
 import { selectUserData } from "@/lib/supabase/supabase.queries";
 import { isBoolean } from "@/lib/util/assert";
 import { store } from "@/store/store";
-import { setSubscription, setToken, signIn } from "@/store/user/user.slice";
+import {
+	setSpotifyUserId,
+	setSubscription,
+	setToken,
+	signIn,
+} from "@/store/user/user.slice";
 
-import type { SpotifyToken } from "@/store/user/user.interface";
+import { SpotifyToken } from "@/store/user/user.interface";
 
 function useAppDataLoader() {
 	const [appReady, setAppReady] = useState(false);
@@ -25,8 +30,19 @@ function useAppDataLoader() {
 					}
 
 					if (userData?.spotify_token_data) {
-						const data = userData.spotify_token_data as SpotifyToken;
-						store.dispatch(setToken({ ...data }));
+						const parsed = SpotifyToken.safeParse(userData.spotify_token_data);
+
+						if (!parsed.success) {
+							return;
+						}
+
+						if (userData.spotify_user_id) {
+							store.dispatch(
+								setSpotifyUserId({ id: userData.spotify_user_id }),
+							);
+						}
+
+						store.dispatch(setToken({ ...parsed.data }));
 					}
 
 					store.dispatch(signIn({ id: fetchedSession.data.session.user.id }));

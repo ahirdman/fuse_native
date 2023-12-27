@@ -8,12 +8,17 @@ import PageView from "@/components/atoms/PageView";
 import SignUpForm from "@/components/organisms/sign-up-form";
 import { authorizeSpotify } from "@/lib/expo/expo.auth";
 import {
-	updateUserSpotifyData,
 	updateUserSubscriptionData,
+	upsertUserSpotifyData,
 } from "@/lib/supabase/supabase.queries";
 import { assertIsDefined } from "@/lib/util/assert";
+import { useLazyGetUserProfileQuery } from "@/services/spotify/user/user.endpoint";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { setSubscription, setToken } from "@/store/user/user.slice";
+import {
+	setSpotifyUserId,
+	setSubscription,
+	setToken,
+} from "@/store/user/user.slice";
 
 const COLLAPSED_HEIGHT = 80;
 const EXPANDED_HEIGHT = 400;
@@ -105,22 +110,37 @@ export default SignUpView;
 
 function AuthorizeSpotify({ userId }: { userId: string | undefined }) {
 	const dispatch = useAppDispatch();
+	const [getSpotifyUserProfile] = useLazyGetUserProfileQuery();
+
 	async function handlePress() {
 		if (!userId) return;
 
-		const data = await authorizeSpotify();
+		try {
+			const data = await authorizeSpotify();
 
-		assertIsDefined(data?.refreshToken);
+			assertIsDefined(data?.refreshToken);
 
-		const { accessToken, tokenType, expiresIn, scope, issuedAt } = data;
+			const { accessToken, tokenType, expiresIn, scope, issuedAt } = data;
 
-		await updateUserSpotifyData({
-			tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
-			refreshToken: data.refreshToken,
-			id: userId,
-		});
+			await upsertUserSpotifyData({
+				tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
+				refreshToken: data.refreshToken,
+			});
 
-		dispatch(setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }));
+			const spotifyProfile = await getSpotifyUserProfile(accessToken);
+
+			if (spotifyProfile.error || !spotifyProfile.data) {
+				throw new Error("Could not fetch spotify user data");
+			}
+
+			dispatch(setSpotifyUserId({ id: spotifyProfile.data.id }));
+
+			dispatch(
+				setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }),
+			);
+		} catch (err) {
+			console.log(err);
+		}
 	}
 
 	return (
