@@ -6,7 +6,7 @@ const Subscription = z.object({
 
 export type Subscription = z.infer<typeof Subscription>;
 
-const SpotifyToken = z.object({
+export const SpotifyToken = z.object({
 	accessToken: z.string(),
 	tokenType: z.string(),
 	expiresIn: z.number().optional(),
@@ -27,6 +27,11 @@ const UserState = z.object({
 	user: User.optional(),
 	token: SpotifyToken.optional(),
 	subscription: Subscription.optional(),
+	spotifyUser: z
+		.object({
+			id: z.string(),
+		})
+		.optional(),
 });
 
 export type UserState = z.infer<typeof UserState>;

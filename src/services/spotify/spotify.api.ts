@@ -9,12 +9,12 @@ import {
 import { config } from "@/config";
 
 import { refreshSpotifyToken } from "@/lib/expo/expo.auth";
-import { updateUserSpotifyData } from "@/lib/supabase/supabase.queries";
+import { upsertUserSpotifyData } from "@/lib/supabase/supabase.queries";
 import { assertIsDefined } from "@/lib/util/assert";
 import type { RootState } from "@/store/store";
 import { setToken, signOut } from "@/store/user/user.slice";
 
-const baseQuery = fetchBaseQuery({
+const spotifyBaseQuery = fetchBaseQuery({
 	baseUrl: config.spotify.baseUrl,
 	prepareHeaders: (headers, { getState }) => {
 		const token = (getState() as RootState).user.token?.accessToken;
@@ -32,7 +32,7 @@ const baseQueryWithReauth: BaseQueryFn<
 	unknown,
 	FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-	let result = await baseQuery(args, api, extraOptions);
+	let result = await spotifyBaseQuery(args, api, extraOptions);
 
 	if (result.error && result.error.status === 401) {
 		const refreshResult = await refreshSpotifyToken();
@@ -55,13 +55,12 @@ const baseQueryWithReauth: BaseQueryFn<
 				setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }),
 			);
 
-			await updateUserSpotifyData({
-				id: userId,
+			await upsertUserSpotifyData({
 				tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
 				refreshToken,
 			});
 
-			result = await baseQuery(args, api, extraOptions);
+			result = await spotifyBaseQuery(args, api, extraOptions);
 		} else {
 			api.dispatch(signOut());
 		}

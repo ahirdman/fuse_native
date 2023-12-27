@@ -38,7 +38,7 @@ function Tracks({ navigation }: RootTabScreenProps<"Tracks">) {
 
 	const filterTracks = useCallback(
 		({ tracks, filter }: FilterTracksArgs): SpotifyTrack[] => {
-			const fieldsToMatch = ["albumName", "name", "artist"] as const;
+			const fieldsToMatch = ["album", "name", "artist"] as const;
 
 			const res = tracks.filter((trackObj) =>
 				fieldsToMatch.some((field) =>

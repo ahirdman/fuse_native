@@ -4,11 +4,17 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 
+import ScreenHeader from "./components/molecules/ScreenHeader";
 import { supabase } from "./lib/supabase/supabase.init";
 import { selectUserData } from "./lib/supabase/supabase.queries";
 import { isBoolean } from "./lib/util/assert";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
-import { setSubscription, setToken, signIn } from "./store/user/user.slice";
+import {
+	setSpotifyUserId,
+	setSubscription,
+	setToken,
+	signIn,
+} from "./store/user/user.slice";
 import ResetPassword from "./views/ResetPassword";
 import SignIn from "./views/SignIn";
 import SignUpView from "./views/SignUp";
@@ -16,9 +22,14 @@ import Track from "./views/Track";
 import Tracks from "./views/Tracks";
 
 import { Feather } from "@expo/vector-icons";
-import type { RootStackParamList, RootTabParamList } from "./navigation.types";
-import type { SpotifyToken } from "./store/user/user.interface";
+import {
+	type RootStackParamList,
+	type RootTabParamList,
+	TagListParamList,
+} from "./navigation.types";
+import { SpotifyToken } from "./store/user/user.interface";
 import Profile from "./views/Profile";
+import Tag from "./views/Tag";
 import TagList from "./views/Tags";
 
 interface TabBarIconProps {
@@ -34,6 +45,7 @@ function TabBarIcon({ name, color }: TabBarIconProps) {
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
+const TagListStack = createNativeStackNavigator<TagListParamList>();
 
 // TODO: TrackView
 
@@ -43,21 +55,30 @@ function RootNavigationStack() {
 
 	useEffect(() => {
 		const { data: authListener } = supabase.auth.onAuthStateChange(
-			async (_, newSession) => {
+			async (event, newSession) => {
+				if (!newSession?.user) return;
+
 				const userData = await selectUserData();
 
 				if (userData && isBoolean(userData.is_subscribed)) {
 					dispatch(setSubscription({ subscribed: userData.is_subscribed }));
 				}
 
-				if (userData?.spotify_token_data) {
-					const data = userData.spotify_token_data as SpotifyToken;
-					dispatch(setToken({ ...data }));
+				if (userData) {
+					const parsed = SpotifyToken.safeParse(userData.spotify_token_data);
+
+					if (!parsed.success) {
+						return;
+					}
+
+					if (userData.spotify_user_id) {
+						dispatch(setSpotifyUserId({ id: userData.spotify_user_id }));
+					}
+
+					dispatch(setToken({ ...parsed.data }));
 				}
 
-				if (newSession?.user.id) {
-					dispatch(signIn({ id: newSession.user.id }));
-				}
+				dispatch(signIn({ id: newSession.user.id }));
 			},
 		);
 
@@ -99,6 +120,27 @@ function RootNavigationStack() {
 	);
 }
 
+function TagListStackScreen() {
+	return (
+		<TagListStack.Navigator>
+			<TagListStack.Screen
+				name="TagList"
+				component={TagList}
+				options={{ headerShown: false }}
+			/>
+			<TagListStack.Screen
+				name="Tag"
+				component={Tag}
+				options={({ route }) => ({
+					header: (props) => (
+						<ScreenHeader {...props} title={route.params.name} />
+					),
+				})}
+			/>
+		</TagListStack.Navigator>
+	);
+}
+
 function RootTabStack() {
 	return (
 		<Tab.Navigator
@@ -119,7 +161,7 @@ function RootTabStack() {
 			/>
 			<Tab.Screen
 				name="Lists"
-				component={TagList}
+				component={TagListStackScreen}
 				options={{
 					title: "Lists",
 					tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,

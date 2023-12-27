@@ -1,31 +1,59 @@
-import { Tables } from "@/lib/supabase/database.interface";
 import { hexToRGBA } from "@/lib/util/color";
-import { Box, IPressableProps, Pressable } from "native-base";
+import {
+	Box,
+	IBoxProps,
+	IPressableProps,
+	ITextProps,
+	Pressable,
+} from "native-base";
+
+type TagBadgeSize = "default" | "small";
+type TagBadgeSizeProps<T> = { [K in TagBadgeSize]: T };
 
 interface TagProps extends IPressableProps {
-	tag: Tables<"tags">;
+	name: string;
+	color: string;
+	size?: TagBadgeSize | undefined;
 }
 
-function Tag({ tag, ...props }: TagProps) {
-	const badgeBackgroundColor = hexToRGBA(tag.color, 0.1);
+function TagBadge({ name, color, size = "default", ...props }: TagProps) {
+	const badgeBackgroundColor = hexToRGBA(color, 0.1);
+
+	const tagBadeSizeProps: TagBadgeSizeProps<IBoxProps> = {
+		default: {
+			px: "3.5",
+			py: "1.5",
+		},
+		small: {
+			px: "2",
+			py: "0.5",
+		},
+	};
+
+	const tagTextSizeProps: TagBadgeSizeProps<ITextProps> = {
+		default: {},
+		small: {
+			fontSize: "xs",
+		},
+	};
 
 	return (
 		<Pressable accessibilityRole="button" {...props}>
 			<Box
-				borderColor={tag.color}
+				borderColor={color}
 				bg={badgeBackgroundColor}
 				_text={{
-					color: tag.color,
+					color: color,
+					...tagTextSizeProps[size],
 				}}
-				px="3.5"
-				py="1.5"
 				rounded="8"
 				borderWidth="0.3"
+				{...tagBadeSizeProps[size]}
 			>
-				{tag.name}
+				{name}
 			</Box>
 		</Pressable>
 	);
 }
 
-export default Tag;
+export default TagBadge;

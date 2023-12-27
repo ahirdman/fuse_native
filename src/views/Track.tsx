@@ -119,7 +119,7 @@ function Track({ route, navigation }: RootStackScreenProps<"Track">) {
 					emptyListLabel="No tags for this track yet..."
 				/>
 
-				<TagFormFooter track={userSavedTrack} />
+				<TagFormFooter trackId={trackId} originalArgs={originalArgs} />
 			</VStack>
 		</Box>
 	);

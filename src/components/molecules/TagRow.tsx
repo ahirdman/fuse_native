@@ -1,13 +1,13 @@
-import { Tables } from "@/lib/supabase/database.interface";
 import { hexToRGBA } from "@/lib/util/color";
 import { HStack, IPressableProps, Pressable, Square, Text } from "native-base";
 
 interface TagListRowProps extends IPressableProps {
-	tag: Tables<"tags">;
+	tagColor: string;
+	tagName: string;
 }
 
-function TagRow({ tag, ...props }: TagListRowProps) {
-	const backgroundColor = hexToRGBA(tag.color, 0.1);
+function TagRow({ tagColor, tagName, ...props }: TagListRowProps) {
+	const backgroundColor = hexToRGBA(tagColor, 0.1);
 
 	return (
 		<Pressable {...props}>
@@ -27,10 +27,10 @@ function TagRow({ tag, ...props }: TagListRowProps) {
 					boxSize="40px"
 					rounded="8"
 					mr="4"
-					borderColor={tag.color}
+					borderColor={tagColor}
 					borderWidth="1px"
 				/>
-				<Text color="base.100">{tag.name}</Text>
+				<Text color="base.100">{tagName}</Text>
 			</HStack>
 		</Pressable>
 	);

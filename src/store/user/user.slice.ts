@@ -12,6 +12,7 @@ const initialState: UserState = {
 	user: undefined,
 	token: undefined,
 	subscription: undefined,
+	spotifyUser: undefined,
 };
 
 export const userSlice = createSlice({
@@ -30,9 +31,13 @@ export const userSlice = createSlice({
 		setSubscription: (state, action: PayloadAction<Subscription>) => {
 			state.subscription = action.payload;
 		},
+		setSpotifyUserId: (state, action: PayloadAction<{ id: string }>) => {
+			state.spotifyUser = { id: action.payload.id };
+		},
 	},
 });
 
-export const { signIn, signOut, setToken, setSubscription } = userSlice.actions;
+export const { signIn, signOut, setToken, setSubscription, setSpotifyUserId } =
+	userSlice.actions;
 
 export default userSlice.reducer;

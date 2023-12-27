@@ -5,6 +5,6 @@ export const supabaseApi = createApi({
   reducerPath: 'supabaseApi',
   baseQuery:  fakeBaseQuery<PostgrestError | AuthError>(),
   keepUnusedDataFor: 600,
-  tagTypes: ['Tag'],
+  tagTypes: ['Tag', 'Track'],
   endpoints: () => ({}),
 });

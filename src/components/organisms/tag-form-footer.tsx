@@ -1,5 +1,6 @@
 import { assertIsDefined } from "@/lib/util/assert";
-import { SpotifyTrack } from "@/services/spotify/tracks/tracks.interface";
+import { useGetUserSavedTracksQuery } from "@/services/spotify/tracks/tracks.endpoints";
+import { UserTracksReq } from "@/services/spotify/tracks/tracks.interface";
 import {
 	useAddTagToTrackMutation,
 	useCreateTagMutation,
@@ -17,21 +18,33 @@ import ColorPickerModal from "../molecules/ColorPickerModal";
 import TagSection from "../molecules/TagSection";
 
 interface CreateTagFormProps extends IVStackProps {
-	track: Pick<SpotifyTrack, "name" | "artist" | "id">;
+	trackId: string;
+	originalArgs: UserTracksReq;
 }
 
-function TagFormFooter({ track, ...props }: CreateTagFormProps) {
+function TagFormFooter({
+	trackId,
+	originalArgs,
+	...props
+}: CreateTagFormProps) {
 	const [tagName, setTagName] = useState("");
 	const [tagColor, setTagColor] = useState("#FFFFFF");
 	const [showModal, setShowModal] = useState(false);
 	const [tagAddView, setTagAddView] = useState<"new" | "existing">("new");
 
+	const { track } = useGetUserSavedTracksQuery(originalArgs, {
+		selectFromResult: ({ data }) => ({
+			track: data?.items.find((item) => item.id === trackId),
+		}),
+	});
+
 	const [tagTrack, { isLoading }] = useCreateTagMutation();
 	const [addTagToTrack] = useAddTagToTrackMutation();
-	const { data } = useGetAllTagsQuery({ exclude: { trackId: track.id } });
+	const { data } = useGetAllTagsQuery({ exclude: { trackId: trackId } });
 
 	async function handlePress() {
 		assertIsDefined(tagColor);
+		assertIsDefined(track);
 
 		const result = await tagTrack({
 			color: tagColor,
@@ -55,6 +68,7 @@ function TagFormFooter({ track, ...props }: CreateTagFormProps) {
 	}
 
 	async function handleTagPress(tagId: number) {
+		assertIsDefined(track);
 		const result = await addTagToTrack({ tagId, track });
 
 		if ("error" in result) {

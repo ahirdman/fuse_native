@@ -7,7 +7,7 @@ export interface GetTagsForTrackArgs {
 export interface CreateTagArgs {
   color: string;
   name: string;
-  track: Pick<SpotifyTrack, 'id' | 'artist' | 'name'>;
+  track: SpotifyTrack
 }
 
 export interface DeleteTagArgs {
@@ -16,10 +16,12 @@ export interface DeleteTagArgs {
 
 export interface UpdateTagArgs {
   tagId: number;
+  name?: string | undefined
+  color?: string | undefined
 }
 
 export interface AddTagToTrackArgs {
-  track: Pick<SpotifyTrack, 'id' | 'artist' | 'name'>;
+  track: SpotifyTrack;
   tagId: number;
 }
 
@@ -32,6 +34,7 @@ export interface GetAllTagsArgs {
 export type TagsWithTrackIdsQuery = {
   color: string;
   created_at: string;
+  latest_snapshot_id: string;
   id: number;
   name: string;
   track_ids: string[] | null;

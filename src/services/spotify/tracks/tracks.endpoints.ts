@@ -1,7 +1,6 @@
 import { spotifyApi } from "../spotify.api";
 
 import type {
-	SpotifyTrack,
 	UserSavedTracksDto,
 	UserSavedTracksRes,
 	UserTracksReq,
@@ -21,9 +20,10 @@ export const tracksApi = spotifyApi.injectEndpoints({
 					items: response.items.map((item) => ({
 						addedAt: item.added_at,
 						id: item.track.id,
+						uri: item.track.uri,
 						artist: item.track.artists[0]?.name,
 						albumCovers: item.track.album.images,
-						albumName: item.track.album.name,
+						album: item.track.album.name,
 						name: item.track.name,
 						explicit: item.track.explicit,
 						duration: item.track.duration_ms,

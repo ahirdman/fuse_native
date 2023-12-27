@@ -11,10 +11,11 @@ export interface UserSavedTracksRes {
 
 export interface SpotifyTrack {
 	id: string;
+	uri: string;
 	addedAt?: string | undefined;
 	artist?: string | undefined;
 	albumCovers: SpotifyAlbumImage[];
-	albumName: string;
+	album: string;
 	name: string;
 	explicit: boolean;
 	duration: number;
@@ -47,6 +48,7 @@ interface SpotifyTrackDto {
 	};
 	artists: SpotifyArtistDto[];
 	id: string;
+	uri: string;
 	explicit: boolean;
 	duration_ms: number;
 }

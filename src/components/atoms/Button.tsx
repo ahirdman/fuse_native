@@ -62,6 +62,7 @@ function Button({
 		<Pressable
 			onPress={onPress}
 			rounded="6"
+			px={props.w ? "6" : "auto"}
 			height={props.height ?? height}
 			{...pressableTypeProps[type]}
 			{...props}
