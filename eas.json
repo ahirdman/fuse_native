@@ -1,9 +1,12 @@
 {
 	"cli": {
-		"version": ">= 3.15.1"
+		"version": ">= 3.15.1",
+		"appVersionSource": "remote"
 	},
 	"build": {
-		"base": {},
+		"base": {
+			"autoIncrement": true
+		},
 		"development": {
 			"extends": "base",
 			"env": {

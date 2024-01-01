@@ -1,7 +1,5 @@
 import * as SecureStore from "expo-secure-store";
 
-import { catchException } from "../sentry/sentry.exceptions";
-
 const secureStoreKeys = ["SPOTIFY_REFRESH_TOKEN"] as const;
 
 type SecureStoreKey = (typeof secureStoreKeys)[number];
@@ -14,9 +12,7 @@ interface StoreItemArgs {
 export async function setSecureItem({ key, value }: StoreItemArgs) {
 	try {
 		await SecureStore.setItemAsync(key, value);
-	} catch (error) {
-		catchException(error);
-	}
+	} catch (error) {}
 }
 
 export async function getSecureItem(
@@ -28,9 +24,7 @@ export async function getSecureItem(
 		const result = await SecureStore.getItemAsync(key);
 
 		secureItem = result;
-	} catch (error) {
-		catchException(error);
-	}
+	} catch (error) {}
 
 	return secureItem;
 }
@@ -38,7 +32,5 @@ export async function getSecureItem(
 export async function clearSecureItem(key: SecureStoreKey) {
 	try {
 		await SecureStore.deleteItemAsync(key);
-	} catch (error) {
-		catchException(error);
-	}
+	} catch (error) {}
 }

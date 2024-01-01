@@ -1,7 +1,6 @@
 import { config } from "@/config";
 import * as Burnt from "burnt";
 import * as AuthSession from "expo-auth-session";
-import { catchException } from "../sentry/sentry.exceptions";
 import { selecteUserSpotifyRefreshToken } from "../supabase/supabase.queries";
 import { generateShortUUID } from "../util";
 import { assertIsDefined } from "../util/assert";
@@ -54,7 +53,6 @@ export async function authorizeSpotify(): Promise<
 			preset: "error",
 			message: "Spotify authorization did not work...",
 		});
-		catchException(error);
 	}
 }
 
@@ -77,7 +75,6 @@ export async function refreshSpotifyToken(): Promise<
 		return request;
 	} catch (error) {
 		//TODO: Sometimes errors here, figure out why
-		catchException(error);
 		Burnt.toast({
 			title: "Something went wrong",
 			preset: "error",

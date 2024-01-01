@@ -1,5 +1,4 @@
 import { applicationConfiguration as defaultConfig } from "./config-default";
-import { applicationConfiguration as testConfig } from "./config-test";
 
 export interface ApplicationConfiguration {
 	supabase: {
@@ -13,6 +12,4 @@ export interface ApplicationConfiguration {
 	};
 }
 
-const { NODE_ENV } = process.env;
-
-export const config = NODE_ENV === "production" ? testConfig : defaultConfig;
+export const config = defaultConfig;
