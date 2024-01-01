@@ -1,8 +1,8 @@
+import { init } from "@aptabase/react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import * as Sentry from "sentry-expo";
 
-import { init } from "@aptabase/react-native";
 import {
 	Mulish_200ExtraLight,
 	Mulish_300Light,

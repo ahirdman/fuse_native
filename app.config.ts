@@ -46,6 +46,9 @@ export default (): ExpoConfig => {
 		ios: {
 			supportsTablet: false,
 			bundleIdentifier: "com.ahirdman.fuse",
+			config: {
+				usesNonExemptEncryption: false,
+			},
 		},
 		android: {
 			adaptiveIcon: {
