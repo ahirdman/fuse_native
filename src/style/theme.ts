@@ -1,4 +1,4 @@
-import { extendTheme } from "native-base";
+import { INativebaseConfig, extendTheme } from "native-base";
 
 export const ApplicationTheme = extendTheme({
 	colors: {
@@ -116,3 +116,7 @@ export type ApplicationTheme = typeof ApplicationTheme;
 declare module "native-base" {
 	interface ICustomTheme extends ApplicationTheme {}
 }
+
+export const nativeBaseConfig: INativebaseConfig = {
+  strictMode: 'warn',
+};

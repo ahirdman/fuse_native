@@ -4,22 +4,9 @@ import type { ExpoConfig } from "expo/config";
 type ExpoPlugins = (string | [] | [string] | [string, any])[];
 
 function expoPlugins(env: string): ExpoPlugins {
-	const common = ["sentry-expo", "expo-build-properties"];
+	const common = ["expo-build-properties"];
 
 	switch (env) {
-		case "development":
-			return [
-				...common,
-				[
-					"expo-build-properties",
-					{
-						ios: {
-							flipper: true,
-						},
-					},
-				],
-			];
-
 		default:
 			return common;
 	}
@@ -57,17 +44,6 @@ export default (): ExpoConfig => {
 			},
 		},
 		plugins,
-		hooks: {
-			postPublish: [
-				{
-					file: "sentry-expo/upload-sourcemaps",
-					config: {
-						organization: "nomad-1l",
-						project: "fuse",
-					},
-				},
-			],
-		},
 		experiments: {
 			tsconfigPaths: true,
 		},

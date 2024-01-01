@@ -1,7 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import { catchException } from "../sentry/sentry.exceptions";
-
 const asyncStorageKeys = ["SPOTIFY_TOKEN", "SUBSCRIPTION"] as const;
 type AsyncStorageKey = (typeof asyncStorageKeys)[number];
 
@@ -17,7 +15,6 @@ export async function getStoredData<T>(
 		const jsonValue = await AsyncStorage.getItem(key);
 		return jsonValue !== null ? (JSON.parse(jsonValue) as T) : null;
 	} catch (error) {
-		catchException(error);
 		return null;
 	}
 }
@@ -33,7 +30,5 @@ export async function clearStoredData(): Promise<void> {
 	try {
 		const presentKeys = await AsyncStorage.getAllKeys();
 		await AsyncStorage.multiRemove(presentKeys);
-	} catch (error) {
-		catchException(error);
-	}
+	} catch (error) {}
 }

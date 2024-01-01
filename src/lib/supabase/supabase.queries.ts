@@ -1,5 +1,3 @@
-import { catchException } from '../sentry/sentry.exceptions';
-
 import { supabase } from './supabase.init';
 
 import type { SpotifyToken } from '@/store/user/user.interface';
@@ -24,7 +22,7 @@ export async function upsertUserSpotifyData({
   spotifyUserId
 }: InsertUserDataArgs) {
   //TOD: verify that undefined refresh token does not overwrite an existing refresh token
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('users')
     .update({
       spotify_token_data: tokenData,
@@ -32,10 +30,6 @@ export async function upsertUserSpotifyData({
       spotify_user_id: spotifyUserId
     })
     .select();
-
-  if (error) {
-    catchException(error);
-  }
 
   return data;
 }
@@ -48,16 +42,12 @@ interface UpdateUserSubscriptionDataArgs {
 export async function updateUserSubscriptionData({
   isSubscribed,
 }: UpdateUserSubscriptionDataArgs) {
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from('users')
     .update({
       is_subscribed: isSubscribed,
     })
     .select();
-
-  if (error) {
-    catchException(error);
-  }
 
   return data;
 }
