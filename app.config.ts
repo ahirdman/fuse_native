@@ -30,7 +30,7 @@ export default (): ExpoConfig => {
 	const backgroundColor = "#1C1C1C";
 
 	return {
-		name: "Fuse",
+		name: "Fuse - Playlist Manager",
 		slug: "fuse",
 		version: "0.0.1",
 		orientation: "portrait",

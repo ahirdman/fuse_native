@@ -14,20 +14,20 @@
 				"simulator": true
 			}
 		},
-		"preview": {
-			"extends": "base",
-			"env": {
-				"EAS_ENV": "test"
-			}
-		},
 		"production": {
 			"extends": "base",
+			"channel": "production",
 			"env": {
 				"EAS_ENV": "production"
 			}
 		}
 	},
 	"submit": {
-		"production": {}
+		"production": {
+			"ios": {
+				"appleId": "hirdman.alex@icloud.com",
+				"appleTeamId": "64FFA8NJWP"
+			}
+		}
 	}
 }
