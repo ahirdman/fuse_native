@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-const Subscription = z.object({
+const appSubscription = z.object({
 	subscribed: z.boolean(),
 });
 
-export type Subscription = z.infer<typeof Subscription>;
+export type AppSubscription = z.infer<typeof appSubscription>;
 
 export const SpotifyToken = z.object({
 	accessToken: z.string(),
@@ -23,15 +23,17 @@ const User = z.object({
 
 export type User = z.infer<typeof User>;
 
+const spotifyUser = z.object({
+	id: z.string(),
+});
+
+export type SpotifyUser = z.infer<typeof spotifyUser>;
+
 const UserState = z.object({
 	user: User.optional(),
-	token: SpotifyToken.optional(),
-	subscription: Subscription.optional(),
-	spotifyUser: z
-		.object({
-			id: z.string(),
-		})
-		.optional(),
+	spotifyToken: SpotifyToken.optional(),
+	appSubscription: appSubscription.optional(),
+	spotifyUser: spotifyUser.optional(),
 });
 
 export type UserState = z.infer<typeof UserState>;

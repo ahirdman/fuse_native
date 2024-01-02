@@ -24,6 +24,8 @@ import { store } from "@/store/store";
 import { ApplicationTheme, nativeBaseConfig } from "@/style/theme";
 
 import "react-native-url-polyfill/auto";
+import { TamaguiProvider } from "tamagui";
+import tamaguiConfig from "./style/tamagui.config";
 
 init(process.env.EXPO_PUBLIC_APTABASE_KEY);
 void SplashScreen.preventAutoHideAsync();
@@ -54,10 +56,12 @@ export default function App() {
 
 	return (
 		<ReduxProvider store={store}>
-			<NativeBaseProvider theme={ApplicationTheme} config={nativeBaseConfig}>
-				<StatusBar style="light" />
-				<RootNavigationStack />
-			</NativeBaseProvider>
+			<TamaguiProvider config={tamaguiConfig}>
+				<NativeBaseProvider theme={ApplicationTheme} config={nativeBaseConfig}>
+					<StatusBar style="light" />
+					<RootNavigationStack />
+				</NativeBaseProvider>
+			</TamaguiProvider>
 		</ReduxProvider>
 	);
 }

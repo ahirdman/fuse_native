@@ -1,20 +1,11 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 
 import ScreenHeader from "./components/molecules/ScreenHeader";
-import { supabase } from "./lib/supabase/supabase.init";
-import { selectUserData } from "./lib/supabase/supabase.queries";
-import { isBoolean } from "./lib/util/assert";
-import { useAppDispatch, useAppSelector } from "./store/hooks";
-import {
-	setSpotifyUserId,
-	setSubscription,
-	setToken,
-	signIn,
-} from "./store/user/user.slice";
+import { isBoolean, isDefined } from "./lib/util/assert";
+import { useAppSelector } from "./store/hooks";
 import ResetPassword from "./views/ResetPassword";
 import SignIn from "./views/SignIn";
 import SignUpView from "./views/SignUp";
@@ -22,12 +13,14 @@ import Track from "./views/Track";
 import Tracks from "./views/Tracks";
 
 import { Feather } from "@expo/vector-icons";
+import { Progress } from "tamagui";
+import Button from "./components/atoms/Button";
+import { ModalHeader } from "./components/organisms/modal-header";
 import {
 	type RootStackParamList,
 	type RootTabParamList,
 	TagListParamList,
 } from "./navigation.types";
-import { SpotifyToken } from "./store/user/user.interface";
 import Profile from "./views/Profile";
 import Tag from "./views/Tag";
 import TagList from "./views/Tags";
@@ -50,47 +43,17 @@ const TagListStack = createNativeStackNavigator<TagListParamList>();
 // TODO: TrackView
 
 function RootNavigationStack() {
-	const dispatch = useAppDispatch();
-	const { user, token } = useAppSelector((state) => state.user);
+	const { user, spotifyToken, appSubscription } = useAppSelector(
+		(state) => state.user,
+	);
 
-	useEffect(() => {
-		const { data: authListener } = supabase.auth.onAuthStateChange(
-			async (event, newSession) => {
-				if (!newSession?.user) return;
-
-				const userData = await selectUserData();
-
-				if (userData && isBoolean(userData.is_subscribed)) {
-					dispatch(setSubscription({ subscribed: userData.is_subscribed }));
-				}
-
-				if (userData) {
-					const parsed = SpotifyToken.safeParse(userData.spotify_token_data);
-
-					if (!parsed.success) {
-						return;
-					}
-
-					if (userData.spotify_user_id) {
-						dispatch(setSpotifyUserId({ id: userData.spotify_user_id }));
-					}
-
-					dispatch(setToken({ ...parsed.data }));
-				}
-
-				dispatch(signIn({ id: newSession.user.id }));
-			},
-		);
-
-		return () => {
-			authListener.subscription.unsubscribe();
-		};
-	}, [dispatch]);
+	const userReady =
+		isDefined(user) && isDefined(spotifyToken) && isDefined(appSubscription);
 
 	return (
 		<NavigationContainer>
 			<RootStack.Navigator screenOptions={{ headerShown: false }}>
-				{user && token ? (
+				{userReady ? (
 					<>
 						<RootStack.Screen name="Root" component={RootTabStack} />
 						<RootStack.Screen
@@ -106,13 +69,48 @@ function RootNavigationStack() {
 							component={SignIn}
 							options={{ animationTypeForReplace: "pop" }}
 						/>
-						<RootStack.Group screenOptions={{ presentation: "modal" }}>
-							<RootStack.Screen name="SignUp" component={SignUpView} />
-							<RootStack.Screen
-								name="ResetPassword"
-								component={ResetPassword}
-							/>
-						</RootStack.Group>
+						<RootStack.Screen
+							name="SignUp"
+							component={SignUpView}
+							options={{
+								presentation: "modal",
+								headerShown: true,
+								header: (props) => {
+									const progress = isDefined(appSubscription)
+										? 100
+										: spotifyToken
+										  ? 66
+										  : user
+											  ? 33
+											  : 0;
+
+									return (
+										<ModalHeader
+											centerElement={() => (
+												<Progress size="$2" value={progress} bg="#505050">
+													<Progress.Indicator animation="slow" bg="#F3640B" />
+												</Progress>
+											)}
+											rightElement={() => (
+												<Button
+													type="teritary"
+													label="Cancel"
+													onPress={() => props.navigation.goBack()}
+												/>
+											)}
+											{...props}
+										/>
+									);
+								},
+							}}
+						/>
+						<RootStack.Screen
+							name="ResetPassword"
+							component={ResetPassword}
+							options={{
+								presentation: "modal",
+							}}
+						/>
 					</>
 				)}
 			</RootStack.Navigator>

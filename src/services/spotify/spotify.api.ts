@@ -7,17 +7,53 @@ import {
 } from "@reduxjs/toolkit/dist/query/react";
 
 import { config } from "@/config";
+import * as Burnt from "burnt";
 
-import { refreshSpotifyToken } from "@/lib/expo/expo.auth";
-import { upsertUserSpotifyData } from "@/lib/supabase/supabase.queries";
+import {
+	selecteUserSpotifyRefreshToken,
+	upsertUserSpotifyData,
+} from "@/lib/supabase/supabase.queries";
 import { assertIsDefined } from "@/lib/util/assert";
 import type { RootState } from "@/store/store";
-import { setToken, signOut } from "@/store/user/user.slice";
+import { signOut, updateSpotifyToken } from "@/store/user/user.slice";
+import { ThunkDispatch } from "@reduxjs/toolkit";
+import * as AuthSession from "expo-auth-session";
+import { authApi } from "../supabase/auth/auth.endpoints";
+
+export async function refreshSpotifyToken(
+	// biome-ignore lint/suspicious/noExplicitAny: reason
+	dispatch: ThunkDispatch<any, any, any>,
+): Promise<AuthSession.TokenResponse | undefined> {
+	try {
+		const refreshToken = await selecteUserSpotifyRefreshToken();
+
+		assertIsDefined(refreshToken);
+
+		const request = await AuthSession.refreshAsync(
+			{
+				clientId: config.spotify.clientId,
+				refreshToken,
+			},
+			config.expoAuth.discovery,
+		);
+
+		return request;
+	} catch (error) {
+		console.error(error);
+		//TODO: Refersh token sometimes revoked, needs re-authorization
+		dispatch(authApi.endpoints.signOut.initiate());
+		Burnt.toast({
+			title: "Something went wrong",
+			preset: "error",
+			message: "Refreshing Spotify token did not work...",
+		});
+	}
+}
 
 const spotifyBaseQuery = fetchBaseQuery({
 	baseUrl: config.spotify.baseUrl,
 	prepareHeaders: (headers, { getState }) => {
-		const token = (getState() as RootState).user.token?.accessToken;
+		const token = (getState() as RootState).user.spotifyToken?.accessToken;
 
 		if (token) {
 			headers.set("Authorization", `Bearer ${token}`);
@@ -35,7 +71,7 @@ const baseQueryWithReauth: BaseQueryFn<
 	let result = await spotifyBaseQuery(args, api, extraOptions);
 
 	if (result.error && result.error.status === 401) {
-		const refreshResult = await refreshSpotifyToken();
+		const refreshResult = await refreshSpotifyToken(api.dispatch);
 
 		if (refreshResult) {
 			const {
@@ -52,7 +88,13 @@ const baseQueryWithReauth: BaseQueryFn<
 			assertIsDefined(userId);
 
 			api.dispatch(
-				setToken({ accessToken, tokenType, expiresIn, scope, issuedAt }),
+				updateSpotifyToken({
+					accessToken,
+					tokenType,
+					expiresIn,
+					scope,
+					issuedAt,
+				}),
 			);
 
 			await upsertUserSpotifyData({

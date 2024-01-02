@@ -9,7 +9,6 @@ export function isBoolean(value: any): value is NonNullable<boolean> {
 	return value !== undefined && value !== null && typeof value === "boolean";
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: reason
-export function isDefined(value: any): boolean {
-	return value !== undefined && value !== null;
+export function isDefined<T>(val?: T): val is NonNullable<T> {
+	return val !== undefined && val !== null;
 }

@@ -2,16 +2,17 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type {
+	AppSubscription,
 	SpotifyToken,
-	Subscription,
+	SpotifyUser,
 	User,
 	UserState,
 } from "./user.interface";
 
 const initialState: UserState = {
 	user: undefined,
-	token: undefined,
-	subscription: undefined,
+	spotifyToken: undefined,
+	appSubscription: undefined,
 	spotifyUser: undefined,
 };
 
@@ -20,24 +21,31 @@ export const userSlice = createSlice({
 	initialState,
 	reducers: {
 		signIn: (state, action: PayloadAction<User>) => {
-			if (!state.user) {
+			if (!state.user || state.user.id !== action.payload.id) {
 				state.user = action.payload;
 			}
 		},
-		signOut: () => initialState,
-		setToken: (state, action: PayloadAction<SpotifyToken>) => {
-			state.token = action.payload;
+		updateSpotifyToken: (state, action: PayloadAction<SpotifyToken>) => {
+			state.spotifyToken = action.payload;
 		},
-		setSubscription: (state, action: PayloadAction<Subscription>) => {
-			state.subscription = action.payload;
+		updateSubscription: (state, action: PayloadAction<AppSubscription>) => {
+			state.appSubscription = action.payload;
 		},
-		setSpotifyUserId: (state, action: PayloadAction<{ id: string }>) => {
+		updateSpotifyUserId: (state, action: PayloadAction<SpotifyUser>) => {
 			state.spotifyUser = { id: action.payload.id };
 		},
+		hydrateAuthState: (_, action: PayloadAction<UserState>) => action.payload,
+		signOut: () => initialState,
 	},
 });
 
-export const { signIn, signOut, setToken, setSubscription, setSpotifyUserId } =
-	userSlice.actions;
+export const {
+	signIn,
+	signOut,
+	updateSpotifyToken,
+	updateSubscription,
+	updateSpotifyUserId,
+	hydrateAuthState,
+} = userSlice.actions;
 
 export default userSlice.reducer;

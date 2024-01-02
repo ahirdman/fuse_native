@@ -118,5 +118,5 @@ declare module "native-base" {
 }
 
 export const nativeBaseConfig: INativebaseConfig = {
-  strictMode: 'warn',
+	strictMode: "warn",
 };

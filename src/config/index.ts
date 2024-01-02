@@ -10,6 +10,12 @@ export interface ApplicationConfiguration {
 		baseUrl: string;
 		authScope: string[];
 	};
+	expoAuth: {
+		discovery: {
+			authorizationEndpoint: string;
+			tokenEndpoint: string;
+		};
+	};
 }
 
 export const config = defaultConfig;

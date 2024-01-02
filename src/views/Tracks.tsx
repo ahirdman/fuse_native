@@ -11,6 +11,7 @@ import TracksList from "@/components/organisms/TrackList";
 import useDebounce from "@/hooks/useDebounce";
 import type { RootTabScreenProps } from "@/navigation.types";
 import type { SpotifyTrack } from "@/services/spotify/tracks/tracks.interface";
+import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
 
 interface FilterTracksArgs {
@@ -22,8 +23,15 @@ const TRACK_REQ_LIMIT = 50;
 
 function Tracks({ navigation }: RootTabScreenProps<"Tracks">) {
 	const [offset, setOffset] = useState<number>(0);
-	const [trackFilter, setTrackFilter] = useState<string>("");
-	const debouncedTrackFilter = useDebounce(trackFilter, 300);
+	const { control, watch } = useForm({
+		defaultValues: {
+			trackFilter: "",
+		},
+	});
+
+	const formValue = watch();
+
+	const debouncedTrackFilter = useDebounce(formValue.trackFilter, 300);
 
 	const reqArgs = useMemo(
 		() => ({
@@ -92,6 +100,7 @@ function Tracks({ navigation }: RootTabScreenProps<"Tracks">) {
 				borderWidth="0.5"
 			>
 				<InputField
+					controlProps={{ control, name: "trackFilter" }}
 					placeholder="Search for artists or track names"
 					w="72"
 					size="md"
@@ -99,8 +108,6 @@ function Tracks({ navigation }: RootTabScreenProps<"Tracks">) {
 					autoCorrect={false}
 					autoCapitalize="none"
 					InputLeftElement={<Icon as={<Ionicons name="search" />} ml="3" />}
-					value={trackFilter}
-					onChangeText={setTrackFilter}
 				/>
 				<Button type="secondary" label="Filter" w="20" onPress={() => {}} />
 			</Box>

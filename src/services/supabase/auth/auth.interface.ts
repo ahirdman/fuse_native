@@ -24,7 +24,7 @@ export const signUpInputSchema = z
   })
   .refine((schema) => schema.password === schema.confirmPassword, {
     path: ['confirmPassword'],
-    message: "Password don't match",
+    message: "Passwords don't match",
   });
 
 export const resetPasswordInputSchema = z.object({
