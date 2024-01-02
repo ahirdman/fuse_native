@@ -1,15 +1,8 @@
 import { config } from "@/config";
 import * as Burnt from "burnt";
 import * as AuthSession from "expo-auth-session";
-import { selecteUserSpotifyRefreshToken } from "../supabase/supabase.queries";
 import { generateShortUUID } from "../util";
-import { assertIsDefined } from "../util/assert";
 import { redirectUri } from "./expo.linking";
-
-const discovery = {
-	authorizationEndpoint: "https://accounts.spotify.com/authorize",
-	tokenEndpoint: "https://accounts.spotify.com/api/token",
-};
 
 export async function authorizeSpotify(): Promise<
 	AuthSession.TokenResponse | undefined
@@ -28,7 +21,9 @@ export async function authorizeSpotify(): Promise<
 
 		const authRequest = new AuthSession.AuthRequest(authRequestOptions);
 
-		const authorizeResult = await authRequest.promptAsync(discovery);
+		const authorizeResult = await authRequest.promptAsync(
+			config.expoAuth.discovery,
+		);
 
 		if (authorizeResult.type !== "success") {
 			throw new Error("oh no");
@@ -43,7 +38,7 @@ export async function authorizeSpotify(): Promise<
 					code_verifier: authRequest.codeVerifier || "",
 				},
 			},
-			discovery,
+			config.expoAuth.discovery,
 		);
 
 		return tokenResult;
@@ -52,33 +47,6 @@ export async function authorizeSpotify(): Promise<
 			title: "Something went wrong",
 			preset: "error",
 			message: "Spotify authorization did not work...",
-		});
-	}
-}
-
-export async function refreshSpotifyToken(): Promise<
-	AuthSession.TokenResponse | undefined
-> {
-	try {
-		const refreshToken = await selecteUserSpotifyRefreshToken();
-
-		assertIsDefined(refreshToken);
-
-		const request = await AuthSession.refreshAsync(
-			{
-				clientId: config.spotify.clientId,
-				refreshToken,
-			},
-			discovery,
-		);
-
-		return request;
-	} catch (error) {
-		//TODO: Sometimes errors here, figure out why
-		Burnt.toast({
-			title: "Something went wrong",
-			preset: "error",
-			message: "Refreshing Spotify token did not work...",
 		});
 	}
 }

@@ -1,12 +1,12 @@
 import { Heading, Text } from "native-base";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import Button from "@/components/atoms/Button";
-import FormInputField from "@/components/atoms/FormInputField";
 import PageView from "@/components/atoms/PageView";
 import { useResetPasswordMutation } from "@/services/supabase/auth/auth.endpoints";
 import { CustomerQueryError } from "@/services/supabase/auth/auth.interface";
 
+import InputField from "@/components/atoms/InputField";
 import type { ResetPasswordInput } from "@/services/supabase/auth/auth.interface";
 
 function ResetPassword() {
@@ -35,22 +35,10 @@ function ResetPassword() {
 				A link will be sent to your email to enable restoration of your password
 			</Text>
 
-			<Controller
-				control={control}
-				name="email"
-				render={({
-					field: { onBlur, onChange, value },
-					fieldState: { error },
-				}) => (
-					<FormInputField
-						onBlur={onBlur}
-						value={value}
-						onChangeText={(val) => onChange(val)}
-						error={error?.message}
-						placeholder="Email"
-						keyboardType="email-address"
-					/>
-				)}
+			<InputField
+				controlProps={{ control, name: "email" }}
+				placeholder="Email"
+				keyboardType="email-address"
 			/>
 
 			<Button

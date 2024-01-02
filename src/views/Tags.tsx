@@ -8,7 +8,8 @@ import { useGetAllTagsQuery } from "@/services/supabase/tags/tags.endpoints";
 import { TagsWithTrackIdsQuery } from "@/services/supabase/tags/tags.interface";
 import { Feather } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import { useForm } from "react-hook-form";
 import { RefreshControl, StyleSheet } from "react-native";
 
 interface FilterTagsArgs {
@@ -18,8 +19,14 @@ interface FilterTagsArgs {
 
 export default function TagList({ navigation }: TagListScreenProps<"TagList">) {
 	const { data, refetch, isFetching } = useGetAllTagsQuery({});
-	const [tagFilter, setTagFilter] = useState<string>("");
-	const debouncedTrackFilter = useDebounce(tagFilter, 300);
+	const { control, watch } = useForm({
+		defaultValues: {
+			tagFilter: "",
+		},
+	});
+
+	const formValue = watch();
+	const debouncedTrackFilter = useDebounce(formValue.tagFilter, 300);
 
 	function handleRefetch() {
 		void refetch();
@@ -88,8 +95,7 @@ export default function TagList({ navigation }: TagListScreenProps<"TagList">) {
 					autoCorrect={false}
 					autoCapitalize="none"
 					InputLeftElement={<Icon as={<Feather name="search" />} ml="3" />}
-					value={tagFilter}
-					onChangeText={setTagFilter}
+					controlProps={{ control, name: "tagFilter" }}
 				/>
 			</Box>
 

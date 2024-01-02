@@ -1,11 +1,8 @@
 import { supabaseApi } from "../supabase.api";
 
 import { supabase } from "@/lib/supabase/supabase.init";
-import { setSpotifyUserId, setSubscription, setToken, signOut } from "@/store/user/user.slice";
-import { selectUserData } from "@/lib/supabase/supabase.queries";
-import { isBoolean } from "@/lib/util/assert";
+import { signIn, signOut } from "@/store/user/user.slice";
 
-import type { SpotifyToken } from "@/store/user/user.interface";
 import type {
   ResetPasswordInput,
   SignInInput,
@@ -13,6 +10,7 @@ import type {
   SupaBaseAuthRes,
 } from "./auth.interface";
 import { AuthError } from "@supabase/supabase-js";
+import { handleAuthStateSignIn } from "@/lib/auth";
 
 export const authApi = supabaseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -27,29 +25,14 @@ export const authApi = supabaseApi.injectEndpoints({
           return { error };
         }
 
-        const userData = await selectUserData();
-
-        if (userData && isBoolean(userData.is_subscribed)) {
-          api.dispatch(
-            setSubscription({ subscribed: userData.is_subscribed }),
-          );
-        }
-
-        if (userData.spotify_user_id) {
-          api.dispatch(setSpotifyUserId({ id: userData.spotify_user_id }))
-        }
-
-        if (userData && isBoolean(userData.is_subscribed)) {
-          const tokenData = userData.spotify_token_data as SpotifyToken;
-          api.dispatch(setToken(tokenData));
-        }
+        await handleAuthStateSignIn(data.session, api.dispatch)
 
         return { data };
       },
     }),
 
     signUp: builder.mutation<SupaBaseAuthRes, SignUpRequest>({
-      async queryFn({ email, password }) {
+      async queryFn({ email, password }, api) {
         const { error, data } = await supabase.auth.signUp({ email, password });
 
         if (error) {
@@ -61,6 +44,8 @@ export const authApi = supabaseApi.injectEndpoints({
             error: new AuthError("", 500),
           };
         }
+
+        api.dispatch(signIn({ id: data.session.user.id }))
 
         return {
           data: {

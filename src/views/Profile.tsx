@@ -1,27 +1,27 @@
-import Button from "@/components/atoms/Button";
-import PageView from "@/components/atoms/PageView";
 import { useLazySignOutQuery } from "@/services/supabase/auth/auth.endpoints";
-import { useAppDispatch } from "@/store/hooks";
-import { signOut } from "@/store/user/user.slice";
+import { Button, YGroup, YStack } from "tamagui";
 
 function Profile() {
 	const [signOutQuery] = useLazySignOutQuery();
-	const dispatch = useAppDispatch();
 
 	function handleOnPress() {
 		void signOutQuery();
-		dispatch(signOut());
 	}
 
 	return (
-		<PageView>
-			<Button
-				mb="4"
-				type="secondary"
-				label="Sign out"
-				onPress={handleOnPress}
-			/>
-		</PageView>
+		<YStack flex={1} bg="#1C1C1C" justifyContent="center" alignItems="center">
+			<YGroup width={200}>
+				<YGroup.Item>
+					<Button>First</Button>
+				</YGroup.Item>
+				<YGroup.Item>
+					<Button>Second</Button>
+				</YGroup.Item>
+				<YGroup.Item>
+					<Button onPress={handleOnPress}>signOut</Button>
+				</YGroup.Item>
+			</YGroup>
+		</YStack>
 	);
 }
 

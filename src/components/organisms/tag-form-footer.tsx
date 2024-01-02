@@ -10,12 +10,17 @@ import * as Burnt from "burnt";
 import { HStack, VStack } from "native-base";
 import { IVStackProps } from "native-base/lib/typescript/components/primitives/Stack/VStack";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { returnedResults } from "reanimated-color-picker";
 import Button from "../atoms/Button";
 import IconButton from "../atoms/IconButton";
 import InputField from "../atoms/InputField";
 import ColorPickerModal from "../molecules/ColorPickerModal";
 import TagSection from "../molecules/TagSection";
+
+interface TagFormInput {
+	tagName: string;
+}
 
 interface CreateTagFormProps extends IVStackProps {
 	trackId: string;
@@ -27,7 +32,6 @@ function TagFormFooter({
 	originalArgs,
 	...props
 }: CreateTagFormProps) {
-	const [tagName, setTagName] = useState("");
 	const [tagColor, setTagColor] = useState("#FFFFFF");
 	const [showModal, setShowModal] = useState(false);
 	const [tagAddView, setTagAddView] = useState<"new" | "existing">("new");
@@ -42,13 +46,19 @@ function TagFormFooter({
 	const [addTagToTrack] = useAddTagToTrackMutation();
 	const { data } = useGetAllTagsQuery({ exclude: { trackId: trackId } });
 
-	async function handlePress() {
+	const { control, handleSubmit } = useForm<TagFormInput>({
+		defaultValues: {
+			tagName: "",
+		},
+	});
+
+	async function handlePress(data: TagFormInput) {
 		assertIsDefined(tagColor);
 		assertIsDefined(track);
 
 		const result = await tagTrack({
 			color: tagColor,
-			name: tagName,
+			name: data.tagName,
 			track,
 		});
 
@@ -59,8 +69,6 @@ function TagFormFooter({
 				message: "Could not create tag",
 			});
 		}
-
-		setTagName("");
 	}
 
 	function onSelectColor(colors: returnedResults) {
@@ -106,10 +114,9 @@ function TagFormFooter({
 					<>
 						<HStack justifyContent="space-between">
 							<InputField
-								value={tagName}
-								onChangeText={setTagName}
+								controlProps={{ control, name: "tagName" }}
 								placeholder="Name"
-								w="87%" //TODO: Fix
+								w="80%" //TODO: Fix
 							/>
 							<IconButton color={tagColor} onPress={() => setShowModal(true)} />
 						</HStack>
@@ -117,7 +124,7 @@ function TagFormFooter({
 						<Button
 							type="secondary"
 							label="Create New Tag"
-							onPress={handlePress}
+							onPress={handleSubmit(handlePress)}
 							isLoading={isLoading}
 						/>
 						<ColorPickerModal

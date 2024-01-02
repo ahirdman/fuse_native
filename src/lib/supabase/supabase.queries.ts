@@ -21,15 +21,19 @@ export async function upsertUserSpotifyData({
   refreshToken,
   spotifyUserId
 }: InsertUserDataArgs) {
-  //TOD: verify that undefined refresh token does not overwrite an existing refresh token
-  const { data } = await supabase
+  //TODO: verify that undefined refresh token does not overwrite an existing refresh token
+  const { data, error } = await supabase
     .from('users')
-    .update({
+    .upsert({
       spotify_token_data: tokenData,
       spotify_refresh_token: refreshToken,
       spotify_user_id: spotifyUserId
     })
     .select();
+
+  if (error) {
+    console.log('err', error)
+  }
 
   return data;
 }
@@ -42,12 +46,16 @@ interface UpdateUserSubscriptionDataArgs {
 export async function updateUserSubscriptionData({
   isSubscribed,
 }: UpdateUserSubscriptionDataArgs) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('users')
-    .update({
+    .upsert({
       is_subscribed: isSubscribed,
     })
     .select();
+
+  if (error) {
+    console.error("Sub", error)
+  }
 
   return data;
 }
@@ -56,7 +64,8 @@ export async function selectUserData() {
   const { data, error } = await supabase.from('users').select('*').single()
 
   if (error) {
-    throw new Error('No data');
+    console.debug("No user data")
+    return undefined
   }
 
   return data;
@@ -65,16 +74,11 @@ export async function selectUserData() {
 export async function selecteUserSpotifyRefreshToken() {
   const { data, error } = await supabase
     .from('users')
-    .select('spotify_refresh_token');
+    .select('spotify_refresh_token').single()
 
   if (error) {
     throw new Error('no refresh');
   }
 
-  if (!data.length) {
-    return null;
-  }
-
-  // @ts-ignore
-  return data[0].spotify_refresh_token;
+  return data.spotify_refresh_token;
 }

@@ -1,10 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Heading } from "native-base";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import Button from "@/components/atoms/Button";
 import HorizontalDivider from "@/components/atoms/Divider";
-import FormInputField from "@/components/atoms/FormInputField";
 import PageView from "@/components/atoms/PageView";
 import { useSignInMutation } from "@/services/supabase/auth/auth.endpoints";
 import {
@@ -12,6 +11,7 @@ import {
 	signInInputSchema,
 } from "@/services/supabase/auth/auth.interface";
 
+import InputField from "@/components/atoms/InputField";
 import type { RootStackScreenProps } from "@/navigation.types";
 import type { SignInInput } from "@/services/supabase/auth/auth.interface";
 
@@ -48,42 +48,20 @@ function SignIn({ navigation }: RootStackScreenProps<"SignIn">) {
 					FUSE
 				</Heading>
 
-				<Controller
-					control={control}
-					name="email"
-					render={({
-						field: { onBlur, onChange, value },
-						fieldState: { error },
-					}) => (
-						<FormInputField
-							label="Email"
-							onBlur={onBlur}
-							value={value}
-							onChangeText={(val) => onChange(val)}
-							error={error?.message}
-							placeholder="Email"
-							keyboardType="email-address"
-						/>
-					)}
+				<InputField
+					label="Email"
+					placeholder="Email"
+					keyboardType="email-address"
+					controlProps={{ control, name: "email" }}
+					_stack={{ m: 2 }}
 				/>
 
-				<Controller
-					control={control}
-					name="password"
-					render={({
-						field: { onBlur, onChange, value },
-						fieldState: { error },
-					}) => (
-						<FormInputField
-							label="Password"
-							onBlur={onBlur}
-							value={value}
-							onChangeText={(val) => onChange(val)}
-							error={error?.message}
-							placeholder="********"
-							secureTextEntry
-						/>
-					)}
+				<InputField
+					label="Password"
+					placeholder="********"
+					secureTextEntry
+					controlProps={{ control, name: "password" }}
+					_stack={{ m: 2 }}
 				/>
 
 				<Button

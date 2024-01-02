@@ -16,4 +16,10 @@ export const applicationConfiguration: ApplicationConfiguration = {
 			"playlist-modify-private",
 		],
 	},
+	expoAuth: {
+		discovery: {
+			authorizationEndpoint: "https://accounts.spotify.com/authorize",
+			tokenEndpoint: "https://accounts.spotify.com/api/token",
+		},
+	},
 };
