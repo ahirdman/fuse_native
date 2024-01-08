@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import Button from "@/components/atoms/Button";
 import PageView from "@/components/atoms/PageView";
 import { useResetPasswordMutation } from "@/services/supabase/auth/auth.endpoints";
-import { CustomerQueryError } from "@/services/supabase/auth/auth.interface";
 
 import InputField from "@/components/atoms/InputField";
 import type { ResetPasswordInput } from "@/services/supabase/auth/auth.interface";
@@ -20,8 +19,7 @@ function ResetPassword() {
 		const result = await resetPassword({ email });
 
 		if ("error" in result) {
-			const message = CustomerQueryError.parse(result).error.data.message;
-			setError("email", { message });
+			setError("email", { message: "Invalid email" });
 		}
 	}
 

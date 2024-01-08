@@ -1,4 +1,4 @@
-import { hexToRGBA } from "@/lib/util/color";
+import { hexToRGBA } from "@/util/color";
 import {
 	Box,
 	IBoxProps,

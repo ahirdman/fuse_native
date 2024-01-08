@@ -14,5 +14,4 @@ export const spotifyUserApi = spotifyApi.injectEndpoints({
 	}),
 });
 
-export const { useGetUserProfileQuery, useLazyGetUserProfileQuery } =
-	spotifyUserApi;
+export const { useLazyGetUserProfileQuery } = spotifyUserApi;

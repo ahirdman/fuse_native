@@ -1,4 +1,3 @@
-import { assertIsDefined } from "@/lib/util/assert";
 import { useGetUserSavedTracksQuery } from "@/services/spotify/tracks/tracks.endpoints";
 import { UserTracksReq } from "@/services/spotify/tracks/tracks.interface";
 import {
@@ -6,6 +5,7 @@ import {
 	useCreateTagMutation,
 	useGetAllTagsQuery,
 } from "@/services/supabase/tags/tags.endpoints";
+import { assertIsDefined } from "@/util/assert";
 import * as Burnt from "burnt";
 import { HStack, VStack } from "native-base";
 import { IVStackProps } from "native-base/lib/typescript/components/primitives/Stack/VStack";

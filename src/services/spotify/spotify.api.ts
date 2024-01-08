@@ -13,9 +13,9 @@ import {
 	selecteUserSpotifyRefreshToken,
 	upsertUserSpotifyData,
 } from "@/lib/supabase/supabase.queries";
-import { assertIsDefined } from "@/lib/util/assert";
 import type { RootState } from "@/store/store";
 import { signOut, updateSpotifyToken } from "@/store/user/user.slice";
+import { assertIsDefined } from "@/util/assert";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import * as AuthSession from "expo-auth-session";
 import { authApi } from "../supabase/auth/auth.endpoints";

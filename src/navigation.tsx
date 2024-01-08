@@ -1,10 +1,10 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { StyleSheet } from "react-native";
+import { Home, Tags, User } from "@tamagui/lucide-icons";
 
+import { isDefined } from "@/util/assert";
 import ScreenHeader from "./components/molecules/ScreenHeader";
-import { isBoolean, isDefined } from "./lib/util/assert";
 import { useAppSelector } from "./store/hooks";
 import ResetPassword from "./views/ResetPassword";
 import SignIn from "./views/SignIn";
@@ -12,7 +12,6 @@ import SignUpView from "./views/SignUp";
 import Track from "./views/Track";
 import Tracks from "./views/Tracks";
 
-import { Feather } from "@expo/vector-icons";
 import { Progress } from "tamagui";
 import Button from "./components/atoms/Button";
 import { ModalHeader } from "./components/organisms/modal-header";
@@ -25,22 +24,9 @@ import Profile from "./views/Profile";
 import Tag from "./views/Tag";
 import TagList from "./views/Tags";
 
-interface TabBarIconProps {
-	name: React.ComponentProps<typeof Feather>["name"];
-	color: string;
-}
-
-function TabBarIcon({ name, color }: TabBarIconProps) {
-	return (
-		<Feather size={28} style={styles.tabBarIcon} color={color} name={name} />
-	);
-}
-
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const TagListStack = createNativeStackNavigator<TagListParamList>();
-
-// TODO: TrackView
 
 function RootNavigationStack() {
 	const { user, spotifyToken, appSubscription } = useAppSelector(
@@ -143,7 +129,7 @@ function RootTabStack() {
 	return (
 		<Tab.Navigator
 			screenOptions={{
-				tabBarActiveTintColor: "white",
+				tabBarActiveTintColor: "#FFFFFF",
 				headerShown: false,
 				tabBarStyle: { backgroundColor: "black" },
 				tabBarShowLabel: false,
@@ -154,7 +140,7 @@ function RootTabStack() {
 				component={Tracks}
 				options={{
 					title: "Home",
-					tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+					tabBarIcon: ({ color }) => <Home color={color} />,
 				}}
 			/>
 			<Tab.Screen
@@ -162,7 +148,7 @@ function RootTabStack() {
 				component={TagListStackScreen}
 				options={{
 					title: "Lists",
-					tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
+					tabBarIcon: ({ color }) => <Tags color={color} />,
 				}}
 			/>
 			<Tab.Screen
@@ -170,17 +156,11 @@ function RootTabStack() {
 				component={Profile}
 				options={{
 					title: "Profile",
-					tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+					tabBarIcon: ({ color }) => <User color={color} />,
 				}}
 			/>
 		</Tab.Navigator>
 	);
 }
-
-const styles = StyleSheet.create({
-	tabBarIcon: {
-		marginBottom: -3,
-	},
-});
 
 export default RootNavigationStack;

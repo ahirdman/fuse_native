@@ -15,6 +15,7 @@ export const signInInputSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
 });
+export type SignInInput = z.infer<typeof signInInputSchema>;
 
 export const signUpInputSchema = z
   .object({
@@ -26,31 +27,15 @@ export const signUpInputSchema = z
     path: ['confirmPassword'],
     message: "Passwords don't match",
   });
+export type SignUpInput = z.infer<typeof signUpInputSchema>;
+export type SignUpRequest = Omit<SignUpInput, 'confirmPassword'>;
 
 export const resetPasswordInputSchema = z.object({
   email: emailSchema,
 });
-
-export type SignInInput = z.infer<typeof signInInputSchema>;
-
-export type SignUpInput = z.infer<typeof signUpInputSchema>;
-
-export type SignUpRequest = Omit<SignUpInput, 'confirmPassword'>;
-
 export type ResetPasswordInput = z.infer<typeof resetPasswordInputSchema>;
 
 export interface SupaBaseAuthRes {
   user: SupabaseUser;
   session: Session;
 }
-
-export const CustomerQueryError = z.object({
-  error: z.object({
-    data: z.object({
-      message: z.string(),
-    }),
-    status: z.number(),
-  }),
-});
-
-export type CustomerQueryError = z.infer<typeof CustomerQueryError>;
