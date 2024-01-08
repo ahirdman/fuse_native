@@ -1,12 +1,12 @@
 import { authorizeSpotify } from "@/lib/expo/expo.auth";
 import { upsertUserSpotifyData } from "@/lib/supabase/supabase.queries";
-import { assertIsDefined } from "@/lib/util/assert";
 import { useLazyGetUserProfileQuery } from "@/services/spotify/user/user.endpoint";
 import { useAppDispatch } from "@/store/hooks";
 import {
 	updateSpotifyToken,
 	updateSpotifyUserId,
 } from "@/store/user/user.slice";
+import { assertIsDefined } from "@/util/assert";
 import { Box, Heading, Text, VStack } from "native-base";
 import Button from "../atoms/Button";
 

@@ -1,8 +1,11 @@
 import { config } from "@/config";
 import * as Burnt from "burnt";
 import * as AuthSession from "expo-auth-session";
-import { generateShortUUID } from "../util";
 import { redirectUri } from "./expo.linking";
+
+function generateShortUUID() {
+	return Math.random().toString(36).substring(2, 15);
+}
 
 export async function authorizeSpotify(): Promise<
 	AuthSession.TokenResponse | undefined

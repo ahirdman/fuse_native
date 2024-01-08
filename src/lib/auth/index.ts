@@ -1,9 +1,9 @@
-import { SpotifyToken, UserState } from "@/store/user/user.interface";
+import { type UserState, spotifyToken } from "@/store/user/user.interface";
 import { hydrateAuthState, signIn } from "@/store/user/user.slice";
+import { isBoolean } from "@/util/assert";
 import { ThunkDispatch } from "@reduxjs/toolkit";
 import { Session } from "@supabase/supabase-js";
 import { selectUserData } from "../supabase/supabase.queries";
-import { isBoolean } from "../util/assert";
 
 export async function handleAuthStateSignIn(
 	session: Session | null,
@@ -20,7 +20,7 @@ export async function handleAuthStateSignIn(
 	}
 
 	const userState: UserState = { user: { id: session.user.id } };
-	const parsedSpotifyToken = SpotifyToken.safeParse(
+	const parsedSpotifyToken = spotifyToken.safeParse(
 		dbUserData.spotify_token_data,
 	);
 
