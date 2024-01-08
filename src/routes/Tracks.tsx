@@ -9,7 +9,7 @@ import InputField from "@Atoms/InputField";
 import Alert from "@/components/molecules/Alert";
 import TracksList from "@/components/organisms/TrackList";
 import useDebounce from "@/hooks/useDebounce";
-import type { RootTabScreenProps } from "@/navigation.types";
+import type { TrackListScreenProps } from "@/navigation.types";
 import type { SpotifyTrack } from "@/services/spotify/tracks/tracks.interface";
 import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
@@ -21,7 +21,7 @@ interface FilterTracksArgs {
 
 const TRACK_REQ_LIMIT = 50;
 
-function Tracks({ navigation }: RootTabScreenProps<"Tracks">) {
+function Tracks({ navigation }: TrackListScreenProps<"TrackList">) {
 	const [offset, setOffset] = useState<number>(0);
 	const { control, watch } = useForm({
 		defaultValues: {

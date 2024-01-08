@@ -24,6 +24,39 @@ CREATE EXTENSION IF NOT EXISTS "supabase_vault" WITH SCHEMA "vault";
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "extensions";
 
+CREATE OR REPLACE FUNCTION "public"."change_user_password"("current_plain_password" character varying, "new_plain_password" character varying) RETURNS "json"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    AS $$
+DECLARE
+_uid uuid; -- for checking by 'is not found'
+user_id uuid; -- to store the user id from the request
+BEGIN
+  
+  -- Get user by its current auth.uid and current password
+  user_id := auth.uid();
+  SELECT id INTO _uid
+  FROM auth.users
+  WHERE id = user_id
+  AND encrypted_password =
+  crypt(current_plain_password::text, auth.users.encrypted_password);
+
+  -- Check the currect password
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'incorrect password';
+  END IF;
+
+  -- Then set the new password
+  UPDATE auth.users SET 
+  encrypted_password =
+  crypt(new_plain_password, gen_salt('bf'))
+  WHERE id = user_id;
+  
+  RETURN '{"data":true}';
+END;
+$$;
+
+ALTER FUNCTION "public"."change_user_password"("current_plain_password" character varying, "new_plain_password" character varying) OWNER TO "postgres";
+
 CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$
@@ -162,6 +195,8 @@ CREATE POLICY "Enable read access for authenticated users" ON "public"."trackTag
 
 CREATE POLICY "Enable select for users based on user_id" ON "public"."tags" FOR SELECT USING (("auth"."uid"() = "user_id"));
 
+CREATE POLICY "Enable update for users based on user_id" ON "public"."tags" FOR UPDATE USING (("auth"."uid"() = "user_id")) WITH CHECK (("auth"."uid"() = "user_id"));
+
 ALTER TABLE "public"."tags" ENABLE ROW LEVEL SECURITY;
 
 ALTER TABLE "public"."trackTags" ENABLE ROW LEVEL SECURITY;
@@ -175,6 +210,10 @@ GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
+
+GRANT ALL ON FUNCTION "public"."change_user_password"("current_plain_password" character varying, "new_plain_password" character varying) TO "anon";
+GRANT ALL ON FUNCTION "public"."change_user_password"("current_plain_password" character varying, "new_plain_password" character varying) TO "authenticated";
+GRANT ALL ON FUNCTION "public"."change_user_password"("current_plain_password" character varying, "new_plain_password" character varying) TO "service_role";
 
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "authenticated";

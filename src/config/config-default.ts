@@ -1,6 +1,6 @@
-import type { ApplicationConfiguration } from ".";
+import type { EnvironmentConfig } from ".";
 
-export const applicationConfiguration: ApplicationConfiguration = {
+export const applicationConfiguration: EnvironmentConfig = {
 	supabase: {
 		url: process.env.EXPO_PUBLIC_SUPABASE_URL,
 		anonKey: process.env.EXPO_PUBLIC_SUPABASE_KEY,
