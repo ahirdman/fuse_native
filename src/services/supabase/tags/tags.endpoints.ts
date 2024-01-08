@@ -23,7 +23,12 @@ export const tagsApi = supabaseApi.injectEndpoints({
           .eq("track_id", trackId);
 
         if (error) {
-          return { error };
+          return {
+            error: {
+              message: error.message,
+              status: 500
+            }
+          };
         }
 
         const transformedData = data
@@ -47,7 +52,12 @@ export const tagsApi = supabaseApi.injectEndpoints({
           .returns<TagsWithTrackIdsQuery[]>();
 
         if (error) {
-          return { error };
+          return {
+            error: {
+              message: error.message,
+              status: 500
+            }
+          };
         }
 
         if (exclude?.trackId) {
@@ -72,12 +82,15 @@ export const tagsApi = supabaseApi.injectEndpoints({
 
         if ((data !== null && data.length > 0) || error) {
           return {
-            error: error ? error : {
-              code: "",
-              hint: "",
-              details: "tag already exists",
-              message: "",
-            },
+            error: error ?
+              {
+                message: error.message,
+                status: 500
+              }
+              : {
+                message: "Something went wrong",
+                status: 500
+              },
           };
         }
 
@@ -89,7 +102,12 @@ export const tagsApi = supabaseApi.injectEndpoints({
           .single();
 
         if (tagError) {
-          return { error: tagError };
+          return {
+            error: {
+              message: tagError.message,
+              status: 500
+            }
+          };
         }
 
         const albumCoversUrls = track.albumCovers.map((cover) => cover.url);
@@ -113,7 +131,12 @@ export const tagsApi = supabaseApi.injectEndpoints({
           .single();
 
         if (trackError) {
-          return { error: trackError };
+          return {
+            error: {
+              message: trackError.message,
+              status: 500
+            }
+          };
         }
 
         const { error: trackTagsError } = await supabase // Create row in junction table
@@ -124,7 +147,12 @@ export const tagsApi = supabaseApi.injectEndpoints({
           });
 
         if (trackTagsError) {
-          return { error: trackTagsError };
+          return {
+            error: {
+              message: trackTagsError.message,
+              status: 500
+            }
+          };
         }
 
         return { data: tag };
@@ -154,7 +182,12 @@ export const tagsApi = supabaseApi.injectEndpoints({
           .single();
 
         if (trackError) {
-          return { error: trackError };
+          return {
+            error: {
+              message: trackError.message,
+              status: 500
+            }
+          };
         }
 
         //TODO: Error or disable if track is already tagged with same name (or better value?)
@@ -166,7 +199,16 @@ export const tagsApi = supabaseApi.injectEndpoints({
             { onConflict: "id" },
           );
 
-        return error ? { error } : { data: "ok" };
+        if (error) {
+          return {
+            error: {
+              message: error.message,
+              status: 500
+            }
+          }
+        }
+
+        return { data: "ok" };
       },
       invalidatesTags: ["Tag", "Track"],
     }),
@@ -177,7 +219,16 @@ export const tagsApi = supabaseApi.injectEndpoints({
           .delete()
           .eq("tag_id", tagId);
 
-        return error ? { error } : { data: "ok" };
+        if (error) {
+          return {
+            error: {
+              message: error.message,
+              status: 500
+            }
+          }
+        }
+
+        return { data: "ok" };
       },
       invalidatesTags: ["Tag"],
     }),
@@ -199,7 +250,12 @@ export const tagsApi = supabaseApi.injectEndpoints({
         );
 
         if (error) {
-          return { error };
+          return {
+            error: {
+              message: error.message,
+              status: 500
+            }
+          };
         }
 
         return {

@@ -17,7 +17,10 @@ export const tracksApi = supabaseApi.injectEndpoints({
           .eq("tag_id", tagId);
 
         if (error) {
-          return { error };
+          return { error: {
+            message: error.message,
+            status: 500
+          } };
         }
 
         const transformedData = data
