@@ -88,7 +88,7 @@ function RootNavigationStack() {
 										<ModalHeader
 											centerElement={() => (
 												<Progress size="$2" value={progress} bg="#505050">
-													<Progress.Indicator animation="slow" bg="#F3640B" />
+													<Progress.Indicator animation="lazy" bg="#F3640B" />
 												</Progress>
 											)}
 											rightElement={() => (
