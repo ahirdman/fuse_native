@@ -9,7 +9,6 @@ import type {
   SignUpRequest,
   SupaBaseAuthRes,
 } from "./auth.interface";
-import { AuthError } from "@supabase/supabase-js";
 import { handleAuthStateSignIn } from "@/lib/auth";
 
 export const authApi = supabaseApi.injectEndpoints({
@@ -22,7 +21,12 @@ export const authApi = supabaseApi.injectEndpoints({
         });
 
         if (error) {
-          return { error };
+          return {
+            error: {
+              message: error.message,
+              status: error.status ?? 500
+            }
+          };
         }
 
         await handleAuthStateSignIn(data.session, api.dispatch)
@@ -35,13 +39,22 @@ export const authApi = supabaseApi.injectEndpoints({
       async queryFn({ email, password }, api) {
         const { error, data } = await supabase.auth.signUp({ email, password });
 
+
         if (error) {
-          return { error };
+          return {
+            error: {
+              message: error.message,
+              status: error.status ?? 500
+            }
+          };
         }
 
         if (data.session === null || data.user === null) {
           return {
-            error: new AuthError("", 500),
+            error: {
+              message: "Session was null",
+              status: 500
+            }
           };
         }
 
@@ -62,7 +75,10 @@ export const authApi = supabaseApi.injectEndpoints({
 
         if (error) {
           return {
-            error,
+            error: {
+              message: error.message,
+              status: error.status ?? 500
+            }
           };
         }
 
@@ -78,7 +94,10 @@ export const authApi = supabaseApi.injectEndpoints({
 
         if (error) {
           return {
-            error,
+            error: {
+              message: error.message,
+              status: error.status ?? 500
+            }
           };
         }
 

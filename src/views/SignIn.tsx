@@ -6,14 +6,12 @@ import Button from "@/components/atoms/Button";
 import HorizontalDivider from "@/components/atoms/Divider";
 import PageView from "@/components/atoms/PageView";
 import { useSignInMutation } from "@/services/supabase/auth/auth.endpoints";
-import {
-	CustomerQueryError,
-	signInInputSchema,
-} from "@/services/supabase/auth/auth.interface";
+import { signInInputSchema } from "@/services/supabase/auth/auth.interface";
 
 import InputField from "@/components/atoms/InputField";
 import type { RootStackScreenProps } from "@/navigation.types";
 import type { SignInInput } from "@/services/supabase/auth/auth.interface";
+import { supabaseQueryError } from "@/services/supabase/supabase.api";
 
 function SignIn({ navigation }: RootStackScreenProps<"SignIn">) {
 	const { control, handleSubmit, setError } = useForm<SignInInput>({
@@ -30,9 +28,9 @@ function SignIn({ navigation }: RootStackScreenProps<"SignIn">) {
 		const result = await logIn({ email, password });
 
 		if ("error" in result) {
-			const message = CustomerQueryError.parse(result).error.data.message;
-			setError("password", { message });
-			setError("email", { message });
+			const errorRes = supabaseQueryError.parse(result.error);
+			setError("password", { message: errorRes.message });
+			setError("email", { message: errorRes.message });
 		}
 	}
 
