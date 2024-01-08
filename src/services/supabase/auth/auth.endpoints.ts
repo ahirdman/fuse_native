@@ -104,13 +104,37 @@ export const authApi = supabaseApi.injectEndpoints({
         return { data: "OK" };
       },
     }),
+
+    updatePassword: builder.mutation({
+      async queryFn({ currentPassword, newPassword }: UpdatePasswordArgs) {
+        const { error } = await supabase.rpc("change_user_password", { current_plain_password: currentPassword, new_plain_password: newPassword })
+
+        if (error) {
+          return {
+            error: {
+              message: error.message,
+              status: 500
+            }
+          }
+        }
+
+        return { data: "OK" }
+      }
+    })
+
   }),
   overrideExisting: false,
 });
+
+interface UpdatePasswordArgs {
+  currentPassword: string
+  newPassword: string
+}
 
 export const {
   useSignInMutation,
   useSignUpMutation,
   useLazySignOutQuery,
   useResetPasswordMutation,
+  useUpdatePasswordMutation
 } = authApi;

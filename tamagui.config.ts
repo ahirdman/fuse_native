@@ -1,9 +1,13 @@
 import { createAnimations } from "@tamagui/animations-react-native";
-import { createInterFont } from "@tamagui/font-inter";
+import { config as tamaguiConfig } from "@tamagui/config/v2";
 import { createMedia } from "@tamagui/react-native-media-driver";
 import { shorthands } from "@tamagui/shorthands";
-import { themes, tokens } from "@tamagui/themes";
-import { createTamagui } from "tamagui";
+import {
+	color as baseColor,
+	themes,
+	tokens as baseTokens,
+} from "@tamagui/themes";
+import { createFont, createTamagui, createTokens } from "tamagui";
 
 const animations = createAnimations({
 	bouncy: {
@@ -23,10 +27,71 @@ const animations = createAnimations({
 		mass: 1.2,
 		stiffness: 250,
 	},
+	medium: {
+		type: "spring",
+		damping: 20,
+		stiffness: 60,
+	},
 });
 
-const headingFont = createInterFont();
-const bodyFont = createInterFont();
+const customTokens = createTokens({
+	...baseTokens,
+	color: {
+		...baseColor,
+		brandLight: "#F07123",
+		brandDefault: "#F59E0B",
+		brandDark: "#F3640B",
+		primary300: "#232323",
+		primary400: "#505050",
+		primary500: "#3d3e42",
+		primary600: "#222222",
+		primary700: "#1C1C1C",
+		white: "#FFFFFF",
+		black: "#000000",
+		lightText: "#BBBBBB",
+		darkText: "#191C1D",
+		lightHeader: "#EDEDED",
+		success500: "#54976F",
+		success600: "#6CCC93",
+		error400: "#1D1415",
+		error777: "#261515",
+		error500: "#5F2324",
+		error600: "#772829",
+		error700: "#D45453",
+		warning500: "#E5A43B",
+		warning600: "#FFCA75",
+		border300: "#707070",
+		border400: "#505050",
+		border500: "#3E3E3E",
+	},
+});
+
+const mulishFace = {
+	normal: { normal: "Mulish_400Regular" },
+	bold: { normal: "Mulish_700Bold" },
+	200: { normal: "Mulish_200ExtraLight" },
+	300: { normal: "Mulish_300Light" },
+	500: { normal: "Mulish_500Medium" },
+	600: { normal: "Mulish_600SemiBold" },
+	800: { normal: "Mulish_800ExtraBold" },
+	900: { normal: "Mulish_900Black" },
+};
+
+const headingFont = createFont({
+	size: tamaguiConfig.fonts.heading.size,
+	lineHeight: tamaguiConfig.fonts.heading.lineHeight,
+	weight: tamaguiConfig.fonts.heading.weight,
+	letterSpacing: tamaguiConfig.fonts.heading.letterSpacing,
+	face: mulishFace,
+});
+
+const bodyFont = createFont({
+	size: tamaguiConfig.fonts.body.size,
+	lineHeight: tamaguiConfig.fonts.body.lineHeight,
+	weight: tamaguiConfig.fonts.body.weight,
+	letterSpacing: tamaguiConfig.fonts.body.letterSpacing,
+	face: mulishFace,
+});
 
 const config = createTamagui({
 	animations,
@@ -39,7 +104,7 @@ const config = createTamagui({
 		body: bodyFont,
 	},
 	themes,
-	tokens,
+	tokens: customTokens,
 	media: createMedia({
 		xs: { maxWidth: 660 },
 		sm: { maxWidth: 800 },

@@ -1,4 +1,4 @@
-import { Box, HStack, Pressable, Spinner, Text } from "native-base";
+import { Box, Pressable, Spinner, Text } from "native-base";
 
 import type { IPressableProps, ITextProps } from "native-base";
 import type { GestureResponderEvent } from "react-native";

@@ -1,6 +1,6 @@
-import type { ApplicationConfiguration } from ".";
+import type { EnvironmentConfig } from ".";
 
-export const applicationConfiguration: ApplicationConfiguration = {
+export const applicationConfiguration: EnvironmentConfig = {
 	supabase: {
 		url: "http://127.0.0.1:54321",
 		anonKey: "id",

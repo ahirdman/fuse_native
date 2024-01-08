@@ -15,10 +15,6 @@ export type RootStackParamList = {
 	SignUp: undefined;
 	ResetPassword: undefined;
 	Root: NavigatorScreenParams<RootTabParamList>;
-	Track: {
-		trackId: string;
-		originalArgs: UserTracksReq;
-	};
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
@@ -38,6 +34,24 @@ export type RootTabScreenProps<T extends keyof RootTabParamList> =
 	CompositeScreenProps<
 		BottomTabScreenProps<RootTabParamList, T>,
 		RootStackScreenProps<keyof RootStackParamList>
+	>;
+
+/*
+ * Track List Navigatior Stack
+ * */
+
+export type TrackListParamList = {
+	TrackList: undefined;
+	Track: {
+		trackId: string;
+		originalArgs: UserTracksReq;
+	};
+};
+
+export type TrackListScreenProps<T extends keyof TrackListParamList> =
+	CompositeScreenProps<
+		NativeStackScreenProps<TrackListParamList, T>,
+		RootTabScreenProps<keyof RootTabParamList>
 	>;
 
 /*

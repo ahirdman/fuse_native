@@ -5,12 +5,12 @@ import { Home, Tags, User } from "@tamagui/lucide-icons";
 
 import { isDefined } from "@/util/assert";
 import ScreenHeader from "./components/molecules/ScreenHeader";
+import ResetPassword from "./routes/ResetPassword";
+import SignIn from "./routes/SignIn";
+import SignUpView from "./routes/SignUp";
+import Track from "./routes/Track";
+import Tracks from "./routes/Tracks";
 import { useAppSelector } from "./store/hooks";
-import ResetPassword from "./views/ResetPassword";
-import SignIn from "./views/SignIn";
-import SignUpView from "./views/SignUp";
-import Track from "./views/Track";
-import Tracks from "./views/Tracks";
 
 import { Progress } from "tamagui";
 import Button from "./components/atoms/Button";
@@ -19,14 +19,17 @@ import {
 	type RootStackParamList,
 	type RootTabParamList,
 	TagListParamList,
+	TrackListParamList,
 } from "./navigation.types";
-import Profile from "./views/Profile";
-import Tag from "./views/Tag";
-import TagList from "./views/Tags";
+import Profile from "./routes/Profile";
+import Tag from "./routes/Tag";
+import TagList from "./routes/Tags";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
-const TagListStack = createNativeStackNavigator<TagListParamList>();
+
+const TrackStackNavigator = createNativeStackNavigator<TrackListParamList>();
+const TagStackNavigator = createNativeStackNavigator<TagListParamList>();
 
 function RootNavigationStack() {
 	const { user, spotifyToken, appSubscription } = useAppSelector(
@@ -40,14 +43,7 @@ function RootNavigationStack() {
 		<NavigationContainer>
 			<RootStack.Navigator screenOptions={{ headerShown: false }}>
 				{userReady ? (
-					<>
-						<RootStack.Screen name="Root" component={RootTabStack} />
-						<RootStack.Screen
-							name="Track"
-							component={Track}
-							options={{ presentation: "modal" }}
-						/>
-					</>
+					<RootStack.Screen name="Root" component={RootTabStack} />
 				) : (
 					<>
 						<RootStack.Screen
@@ -104,15 +100,28 @@ function RootNavigationStack() {
 	);
 }
 
-function TagListStackScreen() {
+function TrackListStack() {
 	return (
-		<TagListStack.Navigator>
-			<TagListStack.Screen
+		<TrackStackNavigator.Navigator screenOptions={{ headerShown: false }}>
+			<TrackStackNavigator.Screen name="TrackList" component={Tracks} />
+			<TrackStackNavigator.Screen
+				name="Track"
+				component={Track}
+				options={{ presentation: "modal" }}
+			/>
+		</TrackStackNavigator.Navigator>
+	);
+}
+
+function TagListStack() {
+	return (
+		<TagStackNavigator.Navigator>
+			<TagStackNavigator.Screen
 				name="TagList"
 				component={TagList}
 				options={{ headerShown: false }}
 			/>
-			<TagListStack.Screen
+			<TagStackNavigator.Screen
 				name="Tag"
 				component={Tag}
 				options={({ route }) => ({
@@ -121,7 +130,7 @@ function TagListStackScreen() {
 					),
 				})}
 			/>
-		</TagListStack.Navigator>
+		</TagStackNavigator.Navigator>
 	);
 }
 
@@ -131,13 +140,13 @@ function RootTabStack() {
 			screenOptions={{
 				tabBarActiveTintColor: "#FFFFFF",
 				headerShown: false,
-				tabBarStyle: { backgroundColor: "black" },
+				tabBarStyle: { backgroundColor: "black", borderTopWidth: 0 },
 				tabBarShowLabel: false,
 			}}
 		>
 			<Tab.Screen
 				name="Tracks"
-				component={Tracks}
+				component={TrackListStack}
 				options={{
 					title: "Home",
 					tabBarIcon: ({ color }) => <Home color={color} />,
@@ -145,7 +154,7 @@ function RootTabStack() {
 			/>
 			<Tab.Screen
 				name="Lists"
-				component={TagListStackScreen}
+				component={TagListStack}
 				options={{
 					title: "Lists",
 					tabBarIcon: ({ color }) => <Tags color={color} />,
