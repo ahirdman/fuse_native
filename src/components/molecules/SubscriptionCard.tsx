@@ -18,7 +18,7 @@ export function SubscriptionCard({
 	return (
 		<Card
 			elevate
-			bg="#1C1C1C"
+			bg="$background"
 			h="$11"
 			borderColor={active ? "#F59E0B" : "#505050"}
 			borderWidth={0.5}

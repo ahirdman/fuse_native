@@ -58,7 +58,13 @@ export function PickSubscription({ userId }: PickSubscriptionProps) {
 	}
 
 	return (
-		<Box flex={1} w="full" safeAreaBottom bg="primary.700">
+		<Box
+			flex={1}
+			w="full"
+			safeAreaBottom
+			justifyContent="space-between"
+			bg="primary.700"
+		>
 			<VStack space="4" pt="4" px="4">
 				<Heading textAlign="center">Pick a Subscription</Heading>
 				<Text>Subscribe for better things</Text>

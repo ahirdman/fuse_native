@@ -7,9 +7,8 @@ import {
 	updateSpotifyToken,
 	updateSpotifyUserId,
 } from "@/store/user/user.slice";
-import { Heading, Text } from "native-base";
+import { Box, Heading, Text, VStack } from "native-base";
 import Button from "../atoms/Button";
-import { SignUpTemplate } from "../templates/signup.template";
 
 export function AuthorizeSpotifyPage() {
 	const dispatch = useAppDispatch();
@@ -50,22 +49,28 @@ export function AuthorizeSpotifyPage() {
 		}
 	}
 	return (
-		<SignUpTemplate
-			renderBody={() => (
-				<>
-					<Heading textAlign="center">Connect to Spotify</Heading>
-					<Text>
-						In order to use FUSE, we need access to your spotify library
-					</Text>
-				</>
-			)}
-			renderFooter={() => (
+		<Box
+			flex={1}
+			w="full"
+			safeAreaBottom
+			justifyContent="space-between"
+			bg="primary.700"
+			px="4"
+		>
+			<VStack space="4" pt="4">
+				<Heading textAlign="center">Connect to Spotify</Heading>
+				<Text>
+					In order to use FUSE, we need access to your spotify library
+				</Text>
+			</VStack>
+
+			<VStack>
 				<Button
-					w="full"
+					mb="4"
 					label="Authorize Spotify"
 					onPress={handleSpotifyAuthorization}
 				/>
-			)}
-		/>
+			</VStack>
+		</Box>
 	);
 }

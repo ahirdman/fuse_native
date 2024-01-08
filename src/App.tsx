@@ -25,7 +25,7 @@ import { ApplicationTheme, nativeBaseConfig } from "@/style/theme";
 
 import "react-native-url-polyfill/auto";
 import { TamaguiProvider } from "tamagui";
-import tamaguiConfig from "./style/tamagui.config";
+import tamaguiConfig from "tamagui.config";
 
 init(process.env.EXPO_PUBLIC_APTABASE_KEY);
 void SplashScreen.preventAutoHideAsync();
