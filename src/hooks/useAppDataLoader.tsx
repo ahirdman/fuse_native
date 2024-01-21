@@ -12,7 +12,10 @@ function useAppDataLoader() {
 			.then(async (fetchedSession) => {
 				if (!fetchedSession.data.session) return;
 
-				void handleAuthStateSignIn(fetchedSession.data.session, store.dispatch);
+				await handleAuthStateSignIn(
+					fetchedSession.data.session,
+					store.dispatch,
+				);
 			})
 			.finally(() => setAppReady(true));
 	}, []);
