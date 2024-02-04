@@ -14,7 +14,7 @@ import {
 import Alert from '@/components/molecules/Alert';
 import TagSection from '@/components/molecules/TagSection';
 import TrackDetails from '@/components/molecules/TrackDetails';
-import TagFormFooter from '@/components/organisms/tag-form-footer';
+import TagFormFooter from '@/components/organisms/tag-form.footer';
 import type { TrackListScreenProps } from '@/navigation.types';
 import * as Burnt from 'burnt';
 

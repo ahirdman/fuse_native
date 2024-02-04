@@ -10,6 +10,7 @@ import type {
   SupaBaseAuthRes,
 } from "./auth.interface";
 import { handleAuthStateSignIn } from "@/lib/auth";
+import Purchases from "react-native-purchases";
 
 export const authApi = supabaseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -58,7 +59,7 @@ export const authApi = supabaseApi.injectEndpoints({
           };
         }
 
-        api.dispatch(signIn({ id: data.session.user.id }))
+        api.dispatch(signIn({ id: data.session.user.id, email: data.session.user.email }))
 
         return {
           data: {
@@ -81,6 +82,8 @@ export const authApi = supabaseApi.injectEndpoints({
             }
           };
         }
+
+        await Purchases.logOut()
 
         api.dispatch(signOut());
 

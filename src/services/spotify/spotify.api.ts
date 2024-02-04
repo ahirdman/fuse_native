@@ -38,8 +38,7 @@ export async function refreshSpotifyToken(
     );
 
     return request;
-  } catch (error) {
-    console.error(error);
+  } catch (_error) {
     //TODO: Refersh token sometimes revoked, needs re-authorization
     dispatch(authApi.endpoints.signOut.initiate());
     Burnt.toast({

@@ -42,7 +42,6 @@ function Tag({ route: { params } }: TagListScreenProps<'Tag'>) {
     });
 
     if ('error' in result) {
-      console.log(result.error);
       Burnt.toast({
         title: 'Something went wrong',
         preset: 'error',

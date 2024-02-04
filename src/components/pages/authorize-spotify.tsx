@@ -7,6 +7,7 @@ import {
   updateSpotifyUserId,
 } from '@/store/user/user.slice';
 import { assertIsDefined } from '@/util/assert';
+import * as Burnt from 'burnt';
 import { Box, Heading, Text, VStack } from 'native-base';
 import Button from '../atoms/Button';
 
@@ -44,10 +45,14 @@ export function AuthorizeSpotifyPage() {
           issuedAt,
         }),
       );
-    } catch (err) {
-      console.log(err);
+    } catch (_e) {
+      Burnt.toast({
+        preset: 'error',
+        title: 'Error Authoriing Spotify',
+      });
     }
   }
+
   return (
     <Box
       flex={1}
