@@ -1,7 +1,7 @@
-import { SafeAreaView } from "react-native-safe-area-context";
-import { styled } from "tamagui";
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { styled } from 'tamagui';
 
 export const SafeAreaStack = styled(SafeAreaView, {
-	name: "SafeAreaStack",
-	flex: 1,
+  name: 'SafeAreaStack',
+  flex: 1,
 });

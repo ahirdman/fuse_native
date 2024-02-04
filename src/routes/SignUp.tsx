@@ -1,26 +1,26 @@
-import { AuthorizeSpotifyPage } from "@/components/pages/authorize-spotify";
-import { CreateUserPage } from "@/components/pages/create-user";
-import { PickSubscription } from "@/components/pages/subscription";
-import { useAppSelector } from "@/store/hooks";
+import { AuthorizeSpotifyPage } from '@/components/pages/authorize-spotify';
+import { CreateUserPage } from '@/components/pages/create-user';
+import { PickSubscription } from '@/components/pages/subscription';
+import { useAppSelector } from '@/store/hooks';
 
 function SignUpView() {
-	const { user, spotifyToken, appSubscription } = useAppSelector(
-		(state) => state.user,
-	);
+  const { user, spotifyToken, appSubscription } = useAppSelector(
+    (state) => state.user,
+  );
 
-	if (!user) {
-		return <CreateUserPage />;
-	}
+  if (!user) {
+    return <CreateUserPage />;
+  }
 
-	if (!spotifyToken) {
-		return <AuthorizeSpotifyPage />;
-	}
+  if (!spotifyToken) {
+    return <AuthorizeSpotifyPage />;
+  }
 
-	if (!appSubscription) {
-		return <PickSubscription userId={user.id} />;
-	}
+  if (!appSubscription) {
+    return <PickSubscription userId={user.id} />;
+  }
 
-	return null;
+  return null;
 }
 
 export default SignUpView;

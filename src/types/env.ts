@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 const envVariables = z.object({
 	EXPO_PUBLIC_APTABASE_KEY: z.string(),

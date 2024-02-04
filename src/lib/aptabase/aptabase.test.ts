@@ -1,15 +1,15 @@
-import { formatPath } from "./aptabase";
+import { formatPath } from './aptabase';
 
-describe("Apatabase", () => {
-	it("formats paths correctly", () => {
-		const path = formatPath("/modal");
+describe('Apatabase', () => {
+  it('formats paths correctly', () => {
+    const path = formatPath('/modal');
 
-		expect(path).toStrictEqual("Modal");
-	});
+    expect(path).toStrictEqual('Modal');
+  });
 
-	it("formats a pathname without characters", () => {
-		const path = formatPath("/");
+  it('formats a pathname without characters', () => {
+    const path = formatPath('/');
 
-		expect(path).toStrictEqual("Home");
-	});
+    expect(path).toStrictEqual('Home');
+  });
 });
