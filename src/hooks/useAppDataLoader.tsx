@@ -10,14 +10,12 @@ function useAppDataLoader() {
     void supabase.auth
       .getSession()
       .then(async (fetchedSession) => {
-        if (!fetchedSession.data.session) {
-          return;
+        if (fetchedSession.data.session) {
+          await handleAuthStateSignIn(
+            fetchedSession.data.session,
+            store.dispatch,
+          );
         }
-
-        await handleAuthStateSignIn(
-          fetchedSession.data.session,
-          store.dispatch,
-        );
       })
       .finally(() => setAppReady(true));
   }, []);

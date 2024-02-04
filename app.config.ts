@@ -12,46 +12,104 @@ function expoPlugins(env: string): ExpoPlugins {
   }
 }
 
-export default (): ExpoConfig => {
-  const plugins = expoPlugins(process.env.EAS_ENV as string);
-  const backgroundColor = '#1C1C1C';
+const common: Partial<ExpoConfig> = {
+  slug: 'fuse',
+  orientation: 'portrait',
+  scheme: 'fuse',
+  userInterfaceStyle: 'automatic',
+  splash: {
+    image: './assets/images/splash.png',
+    resizeMode: 'contain',
+  },
+  assetBundlePatterns: ['**/*'],
+  ios: {
+    supportsTablet: false,
+    config: {
+      usesNonExemptEncryption: false,
+    },
+  },
+  experiments: {
+    tsconfigPaths: true,
+  },
+  updates: {
+    url: 'https://u.expo.dev/deeb4c71-d291-4e30-b509-43b38582400a',
+  },
+  runtimeVersion: {
+    policy: 'appVersion',
+  },
+  extra: {
+    eas: {
+      projectId: 'deeb4c71-d291-4e30-b509-43b38582400a',
+    },
+  },
+  owner: 'ahirdman',
+};
 
-  return {
-    name: 'Fuse - Playlist Manager',
-    slug: 'fuse',
-    version: '0.0.1',
-    orientation: 'portrait',
-    icon: './assets/icons/app_icon.png',
-    scheme: 'fuse',
-    userInterfaceStyle: 'automatic',
+export default (): ExpoConfig => {
+  const backgroundColor = '#1C1C1C';
+  const buildEnv = process.env.EAS_ENV;
+  const name = 'Fuse - Playlist Manager';
+  const slug = 'fuse';
+  const applicationIdentifier = 'com.ahirdman.fuse';
+  const icon = './assets/icons/app_icon.png';
+
+  const plugins = expoPlugins(buildEnv as string);
+
+  const developmentConfig: ExpoConfig = {
+    ...common,
+    name: `${name} (Dev)`,
+    slug,
+    icon,
     splash: {
-      image: './assets/images/splash.png',
-      resizeMode: 'contain',
+      ...common.splash,
       backgroundColor,
     },
-    assetBundlePatterns: ['**/*'],
     ios: {
-      supportsTablet: false,
-      bundleIdentifier: 'com.ahirdman.fuse',
-      config: {
-        usesNonExemptEncryption: false,
-      },
-    },
-    android: {
-      adaptiveIcon: {
-        foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor,
-      },
+      ...common.ios,
+      bundleIdentifier: applicationIdentifier,
     },
     plugins,
-    experiments: {
-      tsconfigPaths: true,
-    },
-    extra: {
-      eas: {
-        projectId: 'deeb4c71-d291-4e30-b509-43b38582400a',
-      },
-    },
-    owner: 'ahirdman',
   };
+
+  switch (buildEnv) {
+    case 'development':
+      return developmentConfig;
+
+    case 'test':
+      return {
+        ...common,
+        name: `${name} (Test)`,
+        slug,
+        icon,
+        splash: {
+          ...common.splash,
+          backgroundColor,
+        },
+        ios: {
+          ...common.ios,
+          bundleIdentifier: applicationIdentifier,
+        },
+        plugins,
+      };
+
+    case 'production':
+      return {
+        ...common,
+        name,
+        slug,
+        icon,
+        splash: {
+          ...common.splash,
+          backgroundColor,
+        },
+        ios: {
+          ...common.ios,
+          bundleIdentifier: applicationIdentifier,
+        },
+        plugins,
+      };
+
+    default:
+      return developmentConfig;
+  }
 };

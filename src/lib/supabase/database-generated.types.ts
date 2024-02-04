@@ -34,6 +34,48 @@ export interface Database {
   }
   public: {
     Tables: {
+      subscriptions: {
+        Row: {
+          app_user_id: string | null
+          billing_issue_at: string | null
+          created_at: string
+          expiration_date: string | null
+          id: string
+          is_active: boolean
+          is_sandbox: boolean
+          product_id: string
+          unsubscribed_at: string | null
+          user_id: string
+          will_renew: boolean
+        }
+        Insert: {
+          app_user_id?: string | null
+          billing_issue_at?: string | null
+          created_at?: string
+          expiration_date?: string | null
+          id?: string
+          is_active: boolean
+          is_sandbox: boolean
+          product_id: string
+          unsubscribed_at?: string | null
+          user_id?: string
+          will_renew: boolean
+        }
+        Update: {
+          app_user_id?: string | null
+          billing_issue_at?: string | null
+          created_at?: string
+          expiration_date?: string | null
+          id?: string
+          is_active?: boolean
+          is_sandbox?: boolean
+          product_id?: string
+          unsubscribed_at?: string | null
+          user_id?: string
+          will_renew?: boolean
+        }
+        Relationships: []
+      }
       tags: {
         Row: {
           color: string
@@ -167,26 +209,26 @@ export interface Database {
       users: {
         Row: {
           id: string
-          is_subscribed: boolean | null
           spotify_refresh_token: string | null
           spotify_token_data: Json | null
           spotify_user_id: string | null
+          subscription: string | null
           updated_at: string
         }
         Insert: {
           id?: string
-          is_subscribed?: boolean | null
           spotify_refresh_token?: string | null
           spotify_token_data?: Json | null
           spotify_user_id?: string | null
+          subscription?: string | null
           updated_at?: string
         }
         Update: {
           id?: string
-          is_subscribed?: boolean | null
           spotify_refresh_token?: string | null
           spotify_token_data?: Json | null
           spotify_user_id?: string | null
+          subscription?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -195,6 +237,13 @@ export interface Database {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "users_subscription_fkey"
+            columns: ["subscription"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
             referencedColumns: ["id"]
           }
         ]

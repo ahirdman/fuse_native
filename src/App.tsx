@@ -23,14 +23,22 @@ import useAppDataLoader from '@/hooks/useAppDataLoader';
 import { store } from '@/store/store';
 import { ApplicationTheme, nativeBaseConfig } from '@/style/theme';
 
+import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 import 'react-native-url-polyfill/auto';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { TamaguiProvider } from 'tamagui';
 import tamaguiConfig from 'tamagui.config';
+import { config } from './config';
 
-init(process.env.EXPO_PUBLIC_APTABASE_KEY);
+init(config.aptabase.apiKey);
 void SplashScreen.preventAutoHideAsync();
 
+const queryClient = new QueryClient();
+
 export default function App() {
+  Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+  Purchases.configure({ apiKey: config.revenueCat.apiKey });
+
   const [appReady] = useAppDataLoader();
 
   const [fontsLoaded] = useFonts({
@@ -55,13 +63,18 @@ export default function App() {
   }
 
   return (
-    <ReduxProvider store={store}>
-      <TamaguiProvider config={tamaguiConfig}>
-        <NativeBaseProvider theme={ApplicationTheme} config={nativeBaseConfig}>
-          <StatusBar style="light" />
-          <RootNavigationStack />
-        </NativeBaseProvider>
-      </TamaguiProvider>
-    </ReduxProvider>
+    <QueryClientProvider client={queryClient}>
+      <ReduxProvider store={store}>
+        <TamaguiProvider config={tamaguiConfig}>
+          <NativeBaseProvider
+            theme={ApplicationTheme}
+            config={nativeBaseConfig}
+          >
+            <StatusBar style="light" />
+            <RootNavigationStack />
+          </NativeBaseProvider>
+        </TamaguiProvider>
+      </ReduxProvider>
+    </QueryClientProvider>
   );
 }

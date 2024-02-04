@@ -12,7 +12,7 @@ import type {
 const initialState: UserState = {
   user: undefined,
   spotifyToken: undefined,
-  appSubscription: undefined,
+  subscription: undefined,
   spotifyUser: undefined,
 };
 
@@ -29,7 +29,7 @@ export const userSlice = createSlice({
       state.spotifyToken = action.payload;
     },
     updateSubscription: (state, action: PayloadAction<AppSubscription>) => {
-      state.appSubscription = action.payload;
+      state.subscription = action.payload;
     },
     updateSpotifyUserId: (state, action: PayloadAction<SpotifyUser>) => {
       state.spotifyUser = { id: action.payload.id };

@@ -21,7 +21,7 @@ import {
   TagListParamList,
   TrackListParamList,
 } from './navigation.types';
-import Profile from './routes/Profile';
+import { Profile } from './routes/Profile';
 import Tag from './routes/Tag';
 import TagList from './routes/Tags';
 
@@ -32,12 +32,12 @@ const TrackStackNavigator = createNativeStackNavigator<TrackListParamList>();
 const TagStackNavigator = createNativeStackNavigator<TagListParamList>();
 
 function RootNavigationStack() {
-  const { user, spotifyToken, appSubscription } = useAppSelector(
+  const { user, spotifyToken, subscription } = useAppSelector(
     (state) => state.user,
   );
 
   const userReady =
-    isDefined(user) && isDefined(spotifyToken) && isDefined(appSubscription);
+    isDefined(user) && isDefined(spotifyToken) && isDefined(subscription);
 
   return (
     <NavigationContainer>
@@ -58,7 +58,7 @@ function RootNavigationStack() {
                 presentation: 'modal',
                 headerShown: true,
                 header: (props) => {
-                  const progress = isDefined(appSubscription)
+                  const progress = isDefined(subscription)
                     ? 100
                     : spotifyToken
                       ? 66

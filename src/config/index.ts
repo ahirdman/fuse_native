@@ -21,6 +21,12 @@ export interface EnvironmentConfig {
 }
 
 export interface CommonConfig {
+  aptabase: {
+    apiKey: string;
+  };
+  revenueCat: {
+    apiKey: string;
+  };
   eas: {
     channel: string;
   };
@@ -30,6 +36,12 @@ export interface CommonConfig {
 }
 
 const commonConfig: CommonConfig = {
+  aptabase: {
+    apiKey: process.env.EXPO_PUBLIC_APTABASE_KEY,
+  },
+  revenueCat: {
+    apiKey: process.env.EXPO_PUBLIC_REVENUE_CAT_KEY,
+  },
   eas: {
     channel: typeof channel === 'string' ? channel : 'NA',
   },

@@ -1,60 +1,21 @@
-import { updateUserSubscriptionData } from '@/lib/supabase/supabase.queries';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useAppDispatch } from '@/store/hooks';
 import { updateSubscription } from '@/store/user/user.slice';
 import { Box, Heading, Text, VStack } from 'native-base';
-import { useState } from 'react';
 import { ScrollView } from 'tamagui';
 import Button from '../atoms/Button';
 import { SubscriptionCard } from '../molecules/SubscriptionCard';
 
-interface PickSubscriptionProps {
-  userId: string;
-}
-
-type AppSubscriptionType = 'MONTHLY' | 'YEARLY' | 'TRIAL';
-
-interface AppSubscription {
-  type: AppSubscriptionType;
-  title: string;
-  desc: string;
-  price: number;
-}
-
-const subscriptions: AppSubscription[] = [
-  {
-    type: 'YEARLY',
-    title: 'Yearly',
-    desc: 'Save some money',
-    price: 20,
-  },
-  {
-    type: 'MONTHLY',
-    title: 'Monthly',
-    desc: 'Default choice for most',
-    price: 2,
-  },
-  {
-    type: 'TRIAL',
-    title: 'Trial',
-    desc: 'Try it out first',
-    price: 0,
-  },
-];
-
-export function PickSubscription({ userId }: PickSubscriptionProps) {
+export function PickSubscription() {
   const dispatch = useAppDispatch();
-  const [activeChoice, setActiveChoice] =
-    useState<AppSubscriptionType>('TRIAL');
+  const [
+    setActiveChoice,
+    handlePickSubscription,
+    { packages, purchaseLoading, activeChoice },
+  ] = useSubscription();
 
-  async function handlePickSubscription(userId: string) {
-    const subscriptionState = { subscribed: false };
-
-    await updateUserSubscriptionData({
-      isSubscribed: subscriptionState.subscribed,
-      id: userId,
-    });
-
-    dispatch(updateSubscription(subscriptionState));
+  function handleSkip() {
+    dispatch(updateSubscription({ isSubscribed: false }));
   }
 
   return (
@@ -70,24 +31,36 @@ export function PickSubscription({ userId }: PickSubscriptionProps) {
         <Text>Subscribe for better things</Text>
       </VStack>
 
-      <ScrollView space padding={16}>
-        {subscriptions.map(({ type, title, desc, price }) => (
-          <SubscriptionCard
-            key={type}
-            onPress={() => setActiveChoice(type)}
-            active={activeChoice === type}
-            title={title}
-            price={price}
-            body={desc}
-          />
-        ))}
+      <ScrollView padding={16}>
+        {packages?.map((sub) => {
+          const title = sub.product.identifier.slice(4);
+
+          return (
+            <SubscriptionCard
+              key={sub.identifier}
+              onPress={() => setActiveChoice(sub)}
+              active={activeChoice?.identifier === sub.identifier}
+              title={title}
+              price={sub.product.priceString}
+              marginVertical="$3"
+            />
+          );
+        })}
       </ScrollView>
 
       <VStack px="4">
         <Button
           label="Choose Subscription"
           mb="4"
-          onPress={() => handlePickSubscription(userId)}
+          disabled={purchaseLoading}
+          isLoading={purchaseLoading}
+          onPress={handlePickSubscription}
+        />
+        <Button
+          label="Skip"
+          onPress={handleSkip}
+          disabled={purchaseLoading}
+          type="secondary"
         />
       </VStack>
     </Box>

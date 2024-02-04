@@ -4,7 +4,7 @@ import { PickSubscription } from '@/components/pages/subscription';
 import { useAppSelector } from '@/store/hooks';
 
 function SignUpView() {
-  const { user, spotifyToken, appSubscription } = useAppSelector(
+  const { user, spotifyToken, subscription } = useAppSelector(
     (state) => state.user,
   );
 
@@ -16,8 +16,8 @@ function SignUpView() {
     return <AuthorizeSpotifyPage />;
   }
 
-  if (!appSubscription) {
-    return <PickSubscription userId={user.id} />;
+  if (!subscription) {
+    return <PickSubscription />;
   }
 
   return null;

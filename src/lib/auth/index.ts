@@ -1,8 +1,8 @@
 import { type UserState, spotifyToken } from '@/store/user/user.interface';
 import { hydrateAuthState, signIn } from '@/store/user/user.slice';
-import { isBoolean } from '@/util/assert';
 import { ThunkDispatch } from '@reduxjs/toolkit';
 import { Session } from '@supabase/supabase-js';
+import Purchases from 'react-native-purchases';
 import { selectUserData } from '../supabase/supabase.queries';
 
 export async function handleAuthStateSignIn(
@@ -14,14 +14,18 @@ export async function handleAuthStateSignIn(
     return;
   }
 
+  await Purchases.logIn(session.user.id);
   const dbUserData = await selectUserData();
 
   if (!dbUserData) {
-    dispatch(signIn({ id: session.user.id }));
+    dispatch(signIn({ id: session.user.id, email: session.user.email }));
     return;
   }
 
-  const userState: UserState = { user: { id: session.user.id } };
+  const userState: UserState = {
+    user: { id: session.user.id, email: session.user.email },
+  };
+
   const parsedSpotifyToken = spotifyToken.safeParse(
     dbUserData.spotify_token_data,
   );
@@ -34,8 +38,14 @@ export async function handleAuthStateSignIn(
     userState.spotifyUser = { id: dbUserData.spotify_user_id };
   }
 
-  if (isBoolean(dbUserData.is_subscribed)) {
-    userState.appSubscription = { subscribed: dbUserData.is_subscribed };
+  if (dbUserData.subscription && dbUserData.subscriptions) {
+    userState.subscription = {
+      isSubscribed: true,
+      package: {
+        ...dbUserData.subscriptions,
+        app_user_id: dbUserData.subscriptions.app_user_id ?? 'Unknwon',
+      },
+    };
   }
 
   dispatch(hydrateAuthState(userState));
