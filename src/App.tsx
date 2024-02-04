@@ -1,67 +1,67 @@
-import { init } from "@aptabase/react-native";
-import * as SplashScreen from "expo-splash-screen";
-import { StatusBar } from "expo-status-bar";
+import { init } from '@aptabase/react-native';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 
 import {
-	Mulish_200ExtraLight,
-	Mulish_300Light,
-	Mulish_400Regular,
-	Mulish_500Medium,
-	Mulish_600SemiBold,
-	Mulish_700Bold,
-	Mulish_800ExtraBold,
-	Mulish_900Black,
-	useFonts,
-} from "@expo-google-fonts/mulish";
-import { NativeBaseProvider } from "native-base";
-import { useEffect } from "react";
-import { Provider as ReduxProvider } from "react-redux";
+  Mulish_200ExtraLight,
+  Mulish_300Light,
+  Mulish_400Regular,
+  Mulish_500Medium,
+  Mulish_600SemiBold,
+  Mulish_700Bold,
+  Mulish_800ExtraBold,
+  Mulish_900Black,
+  useFonts,
+} from '@expo-google-fonts/mulish';
+import { NativeBaseProvider } from 'native-base';
+import { useEffect } from 'react';
+import { Provider as ReduxProvider } from 'react-redux';
 
-import RootNavigationStack from "./navigation";
+import RootNavigationStack from './navigation';
 
-import useAppDataLoader from "@/hooks/useAppDataLoader";
-import { store } from "@/store/store";
-import { ApplicationTheme, nativeBaseConfig } from "@/style/theme";
+import useAppDataLoader from '@/hooks/useAppDataLoader';
+import { store } from '@/store/store';
+import { ApplicationTheme, nativeBaseConfig } from '@/style/theme';
 
-import "react-native-url-polyfill/auto";
-import { TamaguiProvider } from "tamagui";
-import tamaguiConfig from "tamagui.config";
+import 'react-native-url-polyfill/auto';
+import { TamaguiProvider } from 'tamagui';
+import tamaguiConfig from 'tamagui.config';
 
 init(process.env.EXPO_PUBLIC_APTABASE_KEY);
 void SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-	const [appReady] = useAppDataLoader();
+  const [appReady] = useAppDataLoader();
 
-	const [fontsLoaded] = useFonts({
-		Mulish_200ExtraLight,
-		Mulish_300Light,
-		Mulish_400Regular,
-		Mulish_500Medium,
-		Mulish_600SemiBold,
-		Mulish_700Bold,
-		Mulish_800ExtraBold,
-		Mulish_900Black,
-	});
+  const [fontsLoaded] = useFonts({
+    Mulish_200ExtraLight,
+    Mulish_300Light,
+    Mulish_400Regular,
+    Mulish_500Medium,
+    Mulish_600SemiBold,
+    Mulish_700Bold,
+    Mulish_800ExtraBold,
+    Mulish_900Black,
+  });
 
-	useEffect(() => {
-		if (fontsLoaded && appReady) {
-			void SplashScreen.hideAsync();
-		}
-	}, [fontsLoaded, appReady]);
+  useEffect(() => {
+    if (fontsLoaded && appReady) {
+      void SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, appReady]);
 
-	if (!fontsLoaded || !appReady) {
-		return null;
-	}
+  if (!fontsLoaded || !appReady) {
+    return null;
+  }
 
-	return (
-		<ReduxProvider store={store}>
-			<TamaguiProvider config={tamaguiConfig}>
-				<NativeBaseProvider theme={ApplicationTheme} config={nativeBaseConfig}>
-					<StatusBar style="light" />
-					<RootNavigationStack />
-				</NativeBaseProvider>
-			</TamaguiProvider>
-		</ReduxProvider>
-	);
+  return (
+    <ReduxProvider store={store}>
+      <TamaguiProvider config={tamaguiConfig}>
+        <NativeBaseProvider theme={ApplicationTheme} config={nativeBaseConfig}>
+          <StatusBar style="light" />
+          <RootNavigationStack />
+        </NativeBaseProvider>
+      </TamaguiProvider>
+    </ReduxProvider>
+  );
 }

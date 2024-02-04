@@ -1,9 +1,9 @@
-import { setupServer } from "msw/native";
+import { setupServer } from 'msw/native';
 
-import { handlers } from "./handlers";
+import { handlers } from './handlers';
 
 export function initMocks() {
-	const nativeServer = setupServer(...handlers);
-	nativeServer.listen({ onUnhandledRequest: "bypass" });
-	nativeServer.printHandlers();
+  const nativeServer = setupServer(...handlers);
+  nativeServer.listen({ onUnhandledRequest: 'bypass' });
+  nativeServer.printHandlers();
 }

@@ -1,6 +1,6 @@
-import { makeRedirectUri } from "expo-auth-session";
+import { makeRedirectUri } from 'expo-auth-session';
 
 export const redirectUri = makeRedirectUri({
-	scheme: "fuse",
-	path: "auth",
+  scheme: 'fuse',
+  path: 'auth',
 });
