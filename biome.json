@@ -61,7 +61,9 @@
       "test-results",
       "metro.config.js",
       "babel.config.js",
-      "index.js"
+      "index.js",
+      "ios",
+      "android"
     ]
   },
   "overrides": [

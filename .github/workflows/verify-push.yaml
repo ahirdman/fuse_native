@@ -10,14 +10,13 @@ jobs:
       - name: 🛒 Check out Git repository
         uses: actions/checkout@v4
 
-      - name: 🏗️ Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun 🚀
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
+          bun-version: latest
 
-      - name: 📦 Install Packages
-        run: npm ci
+      - name: Install packages
+        run: bun install
 
       - name: 🧬 Setup Biome
         uses: biomejs/setup-biome@v1
@@ -25,7 +24,7 @@ jobs:
           version: 1.4.0
 
       - name: 🔍 Run verify
-        run: npm run verify
+        run: bun run verify
 
   # create-preview:
   #   needs: [lint-and-test]
