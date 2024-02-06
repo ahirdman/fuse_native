@@ -1,7 +1,3 @@
-import { rest } from 'msw';
-
-import { config } from '@/config/index';
-
 import type { Session, User } from '@supabase/supabase-js';
 
 const supaBaseUser: User = {
@@ -28,15 +24,9 @@ interface SuccessResponse {
   };
 }
 
-const tokenRes: SuccessResponse = {
+export const tokenRes: SuccessResponse = {
   data: {
     session: supabaseSession,
     user: supaBaseUser,
   },
 };
-
-export const handlers = [
-  rest.post(`${config.supabase.url}/auth/v1/token`, async (_, res, ctx) => {
-    return res(ctx.json(tokenRes));
-  }),
-];

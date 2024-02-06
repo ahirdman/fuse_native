@@ -8,7 +8,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 
 beforeAll(() => {
   server.listen({ onUnhandledRequest: 'warn' });
-  server.printHandlers();
+  server.listHandlers();
 });
 
 afterEach(() => {
