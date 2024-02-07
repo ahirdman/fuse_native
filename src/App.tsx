@@ -23,9 +23,8 @@ import useAppDataLoader from '@/hooks/useAppDataLoader';
 import { store } from '@/store/store';
 import { ApplicationTheme, nativeBaseConfig } from '@/style/theme';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Purchases, { LOG_LEVEL } from 'react-native-purchases';
-import 'react-native-url-polyfill/auto';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { TamaguiProvider } from 'tamagui';
 import tamaguiConfig from 'tamagui.config';
 import { config } from './config';

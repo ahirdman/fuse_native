@@ -2,19 +2,23 @@ import { getOfferings, makePurchase } from '@/lib/subscription';
 import { updateUserSubscriptionData } from '@/lib/supabase/supabase.queries';
 import { useAppDispatch } from '@/store/hooks';
 import { updateSubscription } from '@/store/user/user.slice';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import * as Burnt from 'burnt';
 import { useState } from 'react';
 import { PurchasesPackage } from 'react-native-purchases';
-import { useMutation, useQuery } from 'react-query';
 
 export function useSubscription() {
   const dispatch = useAppDispatch();
   const [activeChoice, setActiveChoice] = useState<PurchasesPackage>();
-  const { mutateAsync, isLoading: purchaseLoading } = useMutation(
-    'makePurchase',
-    makePurchase,
-  );
-  const { data: packages } = useQuery('packages', getOfferings);
+  const { mutateAsync, isPending: purchaseLoading } = useMutation({
+    mutationKey: ['makePurchase'],
+    mutationFn: makePurchase,
+  });
+
+  const { data: packages } = useQuery({
+    queryKey: ['packages'],
+    queryFn: getOfferings,
+  });
 
   async function handlePickSubscription() {
     try {
