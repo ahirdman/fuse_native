@@ -1,4 +1,4 @@
-import type { ExpoConfig } from 'expo/config';
+import type { ConfigContext, ExpoConfig } from 'expo/config';
 
 // biome-ignore lint/suspicious/noExplicitAny: reason
 type ExpoPlugins = (string | [] | [string] | [string, any])[];
@@ -45,19 +45,29 @@ const common: Partial<ExpoConfig> = {
   owner: 'ahirdman',
 };
 
-export default (): ExpoConfig => {
+function parseReleaseCandidateVersion(version: string): string {
+  const regex = /^(\d+\.\d+\.\d+)(?:-rc\.\d+)?$/;
+  const match = version.match(regex);
+
+  return match?.[1] ? match[1] : version;
+}
+
+export default ({ config }: ConfigContext): ExpoConfig => {
   const backgroundColor = '#1C1C1C';
   const buildEnv = process.env.EAS_ENV;
   const name = 'Fuse - Playlist Manager';
   const slug = 'fuse';
   const applicationIdentifier = 'com.ahirdman.fuse';
   const icon = './assets/icons/app_icon.png';
-
   const plugins = expoPlugins(buildEnv as string);
+  const version = config.version
+    ? parseReleaseCandidateVersion(config.version)
+    : config.version;
 
   const developmentConfig: ExpoConfig = {
     ...common,
     name: `${name} (Dev)`,
+    version,
     slug,
     icon,
     splash: {
@@ -80,6 +90,7 @@ export default (): ExpoConfig => {
         ...common,
         name: `${name} (Test)`,
         slug,
+        version,
         icon,
         splash: {
           ...common.splash,
@@ -97,6 +108,7 @@ export default (): ExpoConfig => {
         ...common,
         name,
         slug,
+        version,
         icon,
         splash: {
           ...common.splash,
