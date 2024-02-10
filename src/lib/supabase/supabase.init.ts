@@ -1,7 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 import { createClient } from '@supabase/supabase-js';
-import { config } from '@/config';
-import type { Database } from './database.interface';
+
+import { config } from 'config';
+import type { Database } from 'lib/supabase/database.interface';
 
 const ExpoSecureStoreAdapter = {
   getItem: (key: string) => {

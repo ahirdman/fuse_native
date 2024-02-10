@@ -68,7 +68,7 @@
   },
   "overrides": [
     {
-      "include": ["navigation.types.ts", "tamagui.config.ts", "env.ts"],
+      "include": ["navigation.types.ts", "tamagui.config.ts", "env.types.ts"],
       "linter": {
         "rules": {
           "suspicious": {

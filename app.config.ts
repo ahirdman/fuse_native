@@ -24,6 +24,7 @@ const common: Partial<ExpoConfig> = {
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: false,
+    buildNumber: '25',
     config: {
       usesNonExemptEncryption: false,
     },
@@ -35,7 +36,7 @@ const common: Partial<ExpoConfig> = {
     url: 'https://u.expo.dev/deeb4c71-d291-4e30-b509-43b38582400a',
   },
   runtimeVersion: {
-    policy: 'appVersion',
+    policy: 'nativeVersion',
   },
   extra: {
     eas: {
@@ -48,7 +49,6 @@ const common: Partial<ExpoConfig> = {
 function parseReleaseCandidateVersion(version: string): string {
   const regex = /^(\d+\.\d+\.\d+)(?:-rc\.\d+)?$/;
   const match = version.match(regex);
-
   return match?.[1] ? match[1] : version;
 }
 

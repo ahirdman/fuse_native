@@ -1,3 +1,5 @@
+import { describe, expect, test } from 'bun:test';
+
 export function generateLongString(length: number): string {
   const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

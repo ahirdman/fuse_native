@@ -1,9 +1,10 @@
-import { type UserState, spotifyToken } from '@/store/user/user.interface';
-import { hydrateAuthState, signIn } from '@/store/user/user.slice';
 import { ThunkDispatch } from '@reduxjs/toolkit';
-import { Session } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import Purchases from 'react-native-purchases';
-import { selectUserData } from '../supabase/supabase.queries';
+
+import { selectUserData } from 'user/queries';
+import { type UserState, spotifyToken } from 'user/user.interface';
+import { hydrateAuthState, signIn } from 'user/user.slice';
 
 export async function handleAuthStateSignIn(
   session: Session | null,

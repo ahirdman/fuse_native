@@ -98,7 +98,10 @@ const config = createTamagui({
 	defaultTheme: 'dark',
 	shouldAddPrefersColorThemes: false,
 	themeClassNameOnRoot: false,
-	shorthands,
+	shorthands: {
+		...shorthands,
+		full: '100%',
+	},
 	fonts: {
 		heading: headingFont,
 		body: bodyFont,
@@ -126,8 +129,6 @@ const config = createTamagui({
 export type AppConfig = typeof config;
 
 declare module 'tamagui' {
-	// overrides TamaguiCustomConfig so your custom types
-	// work everywhere you import `tamagui`
 	interface TamaguiCustomConfig extends AppConfig {}
 }
 

@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -85,6 +85,7 @@ export interface Database {
           name: string
           spotify_playlist_id: string | null
           spotify_playlist_uri: string | null
+          synced_at: string | null
           updated_at: string
           user_id: string
         }
@@ -96,6 +97,7 @@ export interface Database {
           name: string
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
+          synced_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -107,6 +109,7 @@ export interface Database {
           name?: string
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
+          synced_at?: string | null
           updated_at?: string
           user_id?: string
         }
