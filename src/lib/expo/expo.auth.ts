@@ -1,7 +1,8 @@
-import { config } from '@/config';
-import * as Burnt from 'burnt';
 import * as AuthSession from 'expo-auth-session';
-import { redirectUri } from './expo.linking';
+
+import { config } from 'config';
+import { redirectUri } from 'lib/expo/expo.linking';
+import { showToast } from 'util/toast';
 
 function generateShortUUID() {
   return Math.random().toString(36).substring(2, 15);
@@ -46,7 +47,7 @@ export async function authorizeSpotify(): Promise<
 
     return tokenResult;
   } catch (_error) {
-    Burnt.toast({
+    showToast({
       title: 'Something went wrong',
       preset: 'error',
       message: 'Spotify authorization did not work...',

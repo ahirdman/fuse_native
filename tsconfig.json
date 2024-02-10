@@ -5,13 +5,30 @@
     "esModuleInterop": true,
     "noUncheckedIndexedAccess": true,
     "module": "esnext",
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["src/*"],
-      "@Atoms/*": ["src/components/atoms/*"],
-      "@Molecules/*": ["src/components/molecules/*"],
-      "@Organisms/*": ["src/components/organisms/*"]
-    }
+      "common/*": [
+        "features/common/*"
+      ],
+      "subscription/*": [
+        "features/subscription/*"
+      ],
+      "tag/*": [
+        "features/tag/*"
+      ],
+      "track/*": [
+        "features/track/*"
+      ],
+      "user/*": [
+        "features/user/*"
+      ],
+      "config": [
+        "config/index.ts"
+      ]
+    },
+    "types": [
+      "bun-types"
+    ]
   },
   "include": [
     "**/*.ts",

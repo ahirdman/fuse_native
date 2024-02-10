@@ -1,37 +1,44 @@
+import { useReactNavigationDevTools } from '@dev-plugins/react-navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, Tags, User } from '@tamagui/lucide-icons';
-
-import { isDefined } from '@/util/assert';
-import ScreenHeader from './components/molecules/ScreenHeader';
-import ResetPassword from './routes/ResetPassword';
-import SignIn from './routes/SignIn';
-import SignUpView from './routes/SignUp';
-import Track from './routes/Track';
-import Tracks from './routes/Tracks';
-import { useAppSelector } from './store/hooks';
-
-import { Progress } from 'tamagui';
-import Button from './components/atoms/Button';
-import { ModalHeader } from './components/organisms/modal-header';
 import {
-  type RootStackParamList,
-  type RootTabParamList,
+  NavigationContainer,
+  useNavigationContainerRef,
+} from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { ChevronLeft, Home, Tags, User } from '@tamagui/lucide-icons';
+import { Progress, XStack } from 'tamagui';
+
+import type {
+  RootStackParamList,
+  RootTabParamList,
   TagListParamList,
-  TrackListParamList,
-} from './navigation.types';
-import { Profile } from './routes/Profile';
-import Tag from './routes/Tag';
-import TagList from './routes/Tags';
+} from 'navigation.types';
+import { useAppSelector } from 'store/hooks';
+import { isDefined } from 'util/assert';
+import { hexToRGBA } from 'util/color';
+
+import { Button } from 'components/Button';
+import { ModalHeader } from 'components/modal-header';
+
+import { Profile } from 'user/routes/Profile';
+import { SignIn } from 'user/routes/SignIn';
+import { SignUpView } from 'user/routes/SignUp';
+
+import { TagView } from 'tag/routes/Tag';
+import { TagList } from 'tag/routes/Tags';
+
+import { Track } from 'track/routes/Track';
+import { Tracks } from 'track/routes/Tracks';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-const TrackStackNavigator = createNativeStackNavigator<TrackListParamList>();
 const TagStackNavigator = createNativeStackNavigator<TagListParamList>();
 
 function RootNavigationStack() {
+  const navigationRef = useNavigationContainerRef();
+
+  useReactNavigationDevTools(navigationRef);
   const { user, spotifyToken, subscription } = useAppSelector(
     (state) => state.user,
   );
@@ -40,10 +47,17 @@ function RootNavigationStack() {
     isDefined(user) && isDefined(spotifyToken) && isDefined(subscription);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {userReady ? (
-          <RootStack.Screen name="Root" component={RootTabStack} />
+          <>
+            <RootStack.Screen name="Root" component={RootTabStack} />
+            <RootStack.Screen
+              name="Track"
+              component={Track}
+              options={{ presentation: 'modal' }}
+            />
+          </>
         ) : (
           <>
             <RootStack.Screen
@@ -86,30 +100,10 @@ function RootNavigationStack() {
                 },
               }}
             />
-            <RootStack.Screen
-              name="ResetPassword"
-              component={ResetPassword}
-              options={{
-                presentation: 'modal',
-              }}
-            />
           </>
         )}
       </RootStack.Navigator>
     </NavigationContainer>
-  );
-}
-
-function TrackListStack() {
-  return (
-    <TrackStackNavigator.Navigator screenOptions={{ headerShown: false }}>
-      <TrackStackNavigator.Screen name="TrackList" component={Tracks} />
-      <TrackStackNavigator.Screen
-        name="Track"
-        component={Track}
-        options={{ presentation: 'modal' }}
-      />
-    </TrackStackNavigator.Navigator>
   );
 }
 
@@ -123,12 +117,21 @@ function TagListStack() {
       />
       <TagStackNavigator.Screen
         name="Tag"
-        component={Tag}
-        options={({ route }) => ({
-          header: (props) => (
-            <ScreenHeader {...props} title={route.params.name} />
-          ),
-        })}
+        component={TagView}
+        options={(props) => {
+          const titleColor = hexToRGBA(props.route.params.color, 0.8);
+
+          return {
+            headerStyle: { backgroundColor: '#232323' },
+            headerLeft: () => (
+              <XStack onPress={() => props.navigation.goBack()}>
+                <ChevronLeft />
+              </XStack>
+            ),
+            headerTitleStyle: { color: titleColor },
+            headerTitle: props.route.params.name,
+          };
+        }}
       />
     </TagStackNavigator.Navigator>
   );
@@ -146,7 +149,7 @@ function RootTabStack() {
     >
       <Tab.Screen
         name="Tracks"
-        component={TrackListStack}
+        component={Tracks}
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Home color={color} />,

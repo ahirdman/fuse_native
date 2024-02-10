@@ -1,7 +1,5 @@
 import { init } from '@aptabase/react-native';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-
+import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import {
   Mulish_200ExtraLight,
   Mulish_300Light,
@@ -13,30 +11,30 @@ import {
   Mulish_900Black,
   useFonts,
 } from '@expo-google-fonts/mulish';
+import { QueryClientProvider } from '@tanstack/react-query';
+import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { NativeBaseProvider } from 'native-base';
 import { useEffect } from 'react';
-import { Provider as ReduxProvider } from 'react-redux';
-
-import RootNavigationStack from './navigation';
-
-import useAppDataLoader from '@/hooks/useAppDataLoader';
-import { store } from '@/store/store';
-import { ApplicationTheme, nativeBaseConfig } from '@/style/theme';
-
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Purchases, { LOG_LEVEL } from 'react-native-purchases';
+import { Provider as ReduxProvider } from 'react-redux';
 import { TamaguiProvider } from 'tamagui';
-import tamaguiConfig from 'tamagui.config';
-import { config } from './config';
+
+import { config } from 'config';
+import { queryClient } from 'lib/query/init';
+import { store } from 'store';
+import { ApplicationTheme, nativeBaseConfig } from 'style/theme';
+import useAppDataLoader from 'user/useAppDataLoader';
+import tamaguiConfig from '../tamagui.config';
+import RootNavigationStack from './navigation';
 
 init(config.aptabase.apiKey);
 void SplashScreen.preventAutoHideAsync();
 
-const queryClient = new QueryClient();
-
 export default function App() {
   Purchases.setLogLevel(LOG_LEVEL.DEBUG);
   Purchases.configure({ apiKey: config.revenueCat.apiKey });
+  useReactQueryDevTools(queryClient);
 
   const [appReady] = useAppDataLoader();
 
