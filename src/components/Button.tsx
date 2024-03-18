@@ -35,7 +35,7 @@ export function Button({
 
   const pressableTypeProps: ButtonTypeProps<IPressableProps> = {
     primary: {
-      bg: 'brand.dark',
+      bg: '#F4753F',
       w: props.w ?? 'full',
       borderColor: 'brand.light',
       borderWidth: 1,

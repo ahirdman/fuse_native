@@ -1,14 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Heading } from 'native-base';
 import { useForm } from 'react-hook-form';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { H1, YStack } from 'tamagui';
 
 import type { RootStackScreenProps } from 'navigation.types';
 import { supabaseQueryError } from 'services/supabase.api';
 
 import { Button } from 'components/Button';
-import HorizontalDivider from 'components/Divider';
+import { HorizontalDivider } from 'components/Divider';
 import { InputField } from 'components/InputField';
-import { PageView } from 'components/PageView';
 import { type SignInInput, signInInputSchema } from 'user/auth.interface';
 import { useSignInMutation } from 'user/queries/auth.endpoints';
 
@@ -21,6 +21,7 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
     resolver: zodResolver(signInInputSchema),
   });
 
+  const insets = useSafeAreaInsets();
   const [logIn, { isLoading }] = useSignInMutation();
 
   async function submit({ email, password }: SignInInput) {
@@ -34,16 +35,18 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   }
 
   return (
-    <PageView justifyContent="space-between" paddingY="10">
-      <Box w="full" justifyContent="center" alignItems="center">
-        <Heading
-          color="brand.dark"
-          fontWeight="extrabold"
-          fontSize="9xl"
-          paddingY="10"
-        >
+    <YStack
+      justifyContent="space-between"
+      fullscreen
+      bg="$primary700"
+      px={16}
+      pt={insets.top}
+      pb={insets.bottom}
+    >
+      <YStack w="100%" alignItems="center">
+        <H1 color="$brandDark" fontWeight="bold" fontSize="$16" pt={120}>
           FUSE
-        </Heading>
+        </H1>
 
         <InputField
           label="Email"
@@ -67,9 +70,9 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
           onPress={handleSubmit(submit)}
           isLoading={isLoading}
         />
-      </Box>
+      </YStack>
 
-      <Box w="full" justifyContent="center" alignItems="center">
+      <YStack w="100%" justifyContent="center" alignItems="center">
         <HorizontalDivider label="or" mt="100" />
 
         <Button
@@ -78,7 +81,7 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
           label="Sign Up Now"
           onPress={() => navigation.push('SignUp')}
         />
-      </Box>
-    </PageView>
+      </YStack>
+    </YStack>
   );
 }

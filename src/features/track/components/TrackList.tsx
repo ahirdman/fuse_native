@@ -4,7 +4,7 @@ import { RefreshControl } from 'react-native';
 import { YStack } from 'tamagui';
 
 import TrackRow from 'track/components/TrackRow';
-import { SpotifyTrack } from 'track/tracks.interface';
+import { SpotifyTrack } from 'track/track.interface';
 
 const ITEM_HEIGHT = 40;
 

@@ -6,7 +6,10 @@ interface IHorizontalDividerProps extends IBoxProps {
   label?: string;
 }
 
-function HorizontalDivider({ label, ...props }: IHorizontalDividerProps) {
+export function HorizontalDivider({
+  label,
+  ...props
+}: IHorizontalDividerProps) {
   return (
     <Box
       w="100%"
@@ -27,5 +30,3 @@ function HorizontalDivider({ label, ...props }: IHorizontalDividerProps) {
     </Box>
   );
 }
-
-export default HorizontalDivider;

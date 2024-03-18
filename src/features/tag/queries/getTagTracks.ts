@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
 
-import { SpotifyTrack } from 'track/tracks.interface';
+import { SpotifyTrack } from 'track/track.interface';
 import { tagKeys } from './keys';
 
 async function getTagTracks(id: number): Promise<QueryReturnType[]> {

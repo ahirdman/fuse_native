@@ -1,9 +1,8 @@
 import { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { ChevronLeft } from '@tamagui/lucide-icons';
 import { type ReactNode, memo } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack } from 'tamagui';
-
-import { SafeAreaStack } from 'components/SafeAreaStack';
 
 interface ScreenHeaderProps extends NativeStackHeaderProps {
   leftElement?: ReactNode;
@@ -19,12 +18,14 @@ function ScreenHeader({
   leftElement,
   ...props
 }: ScreenHeaderProps) {
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaStack
+    <XStack
       bg="$primary300"
       borderBottomColor="$border400"
       borderWidth="0.5"
-      edges={['top']}
+      pt={insets.top}
       pb={12}
       px={12}
       alignItems="center"
@@ -50,7 +51,7 @@ function ScreenHeader({
       </XStack>
 
       {bottomElement}
-    </SafeAreaStack>
+    </XStack>
   );
 }
 

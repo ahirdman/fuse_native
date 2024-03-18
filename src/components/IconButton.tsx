@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
-import { Stack, StackProps } from 'tamagui';
+import { GetProps, Stack, styled } from 'tamagui';
 
 import type { ButtonSize } from 'components/Button';
 
-interface IconButtonProps extends StackProps {
+interface IconButtonProps extends StyledIconButtonProps {
   size?: ButtonSize;
   icon: ReactNode;
 }
@@ -13,26 +13,38 @@ export function IconButton({
   icon,
   ...props
 }: IconButtonProps) {
-  const height = {
-    large: 52,
-    default: 40,
-    small: 28,
-  }[size];
-
   return (
-    <Stack
-      bg="$primary700"
-      h={height}
-      w={height}
-      justifyContent="center"
-      alignItems="center"
-      borderRadius="$2"
-      pressStyle={{ borderColor: '#707070' }}
-      borderColor="$border400"
-      borderWidth={1}
-      {...props}
-    >
+    <StyledIconButton size={size} {...props}>
       {icon}
-    </Stack>
+    </StyledIconButton>
   );
 }
+
+type StyledIconButtonProps = GetProps<typeof StyledIconButton>;
+
+const StyledIconButton = styled(Stack, {
+  bg: '$primary700',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: '$2',
+  pressStyle: { borderColor: '#707070' },
+  borderColor: '$border500',
+  borderWidth: 1,
+
+  variants: {
+    size: {
+      small: {
+        h: 28,
+        w: 28,
+      },
+      default: {
+        h: 40,
+        w: 40,
+      },
+      large: {
+        h: 52,
+        w: 52,
+      },
+    },
+  },
+});

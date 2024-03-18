@@ -1,11 +1,11 @@
 import { NativeStackHeaderProps } from '@react-navigation/native-stack';
-import { Box, HStack } from 'native-base';
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
+import { Stack, XStack } from 'tamagui';
 
 interface ModalHeaderProps extends NativeStackHeaderProps {
-  leftElement?(): ReactElement | undefined;
-  centerElement?(): ReactElement | undefined;
-  rightElement?(): ReactElement | undefined;
+  leftElement?: ReactNode;
+  centerElement?: ReactNode;
+  rightElement?: ReactNode;
 }
 
 export function ModalHeader({
@@ -14,18 +14,24 @@ export function ModalHeader({
   rightElement,
 }: ModalHeaderProps) {
   return (
-    <HStack bg="primary.600" h="12" w="full" alignItems="center">
-      <Box flex={1} boxSize="full">
-        {leftElement?.()}
-      </Box>
+    <XStack bg="$primary600" h={44} w="100%" alignItems="center" px={16}>
+      <Stack flex={1} w="100%" h="100%">
+        {leftElement}
+      </Stack>
 
-      <Box flex={2} boxSize="full" justifyContent="center">
-        {centerElement?.()}
-      </Box>
+      <Stack flex={2} w="100%" h="100%" justifyContent="center">
+        {centerElement}
+      </Stack>
 
-      <Box flex={1} boxSize="full" alignItems="center" justifyContent="center">
-        {rightElement?.()}
-      </Box>
-    </HStack>
+      <Stack
+        flex={1}
+        w="100%"
+        h="100%"
+        justifyContent="center"
+        alignItems="flex-end"
+      >
+        {rightElement}
+      </Stack>
+    </XStack>
   );
 }

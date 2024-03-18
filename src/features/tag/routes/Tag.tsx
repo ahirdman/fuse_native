@@ -27,7 +27,7 @@ import { formatMsDuration } from 'util/index';
 import { showToast } from 'util/toast';
 
 import { Alert } from 'components/Alert';
-import { EditTagForm } from 'tag/components/edit-tag.form';
+import { TagForm } from 'tag/components/Tagform';
 import { TagEditMenu } from 'tag/components/tag.menu';
 import { useDeleteTag } from 'tag/queries/deleteTag';
 import { useGetTagTracks } from 'tag/queries/getTagTracks';
@@ -182,7 +182,6 @@ export function TagView({
               onTrackPress={(trackId) =>
                 navigation.navigate('Track', {
                   trackId,
-                  originalArgs: { offset: 0, limit: 50 },
                 })
               }
               onRefetch={refetchTracks}
@@ -213,7 +212,8 @@ export function TagView({
           exitStyle={{ opacity: 0 }}
         />
         <Sheet.Frame padding={20} borderRadius={28} pb={48}>
-          <EditTagForm
+          <TagForm
+            label="Edit Tag"
             confirmAction={(data) =>
               updateTagMutation(
                 {

@@ -5,7 +5,7 @@ import {
   useNavigationContainerRef,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ChevronLeft, Home, Tags, User } from '@tamagui/lucide-icons';
+import { ChevronLeft, Home, Tags, User, X } from '@tamagui/lucide-icons';
 import { Progress, XStack } from 'tamagui';
 
 import type {
@@ -27,6 +27,7 @@ import { SignUpView } from 'user/routes/SignUp';
 import { TagView } from 'tag/routes/Tag';
 import { TagList } from 'tag/routes/Tags';
 
+import { AddTag } from 'track/routes/AddTag';
 import { Track } from 'track/routes/Track';
 import { Tracks } from 'track/routes/Tracks';
 
@@ -55,7 +56,36 @@ function RootNavigationStack() {
             <RootStack.Screen
               name="Track"
               component={Track}
-              options={{ presentation: 'modal' }}
+              options={{
+                presentation: 'fullScreenModal',
+                fullScreenGestureEnabled: true,
+                gestureEnabled: true,
+                gestureDirection: 'horizontal',
+              }}
+            />
+            <RootStack.Screen
+              name="AddTag"
+              component={AddTag}
+              options={(props) => {
+                return {
+                  presentation: 'modal',
+                  title: 'Add Tags to track',
+                  headerTitleStyle: { color: '#FFF' },
+                  headerShown: true,
+                  headerStyle: { backgroundColor: '#232323' },
+                  headerRight: () => (
+                    <XStack
+                      onPress={() => props.navigation.goBack()}
+                      pressStyle={{
+                        bg: '$primary800',
+                        borderRadius: '$3',
+                      }}
+                    >
+                      <X />
+                    </XStack>
+                  ),
+                };
+              }}
             />
           </>
         ) : (
@@ -82,18 +112,18 @@ function RootNavigationStack() {
 
                   return (
                     <ModalHeader
-                      centerElement={() => (
+                      centerElement={
                         <Progress size="$2" value={progress} bg="#505050">
                           <Progress.Indicator animation="lazy" bg="#F3640B" />
                         </Progress>
-                      )}
-                      rightElement={() => (
+                      }
+                      rightElement={
                         <Button
                           type="teritary"
                           label="Cancel"
                           onPress={() => props.navigation.goBack()}
                         />
-                      )}
+                      }
                       {...props}
                     />
                   );

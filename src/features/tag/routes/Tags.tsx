@@ -75,8 +75,8 @@ export function TagList({ navigation }: TagListScreenProps<'TagList'>) {
   const renderItem = ({ item }: { item: Tables<'tags'> }) => {
     return (
       <TagRow
-        tagName={item.name}
-        tagColor={item.color}
+        name={item.name}
+        color={item.color}
         onPress={() => handleTagRowPress(item)}
       />
     );
