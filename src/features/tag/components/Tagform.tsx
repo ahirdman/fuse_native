@@ -5,7 +5,7 @@ import ColorPicker, { HueSlider } from 'reanimated-color-picker';
 import { Button, H4, Paragraph, Spinner, XStack, YStack } from 'tamagui';
 import { z } from 'zod';
 
-import type { Tag } from 'tag/tags.interface';
+import type { Tag } from 'tag/tag.interface';
 
 import { InputFieldV2 } from 'components/InputFieldV2';
 
@@ -19,13 +19,15 @@ export type TagFormInput = z.infer<typeof tagFormSchema>;
 interface EditTagFormArgs {
   closeAction(): void;
   confirmAction(data: TagFormInput): void;
+  label: string;
   existingTag?: Partial<Pick<Tag, 'color' | 'name'>> | undefined;
   isLoading?: boolean | undefined;
 }
 
-export function EditTagForm({
+export function TagForm({
   closeAction,
   confirmAction,
+  label,
   existingTag,
   isLoading,
 }: EditTagFormArgs) {
@@ -49,7 +51,7 @@ export function EditTagForm({
   return (
     <YStack gap={16}>
       <XStack justifyContent="space-between" alignItems="center">
-        <H4>Edit Tag</H4>
+        <H4>{label}</H4>
         <XCircle onPress={onClose} />
       </XStack>
 

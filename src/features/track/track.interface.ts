@@ -1,14 +1,3 @@
-export interface UserTracksReq {
-  market?: string | undefined;
-  limit?: number | undefined;
-  offset: number;
-}
-
-export interface UserSavedTracksRes {
-  total: number;
-  items: SpotifyTrack[];
-}
-
 export interface SpotifyTrack {
   id: string;
   uri: string;
@@ -40,7 +29,7 @@ export interface UserSavedTrackDto {
   track: SpotifyTrackDto;
 }
 
-interface SpotifyTrackDto {
+export interface SpotifyTrackDto {
   name: string;
   album: {
     images: SpotifyAlbumImage[];

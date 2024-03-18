@@ -1,46 +1,101 @@
-import { Paragraph, Square, XStack, XStackProps } from 'tamagui';
+import { Check } from '@tamagui/lucide-icons';
+import { memo } from 'react';
+import {
+  AnimatePresence,
+  Checkbox,
+  GetProps,
+  H5,
+  Separator,
+  XStack,
+  styled,
+} from 'tamagui';
 
-import { hexToRGBA } from 'util/color';
-
-interface TagListRowProps extends XStackProps {
+interface TagListRowProps extends TagRowProps {
   onPress(): void;
-  tagColor: string;
-  tagName: string;
+  color: string;
+  name: string;
+  selecteble?: boolean;
+  isSelected?: boolean;
 }
 
-export function TagRow({
-  onPress,
-  tagColor,
-  tagName,
-  ...props
-}: TagListRowProps) {
-  const backgroundColor = hexToRGBA(tagColor, 0.1);
+export const TagRow = memo(
+  ({
+    onPress,
+    color,
+    name,
+    selecteble = false,
+    isSelected = false,
+    ...props
+  }: TagListRowProps) => {
+    return (
+      <StyledTagRow {...props} onPress={onPress} justifyContent="space-between">
+        <XStack alignItems="center">
+          <Separator
+            vertical
+            borderWidth={1}
+            height={16}
+            borderColor={color}
+            ml={16}
+            mr={8}
+          />
+          <H5 color="white">{name}</H5>
+        </XStack>
 
-  return (
-    <XStack
-      h={60}
-      borderRadius={8}
-      borderColor="$border400"
-      borderWidth={1}
-      px={8}
-      elevation={4}
-      bg="$primary700"
-      alignItems="center"
-      {...props}
-      onPress={onPress}
-    >
-      <Square
-        bg={backgroundColor}
-        borderRadius={8}
-        mr={16}
-        h={40}
-        w={40}
-        borderColor={tagColor}
-        borderWidth={1}
-      />
-      <Paragraph color="white">{tagName}</Paragraph>
-    </XStack>
-  );
-}
+        <AnimatePresence>
+          {selecteble && (
+            <Checkbox
+              size="$4"
+              alignSelf="center"
+              mr={16}
+              radiused
+              key={name}
+              checked={isSelected}
+              onPress={onPress}
+              animation="quick"
+              enterStyle={{
+                opacity: 0,
+                x: 10,
+              }}
+              exitStyle={{
+                opacity: 0,
+                x: 10,
+              }}
+            >
+              <Checkbox.Indicator>
+                <Check />
+              </Checkbox.Indicator>
+            </Checkbox>
+          )}
+        </AnimatePresence>
+      </StyledTagRow>
+    );
+  },
+);
 
-export default TagRow;
+type TagRowProps = GetProps<typeof StyledTagRow>;
+
+const StyledTagRow = styled(XStack, {
+  borderRadius: 8,
+  elevation: 4,
+  borderWidth: 1,
+  bg: '$primary700',
+  borderColor: '$border500',
+  pressStyle: {
+    bg: '$primary600',
+  },
+
+  variants: {
+    size: {
+      small: {
+        h: 40,
+      },
+      default: {
+        h: 60,
+      },
+    },
+  } as const,
+
+  defaultVariants: {
+    size: 'default',
+  },
+});

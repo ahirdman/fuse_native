@@ -4,7 +4,6 @@ import type {
 	NavigatorScreenParams,
 } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { UserTracksReq } from 'track/tracks.interface';
 
 /*
  *  Root Stack
@@ -16,7 +15,9 @@ export type RootStackParamList = {
 	Root: NavigatorScreenParams<RootTabParamList>;
 	Track: {
 		trackId: string;
-		originalArgs: UserTracksReq;
+	};
+	AddTag: {
+		trackId: string;
 	};
 };
 

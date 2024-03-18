@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { StyleSheet } from 'react-native';
 import { Stack, View, XStack, YStack } from 'tamagui';
 
-import type { SpotifyTrack } from 'track/tracks.interface';
+import type { SpotifyTrack } from 'track/track.interface';
 
 interface TrackRowProps {
   onPress(): void;
