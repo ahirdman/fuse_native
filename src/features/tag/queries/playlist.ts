@@ -2,7 +2,7 @@ import { supabase } from 'lib/supabase/supabase.init';
 import { store } from 'store';
 
 import { useMutation } from '@tanstack/react-query';
-import { spotifyService } from 'services/spotifyv2.api';
+import { spotifyService } from 'services/spotify.api';
 import { selectSpotifyUserId } from 'user/user.slice';
 import { showToast } from 'util/toast';
 

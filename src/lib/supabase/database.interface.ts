@@ -1,5 +1,6 @@
 import type { PostgrestError } from '@supabase/supabase-js';
 import type { Database } from './database-generated.types';
+import { z } from 'zod';
 
 export type { Database } from './database-generated.types';
 
@@ -13,3 +14,8 @@ export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }>
   ? Exclude<U, null>
   : never;
 export type DbResultErr = PostgrestError;
+
+export const supabaseQueryError = z.object({
+  message: z.string(),
+  status: z.number(),
+});

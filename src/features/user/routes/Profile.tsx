@@ -12,19 +12,20 @@ import {
   YStack,
 } from 'tamagui';
 
+import { ConfirmDialog } from 'components/ConfirmDialog';
 import { config } from 'config';
 
-import { ConfirmDialog } from 'components/ConfirmDialog';
 import { SubscriptionSheet } from 'subscription/components/subscription.sheet';
 import { AccountSheet } from 'user/components/account.sheet';
-import { useLazySignOutQuery } from 'user/queries/auth.endpoints';
-import { useGetUserProfileQuery } from 'user/queries/user.endpoint';
+import { useGetSpotifyUser } from 'user/queries/getSpotifyUser';
+import { useSignOut } from 'user/queries/signOut';
 
 type SheetComponent = 'account' | 'subscription' | undefined;
 
 export function Profile() {
-  const { data } = useGetUserProfileQuery(undefined);
-  const [signOut] = useLazySignOutQuery();
+  const { data } = useGetSpotifyUser();
+  const { mutateAsync: signOut } = useSignOut();
+
   const [sheet, setSheet] = useState<SheetComponent>(undefined);
 
   const appVersion = `Version ${config.meta.appVersion} (${Application.nativeBuildVersion})`;
@@ -111,7 +112,7 @@ export function Profile() {
           <ConfirmDialog
             title="Sign out"
             description="Are you sure?"
-            action={() => signOut({})}
+            action={() => signOut()}
             renderTrigger={() => <Button width="100%">Sign Out</Button>}
           />
         </YStack>

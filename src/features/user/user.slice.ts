@@ -1,11 +1,10 @@
-import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-import { spotifyService } from 'services/spotifyv2.api';
 import type { RootState } from 'store';
-import { AppStartListening } from 'store/listenerMiddleware';
+
+import type { AppSubscription } from 'subscription/subscription.interface';
 import type {
-  AppSubscription,
   SpotifyToken,
   SpotifyUser,
   User,
@@ -55,17 +54,3 @@ export default userSlice.reducer;
 
 export const selectSpotifyUserId = (state: RootState) =>
   state.user.spotifyUser?.id;
-
-export const addSpotifyTokenListener = (startListening: AppStartListening) => {
-  startListening({
-    matcher: isAnyOf(hydrateAuthState, updateSpotifyToken, signOut),
-    effect: (_, listenerApi) => {
-      const newTokenValue =
-        listenerApi.getState().user.spotifyToken?.accessToken;
-
-      spotifyService.defaults.headers.common.Authorization = newTokenValue
-        ? `Bearer ${newTokenValue}`
-        : null;
-    },
-  });
-};

@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { spotifyService } from 'services/spotifyv2.api';
-import { SpotifyTrack, SpotifyTrackDto } from 'track/track.interface';
-import { trackKeys } from './keys';
+
+import { spotifyService } from 'services/spotify.api';
+
+import { trackKeys } from 'track/queries/keys';
+import type { SpotifyTrack, SpotifyTrackDto } from 'track/track.interface';
 
 async function getTrack(id: string) {
   const result = await spotifyService.get<SpotifyTrackDto>(`/tracks/${id}`);

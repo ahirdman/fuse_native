@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { handleAuthStateSignIn } from 'lib/auth';
 import { supabase } from 'lib/supabase/supabase.init';
 import { store } from 'store';
 
-function useAppDataLoader() {
+import { handleAuthStateSignIn } from 'user/queries/signIn';
+
+export function useAppDataLoader() {
   const [appReady, setAppReady] = useState(false);
 
   useEffect(() => {
@@ -23,5 +24,3 @@ function useAppDataLoader() {
 
   return [appReady] as const;
 }
-
-export default useAppDataLoader;

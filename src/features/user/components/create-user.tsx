@@ -1,18 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Heading, VStack } from 'native-base';
 import { useForm } from 'react-hook-form';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { H3, YStack } from 'tamagui';
 
 import { Button } from 'components/Button';
 import { InputField } from 'components/InputField';
+
 import {
-  SignUpInput,
-  SignUpRequest,
+  type SignUpArgs,
+  type SignUpInput,
   signUpInputSchema,
-} from 'user/auth.interface';
-import { useSignUpMutation } from 'user/queries/auth.endpoints';
+  useSignUp,
+} from 'user/queries/signUp';
 
 export function CreateUserPage() {
-  const [signUp, { isLoading }] = useSignUpMutation();
+  const { mutate: signUp, isPending: isLoading } = useSignUp();
   const { control, handleSubmit, setError } = useForm<SignUpInput>({
     defaultValues: {
       email: '',
@@ -22,27 +24,29 @@ export function CreateUserPage() {
     resolver: zodResolver(signUpInputSchema),
   });
 
-  async function onSubmit({ email, password }: SignUpRequest) {
-    const result = await signUp({ email, password });
+  const insets = useSafeAreaInsets();
 
-    if ('error' in result) {
-      setError('email', {
-        message: result.error.message ?? 'Something went wrong',
-      });
-    }
+  async function onSubmit({ email, password }: SignUpArgs) {
+    signUp(
+      { email, password },
+      {
+        onError: ({ message }) => {
+          setError('email', { message });
+        },
+      },
+    );
   }
 
   return (
-    <Box
-      flex={1}
-      w="full"
-      px="4"
-      safeAreaBottom
+    <YStack
+      fullscreen
+      px={16}
+      pb={insets.bottom}
       justifyContent="space-between"
-      bg="primary.700"
+      bg="$primary700"
     >
-      <VStack space="4" pt="4">
-        <Heading textAlign="center">Create an account</Heading>
+      <YStack gap={16} pt={16}>
+        <H3 textAlign="center">Create an account</H3>
         <InputField
           label="Email"
           placeholder="Email"
@@ -65,16 +69,14 @@ export function CreateUserPage() {
           type="password"
           controlProps={{ control, name: 'confirmPassword' }}
         />
-      </VStack>
+      </YStack>
 
-      <VStack>
-        <Button
-          label="Sign Up"
-          mb="4"
-          onPress={handleSubmit(onSubmit)}
-          isLoading={isLoading}
-        />
-      </VStack>
-    </Box>
+      <Button
+        label="Sign Up"
+        mb="4"
+        onPress={handleSubmit(onSubmit)}
+        isLoading={isLoading}
+      />
+    </YStack>
   );
 }
