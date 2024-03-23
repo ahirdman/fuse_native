@@ -1,7 +1,9 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { spotifyService } from 'services/spotifyv2.api';
+
+import { spotifyService } from 'services/spotify.api';
+
+import { trackKeys } from 'track/queries/keys';
 import { SpotifyTrack, UserSavedTrackDto } from 'track/track.interface';
-import { trackKeys } from './keys';
 
 interface UserSavedTracksDto {
   next: string | null;

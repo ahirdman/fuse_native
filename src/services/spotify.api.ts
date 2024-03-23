@@ -1,118 +1,101 @@
-import { ThunkDispatch } from '@reduxjs/toolkit';
-import {
-  BaseQueryFn,
-  FetchArgs,
-  FetchBaseQueryError,
-  createApi,
-  fetchBaseQuery,
-} from '@reduxjs/toolkit/dist/query/react';
+import axios from 'axios';
+
+import { isAxiosError } from 'axios';
+import { config } from 'config';
 import * as AuthSession from 'expo-auth-session';
 
-import { config } from 'config';
-import type { RootState } from 'store';
-import { assertIsDefined } from 'util/assert';
+import { supabase } from 'lib/supabase/supabase.init';
+import { store } from 'store';
 import { showToast } from 'util/toast';
 
-import {
-  selecteUserSpotifyRefreshToken,
-  upsertUserSpotifyData,
-} from 'user/queries';
-import { authApi } from 'user/queries/auth.endpoints';
-import { signOut, updateSpotifyToken } from 'user/user.slice';
+import { signOutSupabase } from 'user/queries/signOut';
+import { upsertUserSpotifyData as upsertDbSpotifyData } from 'user/queries/updateSpotifyCredentials';
+import { updateSpotifyToken } from 'user/user.slice';
 
-export async function refreshSpotifyToken(
-  // biome-ignore lint/suspicious/noExplicitAny: reason
-  dispatch: ThunkDispatch<any, any, any>,
-): Promise<AuthSession.TokenResponse | undefined> {
-  try {
-    const refreshToken = await selecteUserSpotifyRefreshToken();
-
-    assertIsDefined(refreshToken);
-
-    const request = await AuthSession.refreshAsync(
-      {
-        clientId: config.spotify.clientId,
-        refreshToken,
-      },
-      config.expoAuth.discovery,
-    );
-
-    return request;
-  } catch (_error) {
-    //TODO: Refersh token sometimes revoked, needs re-authorization
-    dispatch(authApi.endpoints.signOut.initiate({}));
-    showToast({
-      title: 'Something went wrong',
-      preset: 'error',
-      message: 'Refreshing Spotify token did not work...',
-    });
-  }
-}
-
-const spotifyBaseQuery = fetchBaseQuery({
-  baseUrl: config.spotify.baseUrl,
-  prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).user.spotifyToken?.accessToken;
-
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`);
-    }
-
-    return headers;
-  },
+export const spotifyService = axios.create({
+  baseURL: config.spotify.baseUrl,
+  timeout: 1000,
 });
 
-const baseQueryWithReauth: BaseQueryFn<
-  string | FetchArgs,
-  unknown,
-  FetchBaseQueryError
-> = async (args, api, extraOptions) => {
-  let result = await spotifyBaseQuery(args, api, extraOptions);
+spotifyService.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    if (!isAxiosError(error)) {
+      return Promise.reject(error);
+    }
 
-  if (result.error && result.error.status === 401) {
-    const refreshResult = await refreshSpotifyToken(api.dispatch);
+    if (error.response?.status === 401) {
+      try {
+        const currentRefreshToken = await getDbSpotifyRefreshToken();
 
-    if (refreshResult) {
-      const {
-        refreshToken,
-        accessToken,
-        tokenType,
-        expiresIn,
-        scope,
-        issuedAt,
-      } = refreshResult;
+        const request = await AuthSession.refreshAsync(
+          {
+            clientId: config.spotify.clientId,
+            refreshToken: currentRefreshToken,
+          },
+          config.expoAuth.discovery,
+        );
 
-      const userId = (api.getState() as RootState).user.user?.id;
-
-      assertIsDefined(userId);
-
-      api.dispatch(
-        updateSpotifyToken({
+        const {
+          refreshToken,
           accessToken,
           tokenType,
           expiresIn,
           scope,
           issuedAt,
-        }),
-      );
+        } = request;
 
-      await upsertUserSpotifyData({
-        tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
-        refreshToken,
-      });
+        store.dispatch(
+          updateSpotifyToken({
+            accessToken,
+            tokenType,
+            expiresIn,
+            scope,
+            issuedAt,
+          }),
+        );
 
-      result = await spotifyBaseQuery(args, api, extraOptions);
+        await upsertDbSpotifyData({
+          tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
+          refreshToken,
+        });
+
+        spotifyService.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+      } catch (_e) {
+        //TODO: Refersh token sometimes revoked, needs re-authorization
+        await signOutSupabase();
+
+        spotifyService.defaults.headers.common.Authorization = undefined;
+
+        showToast({
+          title: 'Something went wrong',
+          preset: 'error',
+          message: 'Refreshing Spotify token did not work...',
+        });
+
+        return Promise.reject(error);
+      }
     } else {
-      api.dispatch(signOut());
+      return Promise.reject(error);
     }
+  },
+);
+
+async function getDbSpotifyRefreshToken(): Promise<string> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('spotify_refresh_token')
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
   }
 
-  return result;
-};
+  if (!data.spotify_refresh_token) {
+    throw new Error('No spotify refresh token in database');
+  }
 
-export const spotifyApi = createApi({
-  reducerPath: 'spotifyApi',
-  baseQuery: baseQueryWithReauth,
-  keepUnusedDataFor: 600,
-  endpoints: () => ({}),
-});
+  return data.spotify_refresh_token;
+}

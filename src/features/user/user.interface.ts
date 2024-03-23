@@ -1,22 +1,8 @@
 import { z } from 'zod';
 
-const subscriptionPackage = z.object({
-  app_user_id: z.string(),
-  expiration_date: z.string().datetime().nullable(),
-  is_active: z.boolean(),
-  is_sandbox: z.boolean(),
-  product_id: z.string(),
-  will_renew: z.boolean(),
-});
-export type SubscriptionPackage = z.infer<typeof subscriptionPackage>;
+import { subscriptionSchema } from 'subscription/subscription.interface';
 
-const subscription = z.object({
-  package: subscriptionPackage.optional(),
-  isSubscribed: z.boolean(),
-});
-export type AppSubscription = z.infer<typeof subscription>;
-
-export const spotifyToken = z.object({
+export const spotifyTokenSchema = z.object({
   accessToken: z.string(),
   tokenType: z.string(),
   expiresIn: z.number().optional(),
@@ -24,23 +10,27 @@ export const spotifyToken = z.object({
   idToken: z.string().optional(),
   issuedAt: z.number().optional(),
 });
-export type SpotifyToken = z.infer<typeof spotifyToken>;
 
-const user = z.object({
+export type SpotifyToken = z.infer<typeof spotifyTokenSchema>;
+
+const userSchema = z.object({
   id: z.string(),
   email: z.string().optional(),
 });
-export type User = z.infer<typeof user>;
 
-const spotifyUser = z.object({
+export type User = z.infer<typeof userSchema>;
+
+const spotifyUserSchema = z.object({
   id: z.string(),
 });
-export type SpotifyUser = z.infer<typeof spotifyUser>;
 
-const userState = z.object({
-  user: user.optional(),
-  spotifyToken: spotifyToken.optional(),
-  subscription: subscription.optional(),
-  spotifyUser: spotifyUser.optional(),
+export type SpotifyUser = z.infer<typeof spotifyUserSchema>;
+
+const userStateSchema = z.object({
+  user: userSchema.optional(),
+  spotifyToken: spotifyTokenSchema.optional(),
+  subscription: subscriptionSchema.optional(),
+  spotifyUser: spotifyUserSchema.optional(),
 });
-export type UserState = z.infer<typeof userState>;
+
+export type UserState = z.infer<typeof userStateSchema>;

@@ -24,9 +24,10 @@ import { config } from 'config';
 import { queryClient } from 'lib/query/init';
 import { store } from 'store';
 import { ApplicationTheme, nativeBaseConfig } from 'style/theme';
-import useAppDataLoader from 'user/useAppDataLoader';
 import tamaguiConfig from '../tamagui.config';
 import RootNavigationStack from './navigation';
+
+import { useAppDataLoader } from 'user/hooks/useAppDataLoader';
 
 init(config.aptabase.apiKey);
 void SplashScreen.preventAutoHideAsync();
@@ -34,6 +35,7 @@ void SplashScreen.preventAutoHideAsync();
 export default function App() {
   Purchases.setLogLevel(LOG_LEVEL.DEBUG);
   Purchases.configure({ apiKey: config.revenueCat.apiKey });
+
   useReactQueryDevTools(queryClient);
 
   const [appReady] = useAppDataLoader();

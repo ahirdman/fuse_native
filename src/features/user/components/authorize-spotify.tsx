@@ -1,18 +1,20 @@
-import { Box, Heading, Text, VStack } from 'native-base';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { H3, XStack, YStack } from 'tamagui';
 
+import { Button } from 'components/Button';
+import { Text } from 'components/Text';
 import { authorizeSpotify } from 'lib/expo/expo.auth';
 import { useAppDispatch } from 'store/hooks';
 import { assertIsDefined } from 'util/assert';
 import { showToast } from 'util/toast';
 
-import { Button } from 'components/Button';
-import { upsertUserSpotifyData } from 'user/queries';
-import { useLazyGetUserProfileQuery } from 'user/queries/user.endpoint';
+import { getSpotifyUser } from 'user/queries/getSpotifyUser';
+import { upsertUserSpotifyData } from 'user/queries/updateSpotifyCredentials';
 import { updateSpotifyToken, updateSpotifyUserId } from 'user/user.slice';
 
 export function AuthorizeSpotifyPage() {
   const dispatch = useAppDispatch();
-  const [getSpotifyUserProfile] = useLazyGetUserProfileQuery();
+  const insets = useSafeAreaInsets();
 
   async function handleSpotifyAuthorization() {
     try {
@@ -22,17 +24,15 @@ export function AuthorizeSpotifyPage() {
 
       const { accessToken, tokenType, expiresIn, scope, issuedAt } = data;
 
-      const spotifyProfile = await getSpotifyUserProfile(accessToken);
-
-      assertIsDefined(spotifyProfile.data?.id);
+      const spotifyProfile = await getSpotifyUser(accessToken);
 
       await upsertUserSpotifyData({
         tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
         refreshToken: data.refreshToken,
-        spotifyUserId: spotifyProfile.data.id,
+        spotifyUserId: spotifyProfile.id,
       });
 
-      dispatch(updateSpotifyUserId({ id: spotifyProfile.data.id }));
+      dispatch(updateSpotifyUserId({ id: spotifyProfile.id }));
       dispatch(
         updateSpotifyToken({
           accessToken,
@@ -51,28 +51,27 @@ export function AuthorizeSpotifyPage() {
   }
 
   return (
-    <Box
-      flex={1}
-      w="full"
-      safeAreaBottom
+    <YStack
+      fullscreen
       justifyContent="space-between"
-      bg="primary.700"
-      px="4"
+      bg="$primary700"
+      px={16}
+      pb={insets.bottom}
     >
-      <VStack space="4" pt="4">
-        <Heading textAlign="center">Connect to Spotify</Heading>
+      <YStack gap={16} pt={16}>
+        <H3 textAlign="center">Connect to Spotify</H3>
         <Text>
           In order to use FUSE, we need access to your spotify library
         </Text>
-      </VStack>
+      </YStack>
 
-      <VStack>
+      <XStack>
         <Button
           mb="4"
           label="Authorize Spotify"
           onPress={handleSpotifyAuthorization}
         />
-      </VStack>
-    </Box>
+      </XStack>
+    </YStack>
   );
 }

@@ -4,13 +4,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { H1, YStack } from 'tamagui';
 
 import type { RootStackScreenProps } from 'navigation.types';
-import { supabaseQueryError } from 'services/supabase.api';
 
 import { Button } from 'components/Button';
 import { HorizontalDivider } from 'components/Divider';
 import { InputField } from 'components/InputField';
-import { type SignInInput, signInInputSchema } from 'user/auth.interface';
-import { useSignInMutation } from 'user/queries/auth.endpoints';
+import { SignInInput, signInInputSchema, useSignIn } from 'user/queries/signIn';
 
 export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   const { control, handleSubmit, setError } = useForm<SignInInput>({
@@ -22,16 +20,18 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   });
 
   const insets = useSafeAreaInsets();
-  const [logIn, { isLoading }] = useSignInMutation();
+  const { mutateAsync: logIn, isPending } = useSignIn();
 
   async function submit({ email, password }: SignInInput) {
-    const result = await logIn({ email, password });
-
-    if ('error' in result) {
-      const errorRes = supabaseQueryError.parse(result.error);
-      setError('password', { message: errorRes.message });
-      setError('email', { message: errorRes.message });
-    }
+    logIn(
+      { email, password },
+      {
+        onError: (error) => {
+          setError('password', { message: error.message });
+          setError('email', { message: error.message });
+        },
+      },
+    );
   }
 
   return (
@@ -68,7 +68,7 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
           label="Sign In"
           my="4"
           onPress={handleSubmit(submit)}
-          isLoading={isLoading}
+          isLoading={isPending}
         />
       </YStack>
 

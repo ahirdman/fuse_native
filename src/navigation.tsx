@@ -40,6 +40,7 @@ function RootNavigationStack() {
   const navigationRef = useNavigationContainerRef();
 
   useReactNavigationDevTools(navigationRef);
+
   const { user, spotifyToken, subscription } = useAppSelector(
     (state) => state.user,
   );

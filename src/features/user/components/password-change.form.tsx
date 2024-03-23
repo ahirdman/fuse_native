@@ -7,8 +7,8 @@ import { showToast } from 'util/toast';
 
 import { Button } from 'components/Button';
 import { InputFieldV2 } from 'components/InputFieldV2';
-import { passwordSchema } from 'user/auth.interface';
-import { useUpdatePasswordMutation } from 'user/queries/auth.endpoints';
+import { passwordSchema } from 'user/queries/signIn';
+import { useUpdatePassword } from 'user/queries/updatePassword';
 
 const passwordChangeSchema = z
   .object({
@@ -28,7 +28,7 @@ interface PasswordChangeFormProps {
 }
 
 export function PasswordChangeForm({ onClose }: PasswordChangeFormProps) {
-  const [updatePassword, { isLoading }] = useUpdatePasswordMutation();
+  const { mutate: updatePassword, isPending: isLoading } = useUpdatePassword();
   const { control, handleSubmit, setError, reset } =
     useForm<PasswordChangeInput>({
       defaultValues: {
@@ -40,26 +40,28 @@ export function PasswordChangeForm({ onClose }: PasswordChangeFormProps) {
     });
 
   async function onSubmit(data: PasswordChangeInput) {
-    const result = await updatePassword({
-      currentPassword: data.currentPassword,
-      newPassword: data.newPassword,
-    });
+    updatePassword(
+      {
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      },
+      {
+        onError: (error) => {
+          setError('currentPassword', {
+            message: error.message,
+          });
+        },
+        onSuccess: () => {
+          reset();
+          onClose();
 
-    if ('error' in result) {
-      setError('currentPassword', {
-        message: result.error.message ?? 'Something went wrong',
-      });
-    }
-
-    if ('data' in result) {
-      reset();
-      onClose();
-
-      showToast({
-        title: 'Password changed!',
-        preset: 'done',
-      });
-    }
+          showToast({
+            title: 'Password changed!',
+            preset: 'done',
+          });
+        },
+      },
+    );
   }
 
   return (

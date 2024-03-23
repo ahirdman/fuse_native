@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 export function assertIsDefined<T>(data: T): asserts data is NonNullable<T> {
   if (data === undefined || data === null) {
     throw new Error('Expected data to be defined');
@@ -11,4 +13,8 @@ export function isBoolean(value: any): value is NonNullable<boolean> {
 
 export function isDefined<T>(val?: T): val is NonNullable<T> {
   return val !== undefined && val !== null;
+}
+
+export function isAxiosError(error: unknown): error is AxiosError {
+  return error != null && typeof error === 'object' && 'response' in error;
 }
