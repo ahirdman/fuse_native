@@ -16,6 +16,7 @@ import {
   Paragraph,
   Separator,
   Sheet,
+  Spinner,
   View,
   XStack,
   YStack,
@@ -54,6 +55,8 @@ export function TagView({
     data: selectedTagTracks,
     refetch: refetchTracks,
     isRefetching: isRefreshingTracks,
+    isError: isTracksError,
+    isFetching: isFetchinTracks,
   } = useGetTagTracks({ tagId: params.id });
 
   useEffect(() => {
@@ -174,6 +177,10 @@ export function TagView({
         </XStack>
 
         <Separator mx={12} />
+
+        {isFetchinTracks && <Spinner my={16} />}
+
+        {isTracksError && <Alert label="Error fetching tracks" m={4} />}
 
         {selectedTagTracks && (
           <View h="86%">

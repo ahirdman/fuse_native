@@ -1,53 +1,55 @@
 import { useQuery } from '@tanstack/react-query';
-import { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
 
-import { SpotifyTrack } from 'track/track.interface';
+import { spotifyService } from 'services/spotify.api';
+import { SpotifyTrack, SpotifyTrackDto } from 'track/track.interface';
 import { tagKeys } from './keys';
 
-async function getTagTracks(id: number): Promise<QueryReturnType[]> {
+interface GetSpotifyTracksRes {
+  tracks: SpotifyTrackDto[];
+}
+
+async function getSpotifyTracks(
+  trackIds: string[],
+): Promise<SpotifyTrackDto[]> {
+  const result = await spotifyService.get<GetSpotifyTracksRes>(
+    `/tracks?ids=${trackIds.join(',')}`,
+  );
+
+  return result.data.tracks;
+}
+
+async function getTagTracks(id: number) {
   const { data, error } = await supabase
-    .from('trackTags')
-    .select('tracks(*)')
-    .eq('tag_id', id);
+    .from('tags_with_track_ids')
+    .select('track_ids')
+    .eq('id', id)
+    .single();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data;
+  if (!data.track_ids) {
+    return undefined;
+  }
+
+  const tracks = await getSpotifyTracks(data.track_ids);
+
+  return tracks;
 }
 
-type QueryReturnType = {
-  tracks: Tables<'tracks'> | null;
-};
-
-function sanitizeSpotifyTracks(data: QueryReturnType[]): SpotifyTrack[] {
-  const transformedData = data
-    .map((item) => item.tracks)
-    .filter((item): item is NonNullable<Tables<'tracks'>> => item !== null)
-    .map((track) => {
-      const spotifyTrack: SpotifyTrack = {
-        albumCovers: track.album_covers
-          ? track.album_covers.map((url) => ({
-              url,
-              height: null,
-              width: null,
-            }))
-          : [{ url: 'NA', width: null, height: null }],
-        album: track.album ?? 'NA',
-        artist: track.artist ?? 'NA',
-        id: track.id,
-        uri: track.uri ?? 'NA',
-        explicit: track.explicit,
-        name: track.name ?? 'NA',
-        duration: track.duration,
-      };
-
-      return spotifyTrack;
-    });
-
-  return transformedData;
+function sanitizeSpotifyTracks(data: SpotifyTrackDto[]): SpotifyTrack[] {
+  return data.map((trackDto) => ({
+    id: trackDto.id,
+    uri: trackDto.uri,
+    artist: trackDto.artists[0]?.name,
+    albumCovers: trackDto.album.images,
+    album: trackDto.album.name,
+    name: trackDto.name,
+    explicit: trackDto.explicit,
+    duration: trackDto.duration_ms,
+  }));
 }
 
 interface UseGetTagTracksArgs {
@@ -58,5 +60,7 @@ export const useGetTagTracks = ({ tagId }: UseGetTagTracksArgs) =>
   useQuery({
     queryKey: tagKeys.detail(tagId),
     queryFn: () => getTagTracks(tagId),
-    select: (data) => sanitizeSpotifyTracks(data),
+    select: (data) => {
+      return !data ? data : sanitizeSpotifyTracks(data);
+    },
   });
