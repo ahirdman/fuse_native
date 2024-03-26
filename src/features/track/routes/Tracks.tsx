@@ -1,21 +1,32 @@
 import { FlashList } from '@shopify/flash-list';
 import { useForm } from 'react-hook-form';
-import { RefreshControl } from 'react-native';
+import { Dimensions, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Spinner, XStack, YStack } from 'tamagui';
 
 import { Alert } from 'components/Alert';
-import { Button } from 'components/Button';
 import { InputField } from 'components/InputField';
 import { useDebounce } from 'hooks/useDebounce';
 import type { RootTabScreenProps } from 'navigation.types';
 
 import { Search } from '@tamagui/lucide-icons';
+import { useCallback, useState } from 'react';
+import { FilterMenu } from 'track/components/Filter.menu';
 import TrackRow from 'track/components/TrackRow';
-import { useInfiniteSavedTracks } from 'track/queries/getSavedTracks';
+import {
+  useGetTaggedTrackIds,
+  useInfiniteSavedTracks,
+} from 'track/queries/getSavedTracks';
 import { SpotifyTrack } from 'track/track.interface';
 
+const ITEM_HEIGHT = 44;
+const SEPERATOR_HEIGHT = 8;
+
+const ROW_HEIGHT = ITEM_HEIGHT + SEPERATOR_HEIGHT / 2;
+
 export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
+  const [availableRows, setAvailableRows] = useState<number>();
+  const [filterTaggedTracks, setFilterTaggedTracks] = useState(false);
   const { control, watch } = useForm({
     defaultValues: {
       trackFilter: '',
@@ -25,6 +36,8 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
   const formValue = watch();
   const debouncedTrackFilter = useDebounce(formValue.trackFilter, 300);
   const insets = useSafeAreaInsets();
+
+  const { data: trackIds } = useGetTaggedTrackIds();
   const {
     data: tracks,
     isError,
@@ -32,32 +45,59 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
     fetchNextPage,
     refetch,
     isRefetching,
-  } = useInfiniteSavedTracks(debouncedTrackFilter);
+    hasNextPage,
+  } = useInfiniteSavedTracks({
+    searchString: debouncedTrackFilter.trim(),
+    trackIds: trackIds,
+    filterTaggedTracks,
+  });
 
   function handleTrackPress(trackId: string) {
     navigation.push('Track', { trackId });
   }
 
   function handleEndReached() {
-    if (!isFetching) {
-      fetchNextPage();
+    if (!isFetching && hasNextPage) {
+      fetchNextPage().then(({ data }) => {
+        if (availableRows && data && data.length < availableRows * 2) {
+          recursiveFetchMore(availableRows);
+        }
+      });
     }
   }
 
-  function handleRefetch() {
-    refetch();
-  }
+  // biome-ignore lint/correctness/useExhaustiveDependencies: cant depend on itself dummy
+  const recursiveFetchMore = useCallback(
+    (availableRows: number) => {
+      fetchNextPage().then(({ hasNextPage, data }) => {
+        if (hasNextPage && data && data.length < availableRows * 2) {
+          recursiveFetchMore(availableRows);
+        }
+      });
+    },
+    [fetchNextPage, debouncedTrackFilter],
+  );
 
   const renderItem = ({ item }: { item: SpotifyTrack }) => (
     <TrackRow
       track={item}
-      height={40}
+      height={ITEM_HEIGHT}
       onPress={() => handleTrackPress(item.id)}
+      isTagged={item.isTagged}
     />
   );
 
-  const ItemSeparatorComponent = () => <YStack h={8} />;
+  const ItemSeparatorComponent = () => <YStack h={SEPERATOR_HEIGHT} />;
   const keyExtractor = (item: SpotifyTrack) => item.id;
+
+  function handleListHeight(headerHeight: number) {
+    const { height: screenHeight } = Dimensions.get('screen');
+
+    const flastListHeight = screenHeight - headerHeight;
+    const itemsVisible = flastListHeight / ROW_HEIGHT;
+
+    setAvailableRows(itemsVisible);
+  }
 
   return (
     <YStack fullscreen bg="$primary700">
@@ -68,6 +108,7 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
         pt={insets.top}
         borderWidth={0.5}
         gap={16}
+        onLayout={(event) => handleListHeight(event.nativeEvent.layout.height)}
       >
         <InputField
           controlProps={{ control, name: 'trackFilter' }}
@@ -79,26 +120,36 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
           _stack={{ flex: 3 }}
           InputLeftElement={<Search ml={12} size={16} color="$border300" />}
         />
-        <Button type="secondary" label="Filter" flex={1} onPress={() => {}} />
+        <FilterMenu
+          filterTags={filterTaggedTracks}
+          setFilterTags={setFilterTaggedTracks}
+        />
       </XStack>
 
       <FlashList
         data={tracks ?? []}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
-        onEndReachedThreshold={0.3}
+        onEndReachedThreshold={0.1}
         onEndReached={handleEndReached}
-        estimatedItemSize={40}
+        estimatedItemSize={ITEM_HEIGHT}
         ItemSeparatorComponent={ItemSeparatorComponent}
         ListEmptyComponent={
-          isFetching ? null : <ListEmptyComponent isError={isError} />
+          isFetching ? null : (
+            <ListEmptyComponent
+              isError={isError}
+              isFiltered={debouncedTrackFilter.length > 0}
+            />
+          )
         }
-        ListFooterComponent={isFetching ? <ListFooterComponent /> : null}
+        ListFooterComponent={
+          isFetching && !isRefetching ? <ListFooterComponent /> : null
+        }
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}
-            onRefresh={handleRefetch}
-            tintColor="#F3640B"
+            onRefresh={refetch}
+            tintColor="#F4753F"
           />
         }
         contentContainerStyle={{ padding: 4 }}
@@ -107,14 +158,19 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
   );
 }
 
-function ListEmptyComponent({ isError }: { isError: boolean }) {
+function ListEmptyComponent({
+  isError,
+  isFiltered,
+}: { isError: boolean; isFiltered: boolean }) {
+  const alertLabel = isError
+    ? 'Error fetching tracks'
+    : isFiltered
+      ? 'No matches'
+      : 'You have no saved tracks';
+
   return (
     <YStack p={16}>
-      {isError ? (
-        <Alert label="Error fetching tracks" />
-      ) : (
-        <Alert label="You have no saved tracks" variant="info" />
-      )}
+      <Alert label={alertLabel} variant={isError ? 'error' : 'info'} />
     </YStack>
   );
 }

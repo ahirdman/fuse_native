@@ -46,13 +46,9 @@ export const useCreateTag = () =>
   useMutation({
     mutationFn: createTag,
     onError: () => showToast({ title: 'Error creating tag', preset: 'error' }),
-    onSuccess: (_data, variables) => {
-      if (!variables.trackId) {
-        return;
-      }
-
+    onSuccess: (_data) => {
       queryClient.invalidateQueries({
-        queryKey: trackTagKeys.track(variables.trackId),
+        queryKey: trackTagKeys.list(),
       });
     },
   });

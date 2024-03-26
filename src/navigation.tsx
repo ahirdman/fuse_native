@@ -54,16 +54,7 @@ function RootNavigationStack() {
         {userReady ? (
           <>
             <RootStack.Screen name="Root" component={RootTabStack} />
-            <RootStack.Screen
-              name="Track"
-              component={Track}
-              options={{
-                presentation: 'fullScreenModal',
-                fullScreenGestureEnabled: true,
-                gestureEnabled: true,
-                gestureDirection: 'horizontal',
-              }}
-            />
+            <RootStack.Screen name="Track" component={Track} />
             <RootStack.Screen
               name="AddTag"
               component={AddTag}
@@ -74,15 +65,13 @@ function RootNavigationStack() {
                   headerTitleStyle: { color: '#FFF' },
                   headerShown: true,
                   headerStyle: { backgroundColor: '#232323' },
-                  headerRight: () => (
-                    <XStack
-                      onPress={() => props.navigation.goBack()}
-                      pressStyle={{
-                        bg: '$primary800',
-                        borderRadius: '$3',
-                      }}
-                    >
-                      <X />
+                  headerLeft: () => (
+                    <XStack onPress={() => props.navigation.goBack()}>
+                      <X
+                        pressStyle={{
+                          color: '$border300',
+                        }}
+                      />
                     </XStack>
                   ),
                 };

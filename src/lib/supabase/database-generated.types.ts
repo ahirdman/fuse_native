@@ -265,6 +265,12 @@ export type Database = {
           },
         ]
       }
+      track_tags_view: {
+        Row: {
+          track_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       change_user_password: {

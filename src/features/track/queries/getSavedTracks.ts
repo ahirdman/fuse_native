@@ -1,8 +1,9 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { supabase } from 'lib/supabase/supabase.init';
 
 import { spotifyService } from 'services/spotify.api';
 
-import { trackKeys } from 'track/queries/keys';
+import { trackKeys, trackTagKeys } from 'track/queries/keys';
 import { SpotifyTrack, UserSavedTrackDto } from 'track/track.interface';
 
 interface UserSavedTracksDto {
@@ -41,25 +42,76 @@ function sanitizeTracks(tracksDto: UserSavedTrackDto[]) {
   }));
 }
 
-export const useInfiniteSavedTracks = (searchString?: string) =>
+interface SavedTracksArgs {
+  searchString?: string;
+  trackIds?: string[];
+  filterTaggedTracks: boolean;
+}
+
+export const useInfiniteSavedTracks = (args: SavedTracksArgs) =>
   useInfiniteQuery({
     queryKey: trackKeys.infinite(),
     queryFn: ({ pageParam }) => getSavedTracks(pageParam),
     initialPageParam: '/me/tracks?offset=0&limit=50',
     getNextPageParam: (params) => params.next,
-    select: (data): SpotifyTrack[] => {
-      const tracks = data.pages.flatMap((page) => page.items);
+    enabled: !!args.trackIds,
+    select: (data) =>
+      selectTracksWithFilters({
+        data: data.pages,
+        ...args,
+      }),
+  });
 
-      if (!searchString || searchString === '') {
-        return tracks;
-      }
+function selectTracksWithFilters({
+  data,
+  filterTaggedTracks,
+  trackIds,
+  searchString,
+}: SavedTracksArgs & { data: UserSavedTracksRes[] }): SpotifyTrack[] {
+  const tracks = data.flatMap((page) => page.items);
 
-      const fieldsToMatch = ['album', 'name', 'artist'] as const;
+  const fieldsToMatch = ['album', 'name', 'artist'] as const;
 
-      return tracks.filter((track) =>
-        fieldsToMatch.some((field) =>
-          track[field]?.toLowerCase().includes(searchString),
-        ),
+  return tracks.filter((track) => {
+    const isTrackVisible = !filterTaggedTracks || !trackIds?.includes(track.id);
+
+    if (trackIds?.includes(track.id)) {
+      track.isTagged = true;
+    }
+
+    const doesTrackMatchSearch =
+      !searchString ||
+      fieldsToMatch.some((field) =>
+        track[field]?.toLowerCase().includes(searchString.toLowerCase()),
       );
-    },
+
+    return isTrackVisible && doesTrackMatchSearch;
+  });
+}
+
+interface GetTagedTrackIdsRes {
+  track_id: string | null;
+}
+
+async function getTagedTrackIds(): Promise<GetTagedTrackIdsRes[]> {
+  const { error, data } = await supabase.from('track_tags_view').select();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+function sanitizeTrackIds(data: GetTagedTrackIdsRes[]): string[] {
+  return data
+    .filter((item): item is { track_id: string } => item.track_id !== null)
+    .map((item) => item.track_id);
+}
+
+export const useGetTaggedTrackIds = () =>
+  useQuery({
+    queryKey: trackTagKeys.list(),
+    queryFn: getTagedTrackIds,
+    select: (data) => sanitizeTrackIds(data),
   });

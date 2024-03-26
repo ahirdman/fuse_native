@@ -8,6 +8,7 @@ export interface SpotifyTrack {
   name: string;
   explicit: boolean;
   duration: number;
+  isTagged?: boolean;
 }
 
 /*
