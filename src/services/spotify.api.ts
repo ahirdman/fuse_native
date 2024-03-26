@@ -14,7 +14,7 @@ import { updateSpotifyToken } from 'user/user.slice';
 
 export const spotifyService = axios.create({
   baseURL: config.spotify.baseUrl,
-  timeout: 1000,
+  timeout: 10000,
 });
 
 spotifyService.interceptors.response.use(

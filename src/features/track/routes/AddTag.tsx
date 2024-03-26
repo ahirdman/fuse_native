@@ -1,8 +1,9 @@
 import { FlashList } from '@shopify/flash-list';
 import { useCallback, useEffect, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Label, YStack } from 'tamagui';
+import { AnimatePresence, Button, YStack } from 'tamagui';
 
+import { Text } from 'components/Text';
 import { RootStackScreenProps } from 'navigation.types';
 import { hapticFeedback } from 'util/haptic';
 
@@ -32,13 +33,18 @@ export function AddTag({ route: { params: { trackId } }, navigation }: Props) {
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => {
-        return selectMultiple ? (
-          <Label fontWeight="bold" onPress={() => setSelectMultiple(false)}>
-            Cancel
-          </Label>
-        ) : undefined;
-      },
+      headerRight: () => (
+        <Text
+          fontWeight="bold"
+          selectable={false}
+          onPress={() => setSelectMultiple(!selectMultiple)}
+          pressStyle={{
+            color: '$border300',
+          }}
+        >
+          {selectMultiple ? 'Cancel' : 'Select'}
+        </Text>
+      ),
     });
   }, [selectMultiple, navigation.setOptions]);
 
@@ -86,18 +92,14 @@ export function AddTag({ route: { params: { trackId } }, navigation }: Props) {
 
   function onSelectPress() {
     hapticFeedback('Medium');
-    if (selectMultiple) {
-      addTag(
-        { trackId, tagIds: selectedTagIds },
-        {
-          onSuccess: () => {
-            navigation.goBack();
-          },
+    addTag(
+      { trackId, tagIds: selectedTagIds },
+      {
+        onSuccess: () => {
+          navigation.goBack();
         },
-      );
-    } else {
-      setSelectMultiple(!selectMultiple);
-    }
+      },
+    );
   }
 
   return (
@@ -110,15 +112,28 @@ export function AddTag({ route: { params: { trackId } }, navigation }: Props) {
         ItemSeparatorComponent={ItemSeparatorComponent}
         contentContainerStyle={{ padding: 8 }}
       />
-      <Button
-        onPress={onSelectPress}
-        mx={8}
-        disabled={selectMultiple && !selectedTagIds.length}
-        borderColor="$border500"
-        borderWidth={1}
-      >
-        {selectMultiple ? 'Add Tags' : 'Select Multiple'}
-      </Button>
+
+      <AnimatePresence>
+        {selectMultiple && (
+          <Button
+            mx={24}
+            disabled={!selectedTagIds.length}
+            borderColor="$border500"
+            borderWidth={1}
+            key="add-tags"
+            animation="quick"
+            onPress={onSelectPress}
+            enterStyle={{
+              y: 100,
+            }}
+            exitStyle={{
+              y: 100,
+            }}
+          >
+            Add Tags
+          </Button>
+        )}
+      </AnimatePresence>
     </YStack>
   );
 }

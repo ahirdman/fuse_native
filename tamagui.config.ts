@@ -38,8 +38,6 @@ const customTokens = createTokens({
 	...baseTokens,
 	color: {
 		...baseColor,
-		brandLight: '#F07123',
-		brandDefault: '#F59E0B',
 		brandDark: '#F4753F',
 		primary300: '#232323',
 		primary400: '#505050',

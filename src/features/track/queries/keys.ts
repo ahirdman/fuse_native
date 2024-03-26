@@ -6,6 +6,7 @@ export const trackKeys = {
 
 export const trackTagKeys = {
   all: ['trackTags'] as const,
-  track: (trackId: string) => [...trackTagKeys.all, 'track', trackId] as const,
-  tag: (tagId: string) => [...trackTagKeys.all, tagId] as const,
+  list: () => [...trackTagKeys.all, 'track'] as const,
+  track: (trackId: string) => [...trackTagKeys.list(), trackId] as const,
+  tag: (tagId: string) => [...trackTagKeys.list(), tagId] as const,
 };

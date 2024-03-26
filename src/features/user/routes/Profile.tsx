@@ -24,7 +24,7 @@ type SheetComponent = 'account' | 'subscription' | undefined;
 
 export function Profile() {
   const { data } = useGetSpotifyUser();
-  const { mutateAsync: signOut } = useSignOut();
+  const { mutate: signOut } = useSignOut();
 
   const [sheet, setSheet] = useState<SheetComponent>(undefined);
 

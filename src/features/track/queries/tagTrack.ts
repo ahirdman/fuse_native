@@ -50,7 +50,7 @@ export const useAddTagToTrack = () =>
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: trackTagKeys.track(variables.trackId),
+        queryKey: trackTagKeys.list(),
       });
 
       queryClient.invalidateQueries({

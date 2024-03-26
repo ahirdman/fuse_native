@@ -1,4 +1,5 @@
-import { ArrowDown } from '@tamagui/lucide-icons';
+import { ArrowLeft } from '@tamagui/lucide-icons';
+import { useQuery } from '@tanstack/react-query';
 import { ReactNode, useState } from 'react';
 import { getColors } from 'react-native-image-colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,7 +19,6 @@ import { StyledImage } from 'components/Image';
 import { Text } from 'components/Text';
 import { RootStackScreenProps } from 'navigation.types';
 
-import { useQuery } from '@tanstack/react-query';
 import { TagBadge } from 'tag/components/TagBadge';
 import { TagForm } from 'tag/components/Tagform';
 import { useCreateTag } from 'tag/queries/createTag';
@@ -60,9 +60,9 @@ export function Track({
   const insets = useSafeAreaInsets();
   const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
 
-  if (isLoading) {
+  if (isLoading || !albumColors) {
     return (
-      <YStack fullscreen bg="$primary700">
+      <YStack fullscreen bg="$primary700" justifyContent="center">
         <Spinner />
       </YStack>
     );
@@ -77,7 +77,6 @@ export function Track({
   }
 
   const [albumCover] = track.albumCovers;
-  //const trackDuration = formatMsDuration(track.duration);
 
   return (
     <YStack
@@ -91,17 +90,19 @@ export function Track({
         position="absolute"
         zIndex={10}
         top={insets.top}
-        right={16}
+        left={16}
         onPress={navigation.goBack}
+        h={44}
+        w={44}
       >
-        <ArrowDown pressStyle={{ color: '$brandDark' }} />
+        <ArrowLeft pressStyle={{ color: '$brandDark' }} />
       </Stack>
       <XStack justifyContent="center">
         <XStack
           bg="$primary700"
-          elevation={10}
-          shadowColor={albumColors?.detail ?? '$primary500'}
-          shadowOpacity={0.2}
+          elevation={1}
+          shadowColor={albumColors?.primary ?? '$primary500'}
+          shadowOpacity={0.8}
           shadowRadius={40}
         >
           <StyledImage source={albumCover?.url} h={250} w={250} />
