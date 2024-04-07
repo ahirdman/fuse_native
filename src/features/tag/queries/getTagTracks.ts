@@ -1,25 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from 'lib/supabase/supabase.init';
 
-import { spotifyService } from 'services/spotify.api';
-import { SpotifyTrack, SpotifyTrackDto } from 'track/track.interface';
-import { tagKeys } from './keys';
+import { tagKeys } from 'tag/queries/keys';
+import {
+  getSpotifyTracks,
+  sanitizeSpotifyTracks,
+} from 'track/queries/getTrack';
+import type { SpotifyTrackDto } from 'track/track.interface';
 
-interface GetSpotifyTracksRes {
-  tracks: SpotifyTrackDto[];
-}
-
-async function getSpotifyTracks(
-  trackIds: string[],
-): Promise<SpotifyTrackDto[]> {
-  const result = await spotifyService.get<GetSpotifyTracksRes>(
-    `/tracks?ids=${trackIds.join(',')}`,
-  );
-
-  return result.data.tracks;
-}
-
-async function getTagTracks(id: number) {
+async function getTagTracks(id: number): Promise<SpotifyTrackDto[]> {
   const { data, error } = await supabase
     .from('tags_with_track_ids')
     .select('track_ids')
@@ -31,25 +20,12 @@ async function getTagTracks(id: number) {
   }
 
   if (!data.track_ids) {
-    return undefined;
+    return [];
   }
 
   const tracks = await getSpotifyTracks(data.track_ids);
 
   return tracks;
-}
-
-function sanitizeSpotifyTracks(data: SpotifyTrackDto[]): SpotifyTrack[] {
-  return data.map((trackDto) => ({
-    id: trackDto.id,
-    uri: trackDto.uri,
-    artist: trackDto.artists[0]?.name,
-    albumCovers: trackDto.album.images,
-    album: trackDto.album.name,
-    name: trackDto.name,
-    explicit: trackDto.explicit,
-    duration: trackDto.duration_ms,
-  }));
 }
 
 interface UseGetTagTracksArgs {
@@ -61,6 +37,6 @@ export const useGetTagTracks = ({ tagId }: UseGetTagTracksArgs) =>
     queryKey: tagKeys.detail(tagId),
     queryFn: () => getTagTracks(tagId),
     select: (data) => {
-      return !data ? data : sanitizeSpotifyTracks(data);
+      return sanitizeSpotifyTracks(data);
     },
   });

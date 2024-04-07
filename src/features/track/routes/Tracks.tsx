@@ -5,11 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Spinner, XStack, YStack } from 'tamagui';
 
 import { Alert } from 'components/Alert';
-import { InputField } from 'components/InputField';
 import { useDebounce } from 'hooks/useDebounce';
 import type { RootTabScreenProps } from 'navigation.types';
 
 import { Search } from '@tamagui/lucide-icons';
+import { InputFieldV2 } from 'components/InputFieldV2';
 import { useCallback, useState } from 'react';
 import { FilterMenu } from 'track/components/Filter.menu';
 import TrackRow from 'track/components/TrackRow';
@@ -107,22 +107,20 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
         p={8}
         pt={insets.top}
         borderWidth={0.5}
-        gap={16}
+        gap={8}
         onLayout={(event) => handleListHeight(event.nativeEvent.layout.height)}
       >
-        <InputField
-          controlProps={{ control, name: 'trackFilter' }}
-          placeholder="Search for artists or track names"
-          size="md"
-          rounded="6"
-          autoCorrect={false}
-          autoCapitalize="none"
-          _stack={{ flex: 3 }}
-          InputLeftElement={<Search ml={12} size={16} color="$border300" />}
-        />
         <FilterMenu
           filterTags={filterTaggedTracks}
           setFilterTags={setFilterTaggedTracks}
+        />
+        <InputFieldV2
+          controlProps={{ control, name: 'trackFilter' }}
+          placeholder="Search for artists or track names"
+          autoCorrect={false}
+          autoCapitalize="none"
+          stackProps={{ flex: 3 }}
+          iconLeft={<Search color="$border300" size={18} />}
         />
       </XStack>
 
@@ -152,7 +150,7 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
             tintColor="#F4753F"
           />
         }
-        contentContainerStyle={{ padding: 4 }}
+        contentContainerStyle={{ padding: 8 }}
       />
     </YStack>
   );

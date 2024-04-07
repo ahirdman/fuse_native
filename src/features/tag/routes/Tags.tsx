@@ -1,74 +1,144 @@
 import { FlashList } from '@shopify/flash-list';
-import { Search } from '@tamagui/lucide-icons';
-import { useCallback, useMemo } from 'react';
-import { useForm } from 'react-hook-form';
-import { RefreshControl, StyleSheet } from 'react-native';
-import { Paragraph, Spinner, XStack, YStack } from 'tamagui';
+import { useCallback, useRef, useState } from 'react';
+import { Animated, RefreshControl, StyleSheet } from 'react-native';
+import PagerView from 'react-native-pager-view';
+import { H6, Paragraph, XStack, YStack } from 'tamagui';
 
-import { useDebounce } from 'hooks/useDebounce';
 import { Tables } from 'lib/supabase/database-generated.types';
 import type { TagListScreenProps } from 'navigation.types';
 
-import { InputField } from 'components/InputField';
+import { SectionButton } from 'components/SectionButton';
+import { FuseTagRowRes, useGetFuseLists } from 'fuse/queries/getFuseLists';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagRow } from 'tag/components/TagRow';
 import { useGetTags } from 'tag/queries/getTags';
 
-interface FilterTagsArgs {
-  tags: Tables<'tags'>[];
-  filter: string;
+const AnimatedPager = Animated.createAnimatedComponent(PagerView);
+
+export function TagListView({ navigation }: TagListScreenProps<'TagList'>) {
+  const [activePageIndex, setActivePageIndex] = useState(0);
+  const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
+
+  const insets = useSafeAreaInsets();
+  const pagerRef = useRef<PagerView>(null);
+
+  function handleCreateFuse() {
+    navigation.navigate('AddFuseTag');
+  }
+
+  function handleCreateTag() {
+    setCreateTagSheetOpen(true);
+  }
+
+  function handleTagRowPress(tag: Tables<'tags'>) {
+    navigation.navigate('Tag', { ...tag });
+  }
+
+  function handleFuseRowPress({ id, name }: { id: number; name: string }) {
+    navigation.navigate('FuseList', { id, name });
+  }
+
+  const setPage = useCallback(
+    (page: number) => pagerRef.current?.setPage(page),
+    [],
+  );
+
+  return (
+    <YStack
+      fullscreen
+      bg="$primary700"
+      paddingTop={insets.top}
+      px={12}
+      gap={12}
+    >
+      <H6
+        fontWeight="bold"
+        fontSize="$10"
+        lineHeight="$10"
+        textTransform="uppercase"
+        color="$brandDark"
+      >
+        Lists
+      </H6>
+
+      <XStack justifyContent="space-between" bg="$colorTransparent">
+        <SectionButton title="Create Tag" onPress={handleCreateTag} />
+        <SectionButton title="Create Fuse" onPress={handleCreateFuse} />
+      </XStack>
+
+      <YStack
+        flex={1}
+        bg="$primary800"
+        borderTopLeftRadius={12}
+        borderTopRightRadius={12}
+      >
+        <XStack p={12} mb={3}>
+          <H6
+            fontSize="$4"
+            textTransform="uppercase"
+            color={activePageIndex === 0 ? 'white' : '$border300'}
+            textAlign="center"
+            flex={1}
+            onPress={() => setPage(0)}
+            pressStyle={{
+              color: '$brandDark',
+            }}
+          >
+            Tag Lists
+          </H6>
+
+          <H6
+            fontSize="$4"
+            flex={1}
+            textTransform="uppercase"
+            color={activePageIndex === 1 ? 'white' : '$border300'}
+            textAlign="center"
+            onPress={() => setPage(1)}
+            pressStyle={{
+              color: '$brandDark',
+            }}
+          >
+            Fuse Lists
+          </H6>
+        </XStack>
+
+        <AnimatedPager
+          initialPage={0}
+          style={{ flex: 1 }}
+          ref={pagerRef}
+          onPageSelected={(e) => setActivePageIndex(e.nativeEvent.position)}
+        >
+          <YStack key="tag-lists" width="100%" height="100%" minHeight={40}>
+            <TagList onRowPress={handleTagRowPress} />
+          </YStack>
+
+          <YStack key="fuse-lists" width="100%" height="100%">
+            <FuseList onRowPress={handleFuseRowPress} />
+          </YStack>
+        </AnimatedPager>
+      </YStack>
+
+      <CreateTagSheet
+        modal
+        isOpen={createTagSheetOpen}
+        closeSheet={() => setCreateTagSheetOpen(false)}
+      />
+    </YStack>
+  );
 }
 
-export function TagList({ navigation }: TagListScreenProps<'TagList'>) {
+interface TagListProps {
+  onRowPress(item: Tables<'tags'>): void;
+}
+
+function TagList({ onRowPress }: TagListProps) {
   const { data, refetch, isFetching, isLoading } = useGetTags();
-  const insets = useSafeAreaInsets();
-
   const isRefreshing = isFetching && !isLoading;
-
-  const { control, watch } = useForm({
-    defaultValues: {
-      tagFilter: '',
-    },
-  });
-
-  const formValue = watch();
-  const debouncedTrackFilter = useDebounce(formValue.tagFilter, 300);
 
   function handleRefetch() {
     void refetch();
   }
-
-  function handleTagRowPress(tag: Tables<'tags'>) {
-    navigation.navigate('Tag', {
-      id: tag.id,
-      name: tag.name,
-      color: tag.color,
-    });
-  }
-
-  const filterTags = useCallback(
-    ({ tags, filter }: FilterTagsArgs): Tables<'tags'>[] => {
-      const fieldsToMatch = ['name'] as const;
-
-      const res = tags.filter((tag) =>
-        fieldsToMatch.some((field) =>
-          tag[field]?.toLowerCase().includes(filter),
-        ),
-      );
-
-      return res;
-    },
-    [],
-  );
-
-  const tags: Tables<'tags'>[] = useMemo(() => {
-    return !debouncedTrackFilter.length
-      ? data ?? []
-      : filterTags({
-          tags: data ?? [],
-          filter: debouncedTrackFilter.toLowerCase(),
-        });
-  }, [data, debouncedTrackFilter, filterTags]);
 
   const keyExtractor = (item: Tables<'tags'>) => item.id.toString();
 
@@ -77,7 +147,7 @@ export function TagList({ navigation }: TagListScreenProps<'TagList'>) {
       <TagRow
         name={item.name}
         color={item.color}
-        onPress={() => handleTagRowPress(item)}
+        onPress={() => onRowPress(item)}
       />
     );
   };
@@ -89,54 +159,78 @@ export function TagList({ navigation }: TagListScreenProps<'TagList'>) {
   }
 
   return (
-    <YStack flex={1} bg="$primary700">
-      <XStack
-        bg="$primary300"
-        p={8}
-        paddingTop={insets.top}
-        borderBottomColor="$border400"
-        borderWidth={0.5}
-      >
-        <InputField
-          placeholder="Search for tags"
-          w="full"
-          size="md"
-          rounded="6"
-          autoCorrect={false}
-          autoCapitalize="none"
-          InputLeftElement={<Search size={18} ml={12} color="$primary400" />}
-          controlProps={{ control, name: 'tagFilter' }}
+    <FlashList
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      ListEmptyComponent={ListEmpytComponent}
+      estimatedItemSize={40}
+      ItemSeparatorComponent={ItemSeparatorComponent}
+      contentContainerStyle={styles.flashList}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={handleRefetch}
+          tintColor="#F4753F"
         />
-      </XStack>
+      }
+    />
+  );
+}
 
-      {isLoading && (
-        <YStack fullscreen justifyContent="center" alignItems="center">
-          <Spinner />
-        </YStack>
-      )}
+interface FuseListProps {
+  onRowPress({ id, name }: { id: number; name: string }): void;
+}
 
-      <FlashList
-        data={tags}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        ListEmptyComponent={ListEmpytComponent}
-        estimatedItemSize={40}
-        ItemSeparatorComponent={ItemSeparatorComponent}
-        contentContainerStyle={styles.flashList}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefetch}
-            tintColor="#F07123"
-          />
-        }
+function FuseList({ onRowPress }: FuseListProps) {
+  const { data, refetch, isFetching, isLoading } = useGetFuseLists();
+  const isRefreshing = isFetching && !isLoading;
+
+  function handleRefetch() {
+    void refetch();
+  }
+
+  const keyExtractor = (item: FuseTagRowRes) => item.id.toString();
+
+  const renderItem = ({ item }: { item: FuseTagRowRes }) => {
+    return (
+      <TagRow
+        name={item.name}
+        color={item.tag1.color}
+        onPress={() => onRowPress({ ...item })}
       />
-    </YStack>
+    );
+  };
+
+  const ItemSeparatorComponent = () => <XStack h={8} />;
+
+  function ListEmpytComponent() {
+    return <Paragraph textAlign="center">No fuse lists created</Paragraph>;
+  }
+
+  return (
+    <FlashList
+      data={data}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      ListEmptyComponent={ListEmpytComponent}
+      estimatedItemSize={40}
+      ItemSeparatorComponent={ItemSeparatorComponent}
+      contentContainerStyle={styles.flashList}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={handleRefetch}
+          tintColor="#F4753F"
+        />
+      }
+    />
   );
 }
 
 const styles = StyleSheet.create({
   flashList: {
-    padding: 8,
+    paddingHorizontal: 12,
+    paddingBottom: 12,
   },
 });

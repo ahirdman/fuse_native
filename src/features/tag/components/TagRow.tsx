@@ -11,7 +11,7 @@ import {
 } from 'tamagui';
 
 interface TagListRowProps extends TagRowProps {
-  onPress(): void;
+  onPress?(): void;
   color: string;
   name: string;
   selecteble?: boolean;

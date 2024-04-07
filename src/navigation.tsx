@@ -15,7 +15,6 @@ import type {
 } from 'navigation.types';
 import { useAppSelector } from 'store/hooks';
 import { isDefined } from 'util/assert';
-import { hexToRGBA } from 'util/color';
 
 import { Button } from 'components/Button';
 import { ModalHeader } from 'components/modal-header';
@@ -25,8 +24,11 @@ import { SignIn } from 'user/routes/SignIn';
 import { SignUpView } from 'user/routes/SignUp';
 
 import { TagView } from 'tag/routes/Tag';
-import { TagList } from 'tag/routes/Tags';
+import { TagListView } from 'tag/routes/Tags';
 
+import { AddFuseTag } from 'fuse/routes/AddFuse';
+
+import { FuseListView } from 'fuse/routes/FuseList';
 import { AddTag } from 'track/routes/AddTag';
 import { Track } from 'track/routes/Track';
 import { Tracks } from 'track/routes/Tracks';
@@ -55,6 +57,19 @@ function RootNavigationStack() {
           <>
             <RootStack.Screen name="Root" component={RootTabStack} />
             <RootStack.Screen name="Track" component={Track} />
+            <RootStack.Screen
+              name="AddFuseTag"
+              component={AddFuseTag}
+              options={() => {
+                return {
+                  presentation: 'fullScreenModal',
+                  title: 'Create Fuse',
+                  headerTitleStyle: { color: '#FFF' },
+                  headerShown: true,
+                  headerStyle: { backgroundColor: '#232323' },
+                };
+              }}
+            />
             <RootStack.Screen
               name="AddTag"
               component={AddTag}
@@ -132,15 +147,13 @@ function TagListStack() {
     <TagStackNavigator.Navigator>
       <TagStackNavigator.Screen
         name="TagList"
-        component={TagList}
+        component={TagListView}
         options={{ headerShown: false }}
       />
       <TagStackNavigator.Screen
         name="Tag"
         component={TagView}
         options={(props) => {
-          const titleColor = hexToRGBA(props.route.params.color, 0.8);
-
           return {
             headerStyle: { backgroundColor: '#232323' },
             headerLeft: () => (
@@ -148,8 +161,24 @@ function TagListStack() {
                 <ChevronLeft />
               </XStack>
             ),
-            headerTitleStyle: { color: titleColor },
-            headerTitle: props.route.params.name,
+            headerTitleStyle: { color: '#FFFFFF' },
+            headerTitle: 'Tag',
+          };
+        }}
+      />
+      <TagStackNavigator.Screen
+        name="FuseList"
+        component={FuseListView}
+        options={(props) => {
+          return {
+            headerStyle: { backgroundColor: '#232323' },
+            headerLeft: () => (
+              <XStack onPress={() => props.navigation.goBack()}>
+                <ChevronLeft />
+              </XStack>
+            ),
+            headerTitleStyle: { color: '#FFFFFF' },
+            headerTitle: 'Fuse List',
           };
         }}
       />
