@@ -16,6 +16,9 @@
       "tag/*": [
         "features/tag/*"
       ],
+      "fuse/*": [
+        "features/fuse/*"
+      ],
       "track/*": [
         "features/track/*"
       ],

@@ -25,58 +25,54 @@ import {
 import type { Tables } from 'lib/supabase/database-generated.types';
 import type { TagListScreenProps } from 'navigation.types';
 import { formatMsDuration } from 'util/index';
-import { showToast } from 'util/toast';
 
 import { Alert } from 'components/Alert';
+import { useDeleteFuse } from 'fuse/queries/deleteFuse';
+import { useGetFuseList } from 'fuse/queries/getFuseLists';
+import { useGetFuseTracks } from 'fuse/queries/getFuseTracks';
 import { TagRow } from 'tag/components/TagRow';
-import { TagForm } from 'tag/components/Tagform';
 import { TagEditMenu } from 'tag/components/tag.menu';
-import { useDeleteTag } from 'tag/queries/deleteTag';
-import { useGetTagTracks } from 'tag/queries/getTagTracks';
-import { useGetTag } from 'tag/queries/getTags';
-import { TagSyncStatus, useSyncPlaylist } from 'tag/queries/playlist';
-import { useUpdateTag } from 'tag/queries/updateTag';
+import { type TagSyncStatus, useSyncPlaylist } from 'tag/queries/playlist';
 import { TracksList } from 'track/components/TrackList';
+import { showToast } from 'util/toast';
 
-export function TagView({
+// Sync:
+// Same experience as tag
+// Unsynced if:
+// - Tag names are changed
+// - Tag tracks that are common have changed
+
+export function FuseListView({
   navigation,
   route: { params },
-}: TagListScreenProps<'Tag'>) {
-  const [editTagSheetVisible, setEditTagSheetVisible] = useState(false);
+}: TagListScreenProps<'FuseList'>) {
   const [infoSheetVisible, setInfoSheetVisible] = useState(false);
-  const [tagStatus, setTagStatus] = useState<TagSyncStatus>();
+  const [fuseStatus, setFuseStatus] = useState<TagSyncStatus>();
 
-  const { data: selectedTag, isLoading: selectedTagLoading } = useGetTag({
-    id: params.id,
+  const { data: selectedFuse, isLoading: selectedFuseLoading } = useGetFuseList(
+    {
+      id: params.id,
+    },
+  );
+
+  const { mutate: deleteFuseMutation } = useDeleteFuse();
+  const { mutateAsync: syncPlaylist } = useSyncPlaylist({
+    tagStatus: fuseStatus,
   });
-  const { mutate: updateTagMutation, isPending } = useUpdateTag();
-  const { mutate: deleteTagMutation } = useDeleteTag();
-  const { mutateAsync: syncPlaylist } = useSyncPlaylist({ tagStatus });
   const {
-    data: selectedTagTracks,
+    data: fuseTracks,
     refetch: refetchTracks,
     isRefetching: isRefreshingTracks,
     isError: isTracksError,
     isFetching: isFetchinTracks,
-  } = useGetTagTracks({ tagId: params.id });
-
-  useEffect(() => {
-    if (!selectedTag) {
-      return;
-    }
-
-    const tagSyncStatus = getTagSyncStatus({ ...selectedTag });
-
-    setTagStatus(tagSyncStatus);
-  }, [selectedTag]);
+  } = useGetFuseTracks({ id: params.id });
 
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TagEditMenu
-          onEditPress={() => setEditTagSheetVisible(true)}
           onDeletePress={() =>
-            deleteTagMutation(params.id, {
+            deleteFuseMutation(params.id, {
               onSuccess: () => {
                 navigation.goBack();
               },
@@ -85,15 +81,28 @@ export function TagView({
         />
       ),
     });
-  }, [navigation, deleteTagMutation, params.id]);
+  }, [navigation, deleteFuseMutation, params.id]);
+
+  useEffect(() => {
+    if (!selectedFuse) {
+      return;
+    }
+
+    const tagSyncStatus = getTagSyncStatus({
+      ...selectedFuse,
+      updated_at: selectedFuse.created_at,
+    }); // TODO: Fix
+
+    setFuseStatus(tagSyncStatus);
+  }, [selectedFuse]);
 
   const listDuration = formatMsDuration(
-    selectedTagTracks
+    fuseTracks
       ?.map((track) => track.duration)
       .reduce((acc, curr) => acc + curr, 0) ?? 0,
   );
 
-  if (!selectedTagLoading && !selectedTag) {
+  if (!selectedFuseLoading && !selectedFuse) {
     return (
       <YStack
         bg="%primary700"
@@ -109,13 +118,13 @@ export function TagView({
   return (
     <YStack bg="$primary700" flex={1}>
       <YStack gap={16} px={12} pt={12}>
-        {selectedTag && (
-          <TagRow color={selectedTag.color} name={selectedTag.name} />
+        {selectedFuse && (
+          <TagRow color={selectedFuse.tag1.color} name={selectedFuse.name} />
         )}
 
         <ListItem
-          icon={() => renderStatusIcon(tagStatus)}
-          title={tagStatus}
+          icon={() => renderStatusIcon(fuseStatus)}
+          title={fuseStatus}
           iconAfter={<HelpCircle size={16} />}
           onPress={() => setInfoSheetVisible(true)}
           radiused
@@ -126,41 +135,41 @@ export function TagView({
             flex={1}
             bg="$brandDark"
             iconAfter={RefreshCw}
-            onPress={() =>
+            onPress={() => {
               syncPlaylist(
                 {
                   name: params.name,
-                  tracks: selectedTagTracks?.map((track) => track.uri) ?? [],
+                  tracks: fuseTracks?.map((track) => track.uri) ?? [],
                   id: params.id,
-                  type: 'tags',
-                  snapshot_id: selectedTag?.latest_snapshot_id,
-                  playlistId: selectedTag?.spotify_playlist_id,
+                  type: 'fuseTags',
+                  snapshot_id: selectedFuse?.latest_snapshot_id,
+                  playlistId: selectedFuse?.spotify_playlist_id,
                 },
                 {
                   onSuccess: () => {
                     showToast({
                       title:
-                        tagStatus === 'Unexported'
+                        fuseStatus === 'Unexported'
                           ? 'Playlist created'
                           : 'Playlist synced',
                       preset: 'done',
                     });
-                    setTagStatus('Synced');
+                    setFuseStatus('Synced');
                   },
                 },
-              )
-            }
-            disabled={tagStatus === 'Synced'}
+              );
+            }}
+            disabled={fuseStatus === 'Synced'}
           >
-            {tagStatus === 'Unexported' ? 'Export to Spotify' : 'Sync'}
+            {fuseStatus === 'Unexported' ? 'Export to Spotify' : 'Sync'}
           </Button>
 
-          {selectedTag?.spotify_playlist_uri &&
-            selectedTag.spotify_playlist_uri !== null && (
+          {selectedFuse?.spotify_playlist_uri &&
+            selectedFuse.spotify_playlist_uri !== null && (
               <Button
                 flex={1}
                 onPress={() =>
-                  Linking.openURL(selectedTag.spotify_playlist_uri ?? '')
+                  Linking.openURL(selectedFuse.spotify_playlist_uri ?? '')
                 }
                 iconAfter={ArrowUpRight}
               >
@@ -188,10 +197,10 @@ export function TagView({
 
         {isTracksError && <Alert label="Error fetching tracks" m={4} />}
 
-        {selectedTagTracks && (
+        {fuseTracks && (
           <View h="86%">
             <TracksList
-              tracks={selectedTagTracks}
+              tracks={fuseTracks}
               onTrackPress={(trackId) =>
                 navigation.navigate('Track', {
                   trackId,
@@ -209,45 +218,6 @@ export function TagView({
           </View>
         )}
       </YStack>
-
-      <Sheet
-        modal
-        moveOnKeyboardChange
-        open={editTagSheetVisible}
-        animation="quick"
-        snapPointsMode="fit"
-        disableDrag
-      >
-        <Sheet.Overlay
-          onPress={() => setEditTagSheetVisible(false)}
-          animation="quick"
-          enterStyle={{ opacity: 0.5 }}
-          exitStyle={{ opacity: 0 }}
-        />
-        <Sheet.Frame padding={20} borderRadius={28} pb={48}>
-          <TagForm
-            label="Edit Tag"
-            confirmAction={(data) =>
-              updateTagMutation(
-                {
-                  id: params.id,
-                  color: data.color,
-                  name: data.name,
-                },
-                {
-                  onSuccess: (_, { name, color }) => {
-                    navigation.setParams({ name, color });
-                    setEditTagSheetVisible(false);
-                  },
-                },
-              )
-            }
-            closeAction={() => setEditTagSheetVisible(false)}
-            existingTag={{ color: selectedTag?.color, name: selectedTag?.name }}
-            isLoading={isPending}
-          />
-        </Sheet.Frame>
-      </Sheet>
 
       <Sheet
         modal

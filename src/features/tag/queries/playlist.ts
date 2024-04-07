@@ -21,7 +21,8 @@ interface SyncTagPlatlistArgs {
   name: string;
   description?: string;
   tracks: string[];
-  tagId: string;
+  type: 'tags' | 'fuseTags';
+  id: number;
   playlistId?: string | null;
   snapshot_id?: string | null;
 }
@@ -54,12 +55,12 @@ async function syncTagPlaylist(
     );
 
     const { error } = await supabase
-      .from('tags')
+      .from(args.type)
       .update({
         latest_snapshot_id: data.snapshot_id,
         synced_at: new Date().toISOString().toLocaleString(),
       })
-      .eq('id', args.tagId);
+      .eq('id', args.id);
 
     if (error) {
       throw new Error('Error updating tag');
@@ -100,14 +101,14 @@ async function exportTagPlaylist(
     );
 
     const { error } = await supabase
-      .from('tags')
+      .from(args.type)
       .update({
         latest_snapshot_id: data.snapshot_id,
         spotify_playlist_id: playlist.id,
         spotify_playlist_uri: playlist.uri,
         synced_at: new Date().toISOString().toLocaleString(),
       })
-      .eq('id', args.tagId);
+      .eq('id', args.id);
 
     if (error) {
       throw new Error('Error updating tag');

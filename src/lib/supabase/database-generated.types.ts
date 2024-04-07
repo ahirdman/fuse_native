@@ -34,6 +34,95 @@ export type Database = {
   }
   public: {
     Tables: {
+      fuseTags: {
+        Row: {
+          created_at: string
+          id: number
+          latest_snapshot_id: string | null
+          spotify_playlist_id: string | null
+          spotify_playlist_uri: string | null
+          synced_at: string | null
+          tag_id_1: number
+          tag_id_2: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          latest_snapshot_id?: string | null
+          spotify_playlist_id?: string | null
+          spotify_playlist_uri?: string | null
+          synced_at?: string | null
+          tag_id_1: number
+          tag_id_2: number
+          updated_at?: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          latest_snapshot_id?: string | null
+          spotify_playlist_id?: string | null
+          spotify_playlist_uri?: string | null
+          synced_at?: string | null
+          tag_id_1?: number
+          tag_id_2?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_fuseTags_tag_id_1_fkey"
+            columns: ["tag_id_1"]
+            isOneToOne: false
+            referencedRelation: "initial_tags_with_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_fuseTags_tag_id_1_fkey"
+            columns: ["tag_id_1"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_fuseTags_tag_id_1_fkey"
+            columns: ["tag_id_1"]
+            isOneToOne: false
+            referencedRelation: "tags_with_track_ids"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_fuseTags_tag_id_2_fkey"
+            columns: ["tag_id_2"]
+            isOneToOne: false
+            referencedRelation: "initial_tags_with_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_fuseTags_tag_id_2_fkey"
+            columns: ["tag_id_2"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_fuseTags_tag_id_2_fkey"
+            columns: ["tag_id_2"]
+            isOneToOne: false
+            referencedRelation: "tags_with_track_ids"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_fuseTags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           app_user_id: string | null
@@ -115,7 +204,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "tags_user_id_fkey"
+            foreignKeyName: "public_tags_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -180,6 +269,20 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "public_trackTags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "initial_tags_with_matches"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "trackTags_tag_id_fkey"
             columns: ["tag_id"]
             isOneToOne: false
@@ -191,13 +294,6 @@ export type Database = {
             columns: ["tag_id"]
             isOneToOne: false
             referencedRelation: "tags_with_track_ids"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -229,7 +325,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "users_id_fkey"
+            foreignKeyName: "public_users_id_fkey"
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "users"
@@ -246,6 +342,66 @@ export type Database = {
       }
     }
     Views: {
+      initial_tags_with_matches: {
+        Row: {
+          color: string | null
+          id: number | null
+          name: string | null
+        }
+        Relationships: []
+      }
+      matched_tags: {
+        Row: {
+          color: string | null
+          id: number | null
+          initial_tag_id: number | null
+          name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["initial_tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "initial_tags_with_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "tags_with_track_ids"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["initial_tag_id"]
+            isOneToOne: false
+            referencedRelation: "initial_tags_with_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["initial_tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags_with_track_ids"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags_with_track_ids: {
         Row: {
           color: string | null
@@ -257,7 +413,7 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "tags_user_id_fkey"
+            foreignKeyName: "public_tags_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"

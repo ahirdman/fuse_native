@@ -40,8 +40,7 @@ async function addTagToTrack({ trackId, tagIds }: AddTagToTrackArgs) {
 export const useAddTagToTrack = () =>
   useMutation({
     mutationFn: addTagToTrack,
-    onError: (error) => {
-      console.error(error);
+    onError: () => {
       showToast({
         title: 'Something went wrong',
         preset: 'error',

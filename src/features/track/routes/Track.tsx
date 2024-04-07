@@ -1,13 +1,10 @@
 import { ArrowLeft } from '@tamagui/lucide-icons';
-import { useQuery } from '@tanstack/react-query';
 import { ReactNode, useState } from 'react';
-import { getColors } from 'react-native-image-colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Button,
   H6,
   ScrollView,
-  Sheet,
   Spinner,
   Stack,
   XStack,
@@ -19,27 +16,12 @@ import { StyledImage } from 'components/Image';
 import { Text } from 'components/Text';
 import { RootStackScreenProps } from 'navigation.types';
 
+import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagBadge } from 'tag/components/TagBadge';
-import { TagForm } from 'tag/components/Tagform';
-import { useCreateTag } from 'tag/queries/createTag';
+import { useAlbumCoverColors } from 'track/queries/getAlbumColors';
 import { useGetTrack } from 'track/queries/getTrack';
 import { useGetTrackTags } from 'track/queries/getTrackTags';
 import { useRemoveTagFromTrack } from 'track/queries/removeTagFromTrack';
-
-const useAlbumCoverColors = (albumCoverUrl: string) =>
-  useQuery({
-    queryKey: ['alubmColors', albumCoverUrl],
-    queryFn: async () => {
-      const result = await getColors(albumCoverUrl);
-
-      if (result.platform !== 'ios') {
-        throw new Error('Image color result platform missmatch');
-      }
-
-      return result;
-    },
-    enabled: !!albumCoverUrl,
-  });
 
 export function Track({
   route: { params: { trackId } },
@@ -47,7 +29,6 @@ export function Track({
 }: RootStackScreenProps<'Track'>) {
   const { data: track, isLoading, isError } = useGetTrack(trackId);
   const { mutate: removeTagFromTrack } = useRemoveTagFromTrack();
-  const { mutate: createTag } = useCreateTag();
   const { data: albumColors } = useAlbumCoverColors(
     track?.albumCovers[0]?.url ?? '',
   );
@@ -192,36 +173,10 @@ export function Track({
         </XStack>
       </YStack>
 
-      <Sheet
-        moveOnKeyboardChange
-        open={createTagSheetOpen}
-        animation="quick"
-        snapPointsMode="fit"
-        disableDrag
-      >
-        <Sheet.Overlay
-          onPress={() => setCreateTagSheetOpen(false)}
-          animation="quick"
-          enterStyle={{ opacity: 0.5 }}
-          exitStyle={{ opacity: 0 }}
-        />
-        <Sheet.Frame padding={20} borderRadius={28} pb={48}>
-          <TagForm
-            label="Create New Tag"
-            closeAction={() => setCreateTagSheetOpen(false)}
-            confirmAction={({ name, color }) =>
-              createTag(
-                { name, color, trackId: trackId },
-                {
-                  onSuccess: () => {
-                    setCreateTagSheetOpen(false);
-                  },
-                },
-              )
-            }
-          />
-        </Sheet.Frame>
-      </Sheet>
+      <CreateTagSheet
+        isOpen={createTagSheetOpen}
+        closeSheet={() => setCreateTagSheetOpen(false)}
+      />
     </YStack>
   );
 }

@@ -1,9 +1,11 @@
 import { useMutation } from '@tanstack/react-query';
+
 import { queryClient } from 'lib/query/init';
 import { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
-import { trackTagKeys } from 'track/queries/keys';
 import { showToast } from 'util/toast';
+
+import { trackTagKeys } from 'track/queries/keys';
 
 interface CreateTagArgs {
   color: string;

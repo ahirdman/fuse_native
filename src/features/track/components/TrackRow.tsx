@@ -8,7 +8,7 @@ import { Text } from 'components/Text';
 import type { SpotifyTrack } from 'track/track.interface';
 
 interface TrackRowProps {
-  onPress(): void;
+  onPress?(): void;
   track: SpotifyTrack;
   height: number;
   isTagged?: boolean;
@@ -31,12 +31,7 @@ function TrackRow({ track, height, onPress, isTagged }: TrackRowProps) {
           />
         </Stack>
 
-        <XStack
-          justifyContent="space-between"
-          alignItems="center"
-          flex={1}
-          pr={8}
-        >
+        <XStack justifyContent="space-between" alignItems="center" flex={1}>
           <YStack justifyContent="space-around" flex={1} pr={8}>
             <Text
               color="$white"
@@ -60,7 +55,18 @@ function TrackRow({ track, height, onPress, isTagged }: TrackRowProps) {
             </Text>
           </YStack>
 
-          {isTagged && <Tags size={18} color="$brandDark" />}
+          {isTagged && (
+            <Stack
+              bg="$primary800"
+              w="$3"
+              h="$3"
+              borderRadius="$12"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Tags size={18} color="$brandDark" />
+            </Stack>
+          )}
         </XStack>
       </XStack>
     </View>

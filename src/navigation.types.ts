@@ -10,15 +10,16 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
  * */
 
 export type RootStackParamList = {
+	Root: NavigatorScreenParams<RootTabParamList>;
 	SignIn: undefined;
 	SignUp: undefined;
-	Root: NavigatorScreenParams<RootTabParamList>;
 	Track: {
 		trackId: string;
 	};
 	AddTag: {
 		trackId: string;
 	};
+	AddFuseTag: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
@@ -30,7 +31,7 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 
 export type RootTabParamList = {
 	Tracks: undefined;
-	Lists: undefined;
+	Lists: NavigatorScreenParams<TagListParamList>;
 	Profile: undefined;
 };
 
@@ -51,12 +52,16 @@ export type TagListParamList = {
 		name: string;
 		color: string;
 	};
+	FuseList: {
+		id: number;
+		name: string;
+	};
 };
 
 export type TagListScreenProps<T extends keyof TagListParamList> =
 	CompositeScreenProps<
 		NativeStackScreenProps<TagListParamList, T>,
-		RootTabScreenProps<keyof RootTabParamList>
+		RootStackScreenProps<keyof RootStackParamList>
 	>;
 
 declare global {

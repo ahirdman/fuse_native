@@ -27,7 +27,7 @@ const StyledIconButton = styled(Stack, {
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: '$2',
-  pressStyle: { borderColor: '#707070' },
+  pressStyle: { borderColor: '$border300' },
   borderColor: '$border500',
   borderWidth: 1,
 
