@@ -1,6 +1,7 @@
 import * as Constants from 'expo-constants';
 import { channel } from 'expo-updates';
-import { applicationConfiguration as defaultConfig } from './config-default';
+//import { applicationConfiguration as defaultConfig } from './config-default';
+import { applicationConfiguration as testConfig } from './config-test';
 
 export interface EnvironmentConfig {
   supabase: {
@@ -52,5 +53,5 @@ const commonConfig: CommonConfig = {
 
 export const config = {
   ...commonConfig,
-  ...defaultConfig,
+  ...testConfig,
 };
