@@ -29,7 +29,6 @@ export function CreateUserPage() {
       { email, password },
       {
         onError: (error) => {
-          console.log(JSON.stringify(error, null, 2));
           setError('email', { message: error.message });
         },
       },
