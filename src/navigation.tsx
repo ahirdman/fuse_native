@@ -5,7 +5,7 @@ import {
   useNavigationContainerRef,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ChevronLeft, Home, Tags, User, X } from '@tamagui/lucide-icons';
+import { ChevronLeft, X } from '@tamagui/lucide-icons';
 import { Paragraph, Progress, XStack } from 'tamagui';
 
 import type {
@@ -27,6 +27,7 @@ import { TagListView } from 'tag/routes/Tags';
 
 import { AddFuseTag } from 'fuse/routes/AddFuse';
 
+import { CustomTabBar } from 'components/TabBar';
 import { FuseListView } from 'fuse/routes/FuseList';
 import { AddTag } from 'track/routes/AddTag';
 import { Track } from 'track/routes/Track';
@@ -195,31 +196,11 @@ function RootTabStack() {
         tabBarStyle: { backgroundColor: 'black', borderTopWidth: 0 },
         tabBarShowLabel: false,
       }}
+      tabBar={(props) => <CustomTabBar {...props} />}
     >
-      <Tab.Screen
-        name="Tracks"
-        component={Tracks}
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Home color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Lists"
-        component={TagListStack}
-        options={{
-          title: 'Lists',
-          tabBarIcon: ({ color }) => <Tags color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <User color={color} />,
-        }}
-      />
+      <Tab.Screen name="Tracks" component={Tracks} />
+      <Tab.Screen name="Lists" component={TagListStack} />
+      <Tab.Screen name="Profile" component={Profile} />
     </Tab.Navigator>
   );
 }

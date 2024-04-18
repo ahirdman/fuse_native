@@ -88,7 +88,7 @@ export function Profile() {
                 title="Credentials"
                 subTitle="Edit your account"
                 icon={<UserCog size={24} />}
-                iconAfter={<ChevronRight size={18} />}
+                iconAfter={<ChevronRight size={18} color="$brandDark" />}
                 pressStyle={{ bg: '$primary300' }}
                 onPress={() => setSheet('account')}
               />
@@ -97,7 +97,7 @@ export function Profile() {
                 title="Subscription"
                 subTitle="View your subscription plan"
                 icon={<DollarSign size={24} />}
-                iconAfter={<ChevronRight size={18} />}
+                iconAfter={<ChevronRight size={18} color="$brandDark" />}
                 pressStyle={{ bg: '$primary300' }}
                 onPress={() => setSheet('subscription')}
               />
