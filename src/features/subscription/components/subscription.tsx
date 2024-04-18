@@ -1,15 +1,15 @@
-import { Box, Heading, Text, VStack } from 'native-base';
-import { ScrollView } from 'tamagui';
+import { Button, H3, ScrollView, Spinner, Text, YStack } from 'tamagui';
 
 import { useAppDispatch } from 'store/hooks';
 
-import { Button } from 'components/Button';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SubscriptionCard } from 'subscription/components/SubscriptionCard';
 import { useSubscription } from 'subscription/queries/useSubscription';
 import { updateSubscription } from 'user/user.slice';
 
 export function PickSubscription() {
   const dispatch = useAppDispatch();
+  const insets = useSafeAreaInsets();
   const [
     setActiveChoice,
     handlePickSubscription,
@@ -21,17 +21,16 @@ export function PickSubscription() {
   }
 
   return (
-    <Box
-      flex={1}
-      w="full"
-      safeAreaBottom
+    <YStack
+      fullscreen
+      pb={insets.bottom}
       justifyContent="space-between"
-      bg="primary.700"
+      bg="$primary700"
     >
-      <VStack space="4" pt="4" px="4">
-        <Heading textAlign="center">Pick a Subscription</Heading>
-        <Text>Subscribe for better things</Text>
-      </VStack>
+      <YStack gap={16} pt={16} px={16}>
+        <H3 textAlign="center">Pick a Subscription</H3>
+        <Text textAlign="center">Subscribe for better things</Text>
+      </YStack>
 
       <ScrollView padding={16}>
         {packages?.map((sub) => {
@@ -50,21 +49,29 @@ export function PickSubscription() {
         })}
       </ScrollView>
 
-      <VStack px="4">
+      <YStack px={16}>
         <Button
-          label="Choose Subscription"
-          mb="4"
+          mb={16}
           disabled={purchaseLoading}
-          isLoading={purchaseLoading}
           onPress={handlePickSubscription}
-        />
+          bg="$brandDark"
+          fontWeight="bold"
+        >
+          {purchaseLoading && (
+            <Button.Icon>
+              <Spinner />
+            </Button.Icon>
+          )}
+          Choose Subscription
+        </Button>
         <Button
-          label="Skip"
           onPress={handleSkip}
           disabled={purchaseLoading}
-          type="secondary"
-        />
-      </VStack>
-    </Box>
+          fontWeight="bold"
+        >
+          Skip
+        </Button>
+      </YStack>
+    </YStack>
   );
 }

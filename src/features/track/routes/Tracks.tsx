@@ -9,7 +9,7 @@ import { useDebounce } from 'hooks/useDebounce';
 import type { RootTabScreenProps } from 'navigation.types';
 
 import { Search } from '@tamagui/lucide-icons';
-import { InputFieldV2 } from 'components/InputFieldV2';
+import { InputField } from 'components/InputField';
 import { useCallback, useState } from 'react';
 import { FilterMenu } from 'track/components/Filter.menu';
 import TrackRow from 'track/components/TrackRow';
@@ -114,7 +114,7 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
           filterTags={filterTaggedTracks}
           setFilterTags={setFilterTaggedTracks}
         />
-        <InputFieldV2
+        <InputField
           controlProps={{ control, name: 'trackFilter' }}
           placeholder="Search for artists or track names"
           autoCorrect={false}
@@ -168,7 +168,7 @@ function ListEmptyComponent({
 
   return (
     <YStack p={16}>
-      <Alert label={alertLabel} variant={isError ? 'error' : 'info'} />
+      <Alert label={alertLabel} type={isError ? 'error' : 'info'} />
     </YStack>
   );
 }

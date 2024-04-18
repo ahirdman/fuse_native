@@ -1,11 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { H3, YStack } from 'tamagui';
+import { Button, H3, Spinner, YStack } from 'tamagui';
 
-import { Button } from 'components/Button';
 import { InputField } from 'components/InputField';
-
 import {
   type SignUpArgs,
   type SignUpInput,
@@ -30,8 +28,9 @@ export function CreateUserPage() {
     signUp(
       { email, password },
       {
-        onError: ({ message }) => {
-          setError('email', { message });
+        onError: (error) => {
+          console.log(JSON.stringify(error, null, 2));
+          setError('email', { message: error.message });
         },
       },
     );
@@ -56,27 +55,36 @@ export function CreateUserPage() {
 
         <InputField
           label="Password"
-          secureTextEntry
+          secureTextEntry={!__DEV__}
           placeholder="********"
-          type="password"
+          aria-label="password"
+          textContentType="password"
           controlProps={{ control, name: 'password' }}
         />
 
         <InputField
           label="Confirm Password"
-          secureTextEntry
+          secureTextEntry={!__DEV__}
+          aria-label="confirm-password"
           placeholder="********"
-          type="password"
+          textContentType="password"
           controlProps={{ control, name: 'confirmPassword' }}
         />
       </YStack>
 
       <Button
-        label="Sign Up"
-        mb="4"
+        mb={16}
         onPress={handleSubmit(onSubmit)}
-        isLoading={isLoading}
-      />
+        bg="$brandDark"
+        fontWeight="bold"
+      >
+        {isLoading && (
+          <Button.Icon>
+            <Spinner />
+          </Button.Icon>
+        )}
+        Sign Up
+      </Button>
     </YStack>
   );
 }

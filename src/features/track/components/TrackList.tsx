@@ -49,7 +49,6 @@ export function TracksList({
       onEndReached={onEndReached}
       estimatedItemSize={ITEM_HEIGHT}
       ItemSeparatorComponent={ItemSeparatorComponent}
-      // refreshing={isRefreshing}
       refreshControl={
         <RefreshControl
           refreshing={isRefreshing}

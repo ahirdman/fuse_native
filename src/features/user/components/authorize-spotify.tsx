@@ -1,7 +1,6 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { H3, XStack, YStack } from 'tamagui';
+import { Button, H3, YStack } from 'tamagui';
 
-import { Button } from 'components/Button';
 import { Text } from 'components/Text';
 import { authorizeSpotify } from 'lib/expo/expo.auth';
 import { useAppDispatch } from 'store/hooks';
@@ -65,13 +64,14 @@ export function AuthorizeSpotifyPage() {
         </Text>
       </YStack>
 
-      <XStack>
-        <Button
-          mb="4"
-          label="Authorize Spotify"
-          onPress={handleSpotifyAuthorization}
-        />
-      </XStack>
+      <Button
+        mb={16}
+        fontWeight="bold"
+        bg="$brandDark"
+        onPress={handleSpotifyAuthorization}
+      >
+        Authorize Spotify
+      </Button>
     </YStack>
   );
 }

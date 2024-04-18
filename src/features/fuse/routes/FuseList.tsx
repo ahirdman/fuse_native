@@ -36,12 +36,6 @@ import { type TagSyncStatus, useSyncPlaylist } from 'tag/queries/playlist';
 import { TracksList } from 'track/components/TrackList';
 import { showToast } from 'util/toast';
 
-// Sync:
-// Same experience as tag
-// Unsynced if:
-// - Tag names are changed
-// - Tag tracks that are common have changed
-
 export function FuseListView({
   navigation,
   route: { params },

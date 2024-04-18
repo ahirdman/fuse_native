@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import type { Tag } from 'tag/tag.interface';
 
-import { InputFieldV2 } from 'components/InputFieldV2';
+import { InputField } from 'components/InputField';
 
 const tagFormSchema = z.object({
   name: z.string().min(1, { message: 'Tag requires a name' }),
@@ -57,7 +57,7 @@ export function TagForm({
 
       <YStack gap={4}>
         <Paragraph fontWeight="$8">Name</Paragraph>
-        <InputFieldV2 controlProps={{ control, name: 'name' }} />
+        <InputField controlProps={{ control, name: 'name' }} />
       </YStack>
 
       <YStack gap={4}>

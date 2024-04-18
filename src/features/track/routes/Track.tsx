@@ -154,7 +154,7 @@ export function Track({
               ))
             ) : (
               <YStack justifyContent="center" w="100%" h="100%">
-                <Alert variant="info" label="No tags for this track yet" />
+                <Alert type="info" label="No tags for this track yet" />
               </YStack>
             )}
           </ScrollView>
