@@ -24,7 +24,7 @@ const common: Partial<ExpoConfig> = {
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: false,
-    buildNumber: '29',
+    buildNumber: '30',
     config: {
       usesNonExemptEncryption: false,
     },
