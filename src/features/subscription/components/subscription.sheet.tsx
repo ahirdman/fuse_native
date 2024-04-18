@@ -1,10 +1,9 @@
 import { XCircle } from '@tamagui/lucide-icons';
-import { H4, H6, Paragraph, XStack, YStack } from 'tamagui';
+import { Button, H4, H6, Paragraph, Spinner, XStack, YStack } from 'tamagui';
 
 import { SubscriptionCard } from 'subscription/components/SubscriptionCard';
 import { useSubscription } from 'subscription/queries/useSubscription';
 
-import { Button } from 'components/Button';
 import { useAppSelector } from 'store/hooks';
 import { SubscriptionPackage } from 'subscription/subscription.interface';
 
@@ -90,12 +89,19 @@ function NoSubscription() {
       </YStack>
 
       <Button
-        label="Choose Subscription"
-        mb="4"
+        mb={16}
         disabled={purchaseLoading}
-        isLoading={purchaseLoading}
         onPress={handlePickSubscription}
-      />
+        fontWeight="bold"
+        bg="$brandDark"
+      >
+        {purchaseLoading && (
+          <Button.Icon>
+            <Spinner />
+          </Button.Icon>
+        )}
+        Choose Subscription
+      </Button>
     </YStack>
   );
 }

@@ -1,0 +1,33 @@
+appId: com.ahirdman.fuse
+env:
+    PASSWORD: Test123456
+---
+- launchApp
+- tapOn: Sign Up Now
+
+- tapOn: Email
+- inputText: awsome
+
+- tapOn:
+    id: "Return"
+- tapOn: Sign Up
+
+- assertVisible: "Invalid email"
+- assertVisible: "Password cannot be shorter than 6 characters"
+
+- tapOn: Email
+- inputText: "awsome@gmail.com"
+
+- tapOn: "********"
+- inputText: ${PASSWORD}
+
+- tapOn: "confirm-password"
+- inputText: ${PASSWORD}
+
+- tapOn:
+    id: "Return"
+- tapOn: Sign Up
+
+# TODO
+  # DB Reset whenever flow creates a user
+  # SecureTextEntry fix - current solution is yanky

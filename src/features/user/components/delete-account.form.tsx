@@ -2,7 +2,7 @@ import { AlertTriangle } from '@tamagui/lucide-icons';
 import { useForm } from 'react-hook-form';
 import { Button, Paragraph, YStack } from 'tamagui';
 
-import { InputFieldV2 } from 'components/InputFieldV2';
+import { InputField } from 'components/InputField';
 
 export function DeleteAccountForm() {
   const { control, handleSubmit } = useForm<{ password: string }>({
@@ -20,7 +20,7 @@ export function DeleteAccountForm() {
       <Paragraph color="$lightText">
         Deleting your account is irreverseble.
       </Paragraph>
-      <InputFieldV2
+      <InputField
         label="Confirm Password"
         secureTextEntry
         placeholder="********"

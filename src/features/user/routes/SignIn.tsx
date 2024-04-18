@@ -1,11 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { H1, YStack } from 'tamagui';
+import { Button, H1, Spinner, YStack } from 'tamagui';
 
 import type { RootStackScreenProps } from 'navigation.types';
 
-import { Button } from 'components/Button';
 import { HorizontalDivider } from 'components/Divider';
 import { InputField } from 'components/InputField';
 import { SignInInput, signInInputSchema, useSignIn } from 'user/queries/signIn';
@@ -43,8 +42,14 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
       pt={insets.top}
       pb={insets.bottom}
     >
-      <YStack w="100%" alignItems="center">
-        <H1 color="$brandDark" fontWeight="bold" fontSize="$16" pt={120}>
+      <YStack w="100%">
+        <H1
+          color="$brandDark"
+          textAlign="center"
+          fontWeight="bold"
+          fontSize="$16"
+          pt={120}
+        >
           FUSE
         </H1>
 
@@ -53,7 +58,6 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
           placeholder="Email"
           keyboardType="email-address"
           controlProps={{ control, name: 'email' }}
-          _stack={{ m: 2 }}
         />
 
         <InputField
@@ -61,26 +65,33 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
           placeholder="********"
           secureTextEntry
           controlProps={{ control, name: 'password' }}
-          _stack={{ m: 2 }}
         />
 
         <Button
-          label="Sign In"
-          my="4"
+          my={24}
           onPress={handleSubmit(submit)}
-          isLoading={isPending}
-        />
+          bg="$brandDark"
+          fontWeight="bold"
+        >
+          {isPending && (
+            <Button.Icon>
+              <Spinner />
+            </Button.Icon>
+          )}
+          Sign In
+        </Button>
       </YStack>
 
-      <YStack w="100%" justifyContent="center" alignItems="center">
-        <HorizontalDivider label="or" mt="100" />
+      <YStack w="100%">
+        <HorizontalDivider label="or" />
 
         <Button
-          my="4"
-          type="secondary"
-          label="Sign Up Now"
+          my={16}
           onPress={() => navigation.push('SignUp')}
-        />
+          fontWeight="bold"
+        >
+          Sign Up Now
+        </Button>
       </YStack>
     </YStack>
   );

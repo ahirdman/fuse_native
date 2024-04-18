@@ -6,7 +6,7 @@ import {
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ChevronLeft, Home, Tags, User, X } from '@tamagui/lucide-icons';
-import { Progress, XStack } from 'tamagui';
+import { Paragraph, Progress, XStack } from 'tamagui';
 
 import type {
   RootStackParamList,
@@ -16,7 +16,6 @@ import type {
 import { useAppSelector } from 'store/hooks';
 import { isDefined } from 'util/assert';
 
-import { Button } from 'components/Button';
 import { ModalHeader } from 'components/modal-header';
 
 import { Profile } from 'user/routes/Profile';
@@ -123,11 +122,12 @@ function RootNavigationStack() {
                         </Progress>
                       }
                       rightElement={
-                        <Button
-                          type="teritary"
-                          label="Cancel"
+                        <Paragraph
                           onPress={() => props.navigation.goBack()}
-                        />
+                          fontWeight="bold"
+                        >
+                          Cancel
+                        </Paragraph>
                       }
                       {...props}
                     />
