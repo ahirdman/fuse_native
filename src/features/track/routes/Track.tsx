@@ -175,6 +175,7 @@ export function Track({
 
       <CreateTagSheet
         isOpen={createTagSheetOpen}
+        trackId={trackId}
         closeSheet={() => setCreateTagSheetOpen(false)}
       />
     </YStack>
