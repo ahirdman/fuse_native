@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { GetProps, Stack, styled } from 'tamagui';
+import type { ReactNode } from 'react';
+import { type GetProps, Stack, styled } from 'tamagui';
 
 interface IconButtonProps extends StyledIconButtonProps {
   size?: 'small' | 'default' | 'large';

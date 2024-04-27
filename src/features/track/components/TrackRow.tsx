@@ -1,35 +1,46 @@
 import { Tags } from '@tamagui/lucide-icons';
 import { Image } from 'expo-image';
 import { StyleSheet } from 'react-native';
-import { Stack, View, XStack, YStack } from 'tamagui';
+import { Stack, View, type ViewProps, XStack, YStack } from 'tamagui';
 
+import { StyledImage } from 'components/Image';
 import { Text } from 'components/Text';
-
 import type { SpotifyTrack } from 'track/track.interface';
 
-interface TrackRowProps {
+interface TrackRowProps extends ViewProps {
   onPress?(): void;
+  deleteAction?(): void;
   track: SpotifyTrack;
   height: number;
   isTagged?: boolean;
 }
 
-function TrackRow({ track, height, onPress, isTagged }: TrackRowProps) {
+export function TrackRow({
+  track,
+  height,
+  onPress,
+  isTagged,
+  ...props
+}: TrackRowProps) {
   return (
     <View
       accessibilityRole="button"
       onPress={onPress}
       pressStyle={{ bg: '$primary600', borderRadius: 4, opacity: 0.5 }}
+      px={8}
+      {...props}
     >
       <XStack h={height} w="100%">
-        <Stack h={height} w={height} mr={8}>
-          <Image
-            source={track.albumCovers[track.albumCovers.length - 1]?.url}
-            alt="album-image"
-            accessibilityIgnoresInvertColors
-            style={styles.image}
-          />
-        </Stack>
+        <StyledImage
+          source={track.albumCovers[track.albumCovers.length - 1]?.url}
+          alt="album-image"
+          accessibilityIgnoresInvertColors
+          contain="inherit"
+          w={44}
+          h={44}
+          mr={8}
+          alignSelf="center"
+        />
 
         <XStack justifyContent="space-between" alignItems="center" flex={1}>
           <YStack justifyContent="space-around" flex={1} pr={8}>
@@ -72,12 +83,3 @@ function TrackRow({ track, height, onPress, isTagged }: TrackRowProps) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  image: {
-    flex: 1,
-    width: '100%',
-  },
-});
-
-export default TrackRow;

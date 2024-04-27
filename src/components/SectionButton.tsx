@@ -1,5 +1,5 @@
 import { Plus } from '@tamagui/lucide-icons';
-import { YStack, YStackProps } from 'tamagui';
+import { YStack, type YStackProps } from 'tamagui';
 
 import { Text } from 'components/Text';
 

@@ -9,6 +9,7 @@ import {
 } from '@tamagui/lucide-icons';
 import * as Linking from 'expo-linking';
 import { type ReactNode, useEffect, useState } from 'react';
+import { RefreshControl } from 'react-native';
 import {
   Button,
   H4,
@@ -16,7 +17,6 @@ import {
   Paragraph,
   Separator,
   Sheet,
-  Spinner,
   View,
   XStack,
   YStack,
@@ -28,13 +28,15 @@ import { formatMsDuration } from 'util/index';
 import { showToast } from 'util/toast';
 
 import { Alert } from 'components/Alert';
+import { ListEmptyComponent } from 'components/ListEmptyComponent';
+import { ListFooterComponent } from 'components/ListFooter';
 import { TagRow } from 'tag/components/TagRow';
 import { TagForm } from 'tag/components/Tagform';
 import { TagEditMenu } from 'tag/components/tag.menu';
 import { useDeleteTag } from 'tag/queries/deleteTag';
 import { useGetTagTracks } from 'tag/queries/getTagTracks';
 import { useGetTag } from 'tag/queries/getTags';
-import { TagSyncStatus, useSyncPlaylist } from 'tag/queries/playlist';
+import { type TagSyncStatus, useSyncPlaylist } from 'tag/queries/playlist';
 import { useUpdateTag } from 'tag/queries/updateTag';
 import { TracksList } from 'track/components/TrackList';
 
@@ -55,9 +57,9 @@ export function TagView({
   const {
     data: selectedTagTracks,
     refetch: refetchTracks,
-    isRefetching: isRefreshingTracks,
+    isRefetching: isRefetchingTracks,
     isError: isTracksError,
-    isFetching: isFetchinTracks,
+    isFetching: isFetchingTracks,
   } = useGetTagTracks({ tagId: params.id });
 
   useEffect(() => {
@@ -184,30 +186,44 @@ export function TagView({
 
         <Separator mx={12} />
 
-        {isFetchinTracks && <Spinner my={16} />}
-
-        {isTracksError && <Alert label="Error fetching tracks" m={4} />}
-
-        {selectedTagTracks && (
-          <View h="86%">
-            <TracksList
-              tracks={selectedTagTracks}
-              onTrackPress={(trackId) =>
-                navigation.navigate('Track', {
-                  trackId,
-                })
-              }
-              onRefetch={refetchTracks}
-              onEndReached={() => {}}
-              isRefreshing={isRefreshingTracks}
-              listStyle={{
-                paddingTop: 4,
-                paddingHorizontal: 4,
-                paddingBottom: 8,
-              }}
-            />
-          </View>
-        )}
+        <View h="86%">
+          <TracksList
+            tracks={selectedTagTracks}
+            tagId={params.id}
+            isSwipeable
+            //onEndReachedThreshold={0.3} - TODO: Paginate response from SupaBase
+            ListEmptyComponent={
+              isFetchingTracks ? null : (
+                <ListEmptyComponent
+                  isError={isTracksError}
+                  isFiltered={false}
+                  defaultLabel={`No tracks tagged with ${params.name}`}
+                />
+              )
+            }
+            ListFooterComponent={
+              isFetchingTracks && !isRefetchingTracks ? (
+                <ListFooterComponent />
+              ) : null
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefetchingTracks}
+                onRefresh={refetchTracks}
+                tintColor="#F4753F"
+              />
+            }
+            onTrackPress={(trackId) =>
+              navigation.navigate('Track', {
+                trackId,
+              })
+            }
+            listStyle={{
+              paddingTop: 4,
+              paddingBottom: 8,
+            }}
+          />
+        </View>
       </YStack>
 
       <Sheet

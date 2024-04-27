@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import type { AxiosError } from 'axios';
 
 export function assertIsDefined<T>(data: T): asserts data is NonNullable<T> {
   if (data === undefined || data === null) {

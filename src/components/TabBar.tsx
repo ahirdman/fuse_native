@@ -1,8 +1,8 @@
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Home, Tags, User } from '@tamagui/lucide-icons';
 import { Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, GetProps, View } from 'tamagui';
+import { Button, type GetProps, View } from 'tamagui';
 import { hapticFeedback } from 'util/haptic';
 
 export const CustomTabBar = View.styleable<BottomTabBarProps>(

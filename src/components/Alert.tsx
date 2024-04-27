@@ -1,5 +1,5 @@
-import { AlertTriangle } from '@tamagui/lucide-icons';
-import { GetProps, Text, View, styled } from 'tamagui';
+import { AlertTriangle, Info } from '@tamagui/lucide-icons';
+import { type GetProps, Text, View, styled } from 'tamagui';
 
 interface AlertProps extends StyledAlertProps {
   label: string;
@@ -9,14 +9,15 @@ export function Alert({ label, ...props }: AlertProps) {
   return (
     <StyledAlert {...props}>
       {props.type === 'error' && <AlertTriangle color="$error700" mr={12} />}
+      {props.type === 'info' && <Info color="$border300" mr={12} />}
       <Text
         color={
           props.type === 'error'
             ? '$error700'
             : props.type === 'success'
-              ? 'white'
+              ? '$white'
               : props.type === 'warning'
-                ? 'black'
+                ? '$black'
                 : 'white'
         }
       >
@@ -48,8 +49,8 @@ const StyledAlert = styled(View, {
         borderColor: 'warning.600',
       },
       info: {
-        bg: 'transparent',
-        borderColor: 'transparent',
+        bg: '$primary600',
+        borderColor: '$border500',
       },
     },
   },

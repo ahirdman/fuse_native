@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { store } from 'store';
 
-import { Session, User } from '@supabase/supabase-js';
+import type { Session, User } from '@supabase/supabase-js';
 import { emailSchema, passwordSchema } from 'user/queries/signIn';
 import { signIn } from 'user/user.slice';
 

@@ -15,6 +15,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 import { Provider as ReduxProvider } from 'react-redux';
 import { TamaguiProvider } from 'tamagui';
@@ -62,10 +63,12 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ReduxProvider store={store}>
-        <TamaguiProvider config={tamaguiConfig}>
-          <StatusBar style="light" />
-          <RootNavigationStack />
-        </TamaguiProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <TamaguiProvider config={tamaguiConfig}>
+            <StatusBar style="light" />
+            <RootNavigationStack />
+          </TamaguiProvider>
+        </GestureHandlerRootView>
       </ReduxProvider>
     </QueryClientProvider>
   );

@@ -1,23 +1,24 @@
 import { FlashList } from '@shopify/flash-list';
+import { Search } from '@tamagui/lucide-icons';
+import { useCallback, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Dimensions, RefreshControl } from 'react-native';
+import { Dimensions, LayoutAnimation, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Spinner, XStack, YStack } from 'tamagui';
+import { XStack, YStack } from 'tamagui';
 
-import { Alert } from 'components/Alert';
 import { useDebounce } from 'hooks/useDebounce';
 import type { RootTabScreenProps } from 'navigation.types';
 
-import { Search } from '@tamagui/lucide-icons';
 import { InputField } from 'components/InputField';
-import { useCallback, useState } from 'react';
+import { ListEmptyComponent } from 'components/ListEmptyComponent';
+import { ListFooterComponent } from 'components/ListFooter';
 import { FilterMenu } from 'track/components/Filter.menu';
-import TrackRow from 'track/components/TrackRow';
+import { TrackRow } from 'track/components/TrackRow';
 import {
   useGetTaggedTrackIds,
   useInfiniteSavedTracks,
 } from 'track/queries/getSavedTracks';
-import { SpotifyTrack } from 'track/track.interface';
+import type { SpotifyTrack } from 'track/track.interface';
 
 const ITEM_HEIGHT = 44;
 const SEPERATOR_HEIGHT = 8;
@@ -36,6 +37,7 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
   const formValue = watch();
   const debouncedTrackFilter = useDebounce(formValue.trackFilter, 300);
   const insets = useSafeAreaInsets();
+  const listRef = useRef<FlashList<SpotifyTrack> | null>(null);
 
   const { data: trackIds } = useGetTaggedTrackIds();
   const {
@@ -66,7 +68,6 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: cant depend on itself dummy
   const recursiveFetchMore = useCallback(
     (availableRows: number) => {
       fetchNextPage().then(({ hasNextPage, data }) => {
@@ -75,7 +76,7 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
         }
       });
     },
-    [fetchNextPage, debouncedTrackFilter],
+    [fetchNextPage],
   );
 
   const renderItem = ({ item }: { item: SpotifyTrack }) => (
@@ -99,6 +100,13 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
     setAvailableRows(itemsVisible);
   }
 
+  function onFilterToggle() {
+    setFilterTaggedTracks(!filterTaggedTracks);
+
+    listRef.current?.prepareForLayoutAnimationRender();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }
+
   return (
     <YStack fullscreen bg="$primary700">
       <XStack
@@ -112,7 +120,7 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
       >
         <FilterMenu
           filterTags={filterTaggedTracks}
-          setFilterTags={setFilterTaggedTracks}
+          setFilterTags={onFilterToggle}
         />
         <InputField
           controlProps={{ control, name: 'trackFilter' }}
@@ -126,6 +134,7 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
 
       <FlashList
         data={tracks ?? []}
+        ref={listRef}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={0.1}
@@ -137,6 +146,7 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
             <ListEmptyComponent
               isError={isError}
               isFiltered={debouncedTrackFilter.length > 0}
+              defaultLabel="You have no saved tracks"
             />
           )
         }
@@ -152,31 +162,6 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
         }
         contentContainerStyle={{ padding: 8 }}
       />
-    </YStack>
-  );
-}
-
-function ListEmptyComponent({
-  isError,
-  isFiltered,
-}: { isError: boolean; isFiltered: boolean }) {
-  const alertLabel = isError
-    ? 'Error fetching tracks'
-    : isFiltered
-      ? 'No matches'
-      : 'You have no saved tracks';
-
-  return (
-    <YStack p={16}>
-      <Alert label={alertLabel} type={isError ? 'error' : 'info'} />
-    </YStack>
-  );
-}
-
-function ListFooterComponent() {
-  return (
-    <YStack h={40} justifyContent="center" alignItems="center">
-      <Spinner />
     </YStack>
   );
 }

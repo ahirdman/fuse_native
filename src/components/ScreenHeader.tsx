@@ -1,4 +1,4 @@
-import { NativeStackHeaderProps } from '@react-navigation/native-stack';
+import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
 import { ChevronLeft } from '@tamagui/lucide-icons';
 import { type ReactNode, memo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

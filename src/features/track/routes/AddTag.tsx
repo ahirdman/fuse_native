@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatePresence, Button, YStack } from 'tamagui';
 
 import { Text } from 'components/Text';
-import { RootStackScreenProps } from 'navigation.types';
+import type { RootStackScreenProps } from 'navigation.types';
 import { hapticFeedback } from 'util/haptic';
 
 import { TagRow } from 'tag/components/TagRow';
@@ -22,7 +22,12 @@ interface RenderItemProps {
 
 type Props = RootStackScreenProps<'AddTag'>;
 
-export function AddTag({ route: { params: { trackId } }, navigation }: Props) {
+export function AddTag({
+  route: {
+    params: { trackId },
+  },
+  navigation,
+}: Props) {
   const [selectMultiple, setSelectMultiple] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 

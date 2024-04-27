@@ -1,5 +1,5 @@
 import { ArrowLeft } from '@tamagui/lucide-icons';
-import { ReactNode, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Button,
@@ -14,7 +14,7 @@ import {
 import { Alert } from 'components/Alert';
 import { StyledImage } from 'components/Image';
 import { Text } from 'components/Text';
-import { RootStackScreenProps } from 'navigation.types';
+import type { RootStackScreenProps } from 'navigation.types';
 
 import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagBadge } from 'tag/components/TagBadge';
@@ -24,7 +24,9 @@ import { useGetTrackTags } from 'track/queries/getTrackTags';
 import { useRemoveTagFromTrack } from 'track/queries/removeTagFromTrack';
 
 export function Track({
-  route: { params: { trackId } },
+  route: {
+    params: { trackId },
+  },
   navigation,
 }: RootStackScreenProps<'Track'>) {
   const { data: track, isLoading, isError } = useGetTrack(trackId);
@@ -153,7 +155,7 @@ export function Track({
                 />
               ))
             ) : (
-              <YStack justifyContent="center" w="100%" h="100%">
+              <YStack w="$full" h="$full">
                 <Alert type="info" label="No tags for this track yet" />
               </YStack>
             )}

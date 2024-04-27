@@ -34,7 +34,7 @@ export function TagForm({
   const { control, handleSubmit, reset } = useForm<TagFormInput>({
     defaultValues: {
       name: existingTag?.name ?? '',
-      color: existingTag?.color ?? 'orange',
+      color: existingTag?.color ?? '#F4753F',
     },
     resolver: zodResolver(tagFormSchema),
   });

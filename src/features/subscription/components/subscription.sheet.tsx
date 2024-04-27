@@ -5,7 +5,7 @@ import { SubscriptionCard } from 'subscription/components/SubscriptionCard';
 import { useSubscription } from 'subscription/queries/useSubscription';
 
 import { useAppSelector } from 'store/hooks';
-import { SubscriptionPackage } from 'subscription/subscription.interface';
+import type { SubscriptionPackage } from 'subscription/subscription.interface';
 
 interface SheetProps {
   onClose(): void;

@@ -1,4 +1,4 @@
-import { Paragraph, Separator, XStack, XStackProps } from 'tamagui';
+import { Paragraph, Separator, XStack, type XStackProps } from 'tamagui';
 
 interface IHorizontalDividerProps extends XStackProps {
   label?: string;

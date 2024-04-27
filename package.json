@@ -7,7 +7,8 @@
     "android": "expo run:android",
     "test": "jest",
     "test:e2e": " maestro test ./.maestro/sign-up-flow.yaml",
-    "biome": "biome check .",
+    "lint": "biome check .",
+    "format": "biome format --write .",
     "type-check": "npx tsc --noEmit",
     "verify": "bun run biome && bun run type-check",
     "eas:run": "eas build:run -p ios --latest && bun run start",
@@ -79,7 +80,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "@biomejs/biome": "1.4.0",
+    "@biomejs/biome": "^1.7.1",
     "@snaplet/copycat": "^5.0.0",
     "@snaplet/seed": "0.94.1",
     "@testing-library/jest-native": "^5.4.2",

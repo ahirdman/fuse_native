@@ -2,9 +2,9 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import * as Burnt from 'burnt';
 import { useState } from 'react';
 import Purchases, {
-  CustomerInfo,
-  PurchasesEntitlementInfo,
-  PurchasesPackage,
+  type CustomerInfo,
+  type PurchasesEntitlementInfo,
+  type PurchasesPackage,
 } from 'react-native-purchases';
 
 import { useAppDispatch } from 'store/hooks';

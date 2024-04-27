@@ -1,6 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
+
 import { queryClient } from 'lib/query/init';
 import { supabase } from 'lib/supabase/supabase.init';
+import { tagKeys } from 'tag/queries/keys';
+import type { SpotifyTrack } from 'track/track.interface';
 import { showToast } from 'util/toast';
 import { trackTagKeys } from './keys';
 
@@ -41,6 +44,11 @@ export const useRemoveTagFromTrack = () =>
       });
     },
     onSuccess: (_data, variables) => {
+      queryClient.setQueryData<SpotifyTrack[]>(
+        tagKeys.detail(variables.tagId),
+        (prev) => prev?.filter((track) => track.id !== variables.trackId),
+      );
+
       queryClient.invalidateQueries({
         queryKey: trackTagKeys.track(variables.trackId),
       });
