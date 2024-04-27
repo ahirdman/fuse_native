@@ -4,7 +4,7 @@ import { supabase } from 'lib/supabase/supabase.init';
 import { spotifyService } from 'services/spotify.api';
 
 import { trackKeys, trackTagKeys } from 'track/queries/keys';
-import { SpotifyTrack, UserSavedTrackDto } from 'track/track.interface';
+import type { SpotifyTrack, UserSavedTrackDto } from 'track/track.interface';
 
 interface UserSavedTracksDto {
   next: string | null;

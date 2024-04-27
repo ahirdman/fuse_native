@@ -1,4 +1,4 @@
-import { Sheet, SheetProps } from 'tamagui';
+import { Sheet, type SheetProps } from 'tamagui';
 
 import { TagForm } from 'tag/components/Tagform';
 import { useCreateTag } from 'tag/queries/createTag';

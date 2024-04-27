@@ -16,7 +16,6 @@ import {
   Paragraph,
   Separator,
   Sheet,
-  Spinner,
   View,
   XStack,
   YStack,
@@ -27,9 +26,12 @@ import type { TagListScreenProps } from 'navigation.types';
 import { formatMsDuration } from 'util/index';
 
 import { Alert } from 'components/Alert';
+import { ListEmptyComponent } from 'components/ListEmptyComponent';
+import { ListFooterComponent } from 'components/ListFooter';
 import { useDeleteFuse } from 'fuse/queries/deleteFuse';
 import { useGetFuseList } from 'fuse/queries/getFuseLists';
 import { useGetFuseTracks } from 'fuse/queries/getFuseTracks';
+import { RefreshControl } from 'react-native';
 import { TagRow } from 'tag/components/TagRow';
 import { TagEditMenu } from 'tag/components/tag.menu';
 import { type TagSyncStatus, useSyncPlaylist } from 'tag/queries/playlist';
@@ -56,9 +58,9 @@ export function FuseListView({
   const {
     data: fuseTracks,
     refetch: refetchTracks,
-    isRefetching: isRefreshingTracks,
+    isRefetching: isRefetchingTracks,
     isError: isTracksError,
-    isFetching: isFetchinTracks,
+    isFetching: isFetchingTracks,
   } = useGetFuseTracks({ id: params.id });
 
   useEffect(() => {
@@ -187,30 +189,43 @@ export function FuseListView({
 
         <Separator mx={12} />
 
-        {isFetchinTracks && <Spinner my={16} />}
-
-        {isTracksError && <Alert label="Error fetching tracks" m={4} />}
-
-        {fuseTracks && (
-          <View h="86%">
-            <TracksList
-              tracks={fuseTracks}
-              onTrackPress={(trackId) =>
-                navigation.navigate('Track', {
-                  trackId,
-                })
-              }
-              onRefetch={refetchTracks}
-              onEndReached={() => {}}
-              isRefreshing={isRefreshingTracks}
-              listStyle={{
-                paddingTop: 4,
-                paddingHorizontal: 4,
-                paddingBottom: 8,
-              }}
-            />
-          </View>
-        )}
+        <View h="86%">
+          <TracksList
+            tracks={fuseTracks}
+            tagId={params.id}
+            isSwipeable={false}
+            ListEmptyComponent={
+              isFetchingTracks ? null : (
+                <ListEmptyComponent
+                  isError={isTracksError}
+                  isFiltered={false}
+                  defaultLabel={`No tracks tagged with ${params.name}`}
+                />
+              )
+            }
+            ListFooterComponent={
+              isFetchingTracks && !isRefetchingTracks ? (
+                <ListFooterComponent />
+              ) : null
+            }
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefetchingTracks}
+                onRefresh={refetchTracks}
+                tintColor="#F4753F"
+              />
+            }
+            onTrackPress={(trackId) =>
+              navigation.navigate('Track', {
+                trackId,
+              })
+            }
+            listStyle={{
+              paddingTop: 4,
+              paddingBottom: 8,
+            }}
+          />
+        </View>
       </YStack>
 
       <Sheet

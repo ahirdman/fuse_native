@@ -1,5 +1,5 @@
-import { NativeStackHeaderProps } from '@react-navigation/native-stack';
-import { ReactNode } from 'react';
+import type { NativeStackHeaderProps } from '@react-navigation/native-stack';
+import type { ReactNode } from 'react';
 import { Stack, XStack } from 'tamagui';
 
 interface ModalHeaderProps extends NativeStackHeaderProps {

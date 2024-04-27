@@ -28,7 +28,7 @@ import {
 import { useGetFuseTracksPreview } from 'fuse/queries/getFuseTracks';
 import { TagBadge } from 'tag/components/TagBadge';
 import type { Tag } from 'tag/tag.interface';
-import TrackRow from 'track/components/TrackRow';
+import { TrackRow } from 'track/components/TrackRow';
 
 const AnimatedPager = Animated.createAnimatedComponent(PagerView);
 type Props = RootStackScreenProps<'AddFuseTag'>;
@@ -79,7 +79,7 @@ export function AddFuseTag({ navigation }: Props) {
         </XStack>
       ),
     });
-  }, [selectedInitialTag, navigation.setOptions]);
+  }, [selectedInitialTag, navigation.setOptions, handleClose]);
 
   const setPage = useCallback(
     (page: number) => pagerRef.current?.setPage(page),

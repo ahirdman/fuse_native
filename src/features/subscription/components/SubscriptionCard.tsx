@@ -1,4 +1,4 @@
-import { Card, CardProps, H4, Paragraph } from 'tamagui';
+import { Card, type CardProps, H4, Paragraph } from 'tamagui';
 
 interface SubscriptionCardProps extends CardProps {
   onPress(): void;

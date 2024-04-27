@@ -1,5 +1,5 @@
 import { supabase } from 'lib/supabase/supabase.init';
-import { SpotifyToken } from 'user/user.interface';
+import type { SpotifyToken } from 'user/user.interface';
 
 interface InsertUserDataArgs {
   tokenData: SpotifyToken;

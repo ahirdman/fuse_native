@@ -7,34 +7,15 @@
     "module": "esnext",
     "baseUrl": "src",
     "paths": {
-      "common/*": [
-        "features/common/*"
-      ],
-      "subscription/*": [
-        "features/subscription/*"
-      ],
-      "tag/*": [
-        "features/tag/*"
-      ],
-      "fuse/*": [
-        "features/fuse/*"
-      ],
-      "track/*": [
-        "features/track/*"
-      ],
-      "user/*": [
-        "features/user/*"
-      ],
-      "config": [
-        "config/index.ts"
-      ]
+      "common/*": ["features/common/*"],
+      "subscription/*": ["features/subscription/*"],
+      "tag/*": ["features/tag/*"],
+      "fuse/*": ["features/fuse/*"],
+      "track/*": ["features/track/*"],
+      "user/*": ["features/user/*"],
+      "config": ["config/index.ts"]
     },
-    "types": [
-      "bun-types"
-    ]
+    "types": ["bun-types"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { Tables } from 'lib/supabase/database.interface';
+import type { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
 import { showToast } from 'util/toast';
 

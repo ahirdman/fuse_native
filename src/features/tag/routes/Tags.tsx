@@ -4,11 +4,11 @@ import { Animated, RefreshControl, StyleSheet } from 'react-native';
 import PagerView from 'react-native-pager-view';
 import { H6, Paragraph, XStack, YStack } from 'tamagui';
 
-import { Tables } from 'lib/supabase/database-generated.types';
+import type { Tables } from 'lib/supabase/database-generated.types';
 import type { TagListScreenProps } from 'navigation.types';
 
 import { SectionButton } from 'components/SectionButton';
-import { FuseTagRowRes, useGetFuseLists } from 'fuse/queries/getFuseLists';
+import { type FuseTagRowRes, useGetFuseLists } from 'fuse/queries/getFuseLists';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagRow } from 'tag/components/TagRow';

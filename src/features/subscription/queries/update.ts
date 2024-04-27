@@ -1,5 +1,5 @@
 import { supabase } from 'lib/supabase/supabase.init';
-import { MakePurchaseRes } from './useSubscription';
+import type { MakePurchaseRes } from './useSubscription';
 
 export async function updateUserSubscriptionData({
   activePackage,

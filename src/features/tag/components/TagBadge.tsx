@@ -1,4 +1,4 @@
-import { GetProps, Paragraph, View, styled } from 'tamagui';
+import { type GetProps, Paragraph, View, styled } from 'tamagui';
 
 import { hexToRGBA } from 'util/color';
 

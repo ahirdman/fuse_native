@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { supabase } from 'lib/supabase/supabase.init';
 
-import { Tag } from 'tag/tag.interface';
+import type { Tag } from 'tag/tag.interface';
 
 async function getInitialTagsWithMatches(): Promise<Tag[]> {
   const { data, error } = await supabase

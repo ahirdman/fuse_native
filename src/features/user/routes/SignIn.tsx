@@ -7,7 +7,11 @@ import type { RootStackScreenProps } from 'navigation.types';
 
 import { HorizontalDivider } from 'components/Divider';
 import { InputField } from 'components/InputField';
-import { SignInInput, signInInputSchema, useSignIn } from 'user/queries/signIn';
+import {
+  type SignInInput,
+  signInInputSchema,
+  useSignIn,
+} from 'user/queries/signIn';
 
 export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   const { control, handleSubmit, setError } = useForm<SignInInput>({
@@ -19,9 +23,9 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   });
 
   const insets = useSafeAreaInsets();
-  const { mutateAsync: logIn, isPending } = useSignIn();
+  const { mutate: logIn, isPending } = useSignIn();
 
-  async function submit({ email, password }: SignInInput) {
+  function submit({ email, password }: SignInInput) {
     logIn(
       { email, password },
       {

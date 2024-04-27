@@ -4,7 +4,7 @@ import * as DropdownMenu from 'zeego/dropdown-menu';
 
 interface FilterMenuProps {
   filterTags: boolean;
-  setFilterTags(val: boolean): void;
+  setFilterTags(): void;
 }
 
 export function FilterMenu({ filterTags, setFilterTags }: FilterMenuProps) {
@@ -21,9 +21,7 @@ export function FilterMenu({ filterTags, setFilterTags }: FilterMenuProps) {
       <DropdownMenu.Content>
         <DropdownMenu.CheckboxItem
           value={filterTags ? 'on' : 'off'}
-          onValueChange={() => {
-            setFilterTags(!filterTags);
-          }}
+          onValueChange={setFilterTags}
           key="one"
         >
           <DropdownMenu.ItemIcon

@@ -1,32 +1,65 @@
-import { ContentStyle, FlashList } from '@shopify/flash-list';
-import { ReactNode } from 'react';
-import { RefreshControl } from 'react-native';
-import { YStack } from 'tamagui';
+import {
+  type ContentStyle,
+  FlashList,
+  type FlashListProps,
+} from '@shopify/flash-list';
+import { type ReactNode, useRef } from 'react';
+import { LayoutAnimation } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 
-import TrackRow from 'track/components/TrackRow';
-import { SpotifyTrack } from 'track/track.interface';
+import { hapticFeedback } from 'util/haptic';
 
-const ITEM_HEIGHT = 40;
+import { SwipableTrackRow } from 'track/components/SwipeAbleTrackRow';
+import { TrackRow } from 'track/components/TrackRow';
+import { useRemoveTagFromTrack } from 'track/queries/removeTagFromTrack';
+import type { SpotifyTrack } from 'track/track.interface';
 
-interface TrackListProps {
+const ITEM_HEIGHT = 56;
+
+interface TrackListProps
+  extends Omit<FlashListProps<SpotifyTrack>, 'renderItem' | 'data'> {
   onTrackPress(id: string): void;
   trackMenu?(): ReactNode;
-  onEndReached(): void;
-  onRefetch(): void;
-  tracks: SpotifyTrack[];
-  isRefreshing: boolean;
+  isSwipeable?: boolean | undefined;
+  tracks?: SpotifyTrack[] | undefined;
+  tagId: number;
   listStyle?: ContentStyle | undefined;
 }
 
 export function TracksList({
   onTrackPress,
-  onEndReached,
-  onRefetch,
   tracks,
-  isRefreshing,
-  listStyle: style,
+  isSwipeable = false,
+  tagId,
+  listStyle,
+  ...flashListProps
 }: TrackListProps) {
+  const listRef = useRef<FlashList<SpotifyTrack> | null>(null);
+  const swipedRowActive = useSharedValue<string | null>(null);
+
+  const { mutate: removeTag } = useRemoveTagFromTrack();
+
+  function remoteTrackRow(trackId: string) {
+    hapticFeedback('Medium');
+    removeTag({ tagId, trackId });
+
+    listRef.current?.prepareForLayoutAnimationRender();
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  }
+
   const renderItem = ({ item }: { item: SpotifyTrack }) => {
+    if (isSwipeable) {
+      return (
+        <SwipableTrackRow
+          track={item}
+          height={ITEM_HEIGHT}
+          onPress={() => onTrackPress(item.id)}
+          deleteAction={() => remoteTrackRow(item.id)}
+          swipedRowActive={swipedRowActive}
+        />
+      );
+    }
+
     return (
       <TrackRow
         track={item}
@@ -36,27 +69,17 @@ export function TracksList({
     );
   };
 
-  const ItemSeparatorComponent = () => <YStack h={8} />;
-
   const keyExtractor = (item: SpotifyTrack) => item.id;
 
   return (
     <FlashList
       data={tracks}
+      ref={listRef}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
-      onEndReachedThreshold={0.3}
-      onEndReached={onEndReached}
       estimatedItemSize={ITEM_HEIGHT}
-      ItemSeparatorComponent={ItemSeparatorComponent}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={onRefetch}
-          tintColor="#F07123"
-        />
-      }
-      contentContainerStyle={style}
+      contentContainerStyle={listStyle}
+      {...flashListProps}
     />
   );
 }

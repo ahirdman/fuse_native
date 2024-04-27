@@ -1,5 +1,5 @@
-import { ThunkDispatch } from '@reduxjs/toolkit';
-import { Session } from '@supabase/supabase-js';
+import type { ThunkDispatch } from '@reduxjs/toolkit';
+import type { Session } from '@supabase/supabase-js';
 import { useMutation } from '@tanstack/react-query';
 import Purchases from 'react-native-purchases';
 import { z } from 'zod';
@@ -8,7 +8,7 @@ import { supabase } from 'lib/supabase/supabase.init';
 import { store } from 'store';
 
 import { spotifyService } from 'services/spotify.api';
-import { UserState, spotifyTokenSchema } from 'user/user.interface';
+import { type UserState, spotifyTokenSchema } from 'user/user.interface';
 import { hydrateAuthState, signIn, signOut } from 'user/user.slice';
 import { showToast } from 'util/toast';
 

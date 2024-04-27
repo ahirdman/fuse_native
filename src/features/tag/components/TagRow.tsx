@@ -3,7 +3,7 @@ import { memo } from 'react';
 import {
   AnimatePresence,
   Checkbox,
-  GetProps,
+  type GetProps,
   H5,
   Separator,
   XStack,

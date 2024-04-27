@@ -51,7 +51,7 @@ const commonConfig: CommonConfig = {
   },
 };
 
-const envConfig = __DEV__ ? testConfig : defaultConfig;
+const envConfig = channel === 'production' ? defaultConfig : testConfig;
 
 export const config = {
   ...commonConfig,

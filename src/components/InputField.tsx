@@ -1,18 +1,18 @@
 import { X } from '@tamagui/lucide-icons';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import {
-  FieldValues,
-  UseControllerProps,
+  type FieldValues,
+  type UseControllerProps,
   useController,
 } from 'react-hook-form';
 import {
   Input,
-  InputProps,
+  type InputProps,
   Label,
   Paragraph,
   XStack,
   YStack,
-  YStackProps,
+  type YStackProps,
   styled,
 } from 'tamagui';
 import { isDefined } from 'util/assert';
