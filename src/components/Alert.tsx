@@ -9,7 +9,13 @@ export function Alert({ label, ...props }: AlertProps) {
   return (
     <StyledAlert {...props}>
       {props.type === 'error' && <AlertTriangle color="$error700" mr={12} />}
-      {props.type === 'info' && <Info color="$border300" mr={12} />}
+      {props.type === 'info' && (
+        <Info
+          color="$border300"
+          mr={12}
+          size={props.size === 'small' ? 18 : 24}
+        />
+      )}
       <Text
         color={
           props.type === 'error'
@@ -30,11 +36,21 @@ export function Alert({ label, ...props }: AlertProps) {
 const StyledAlert = styled(View, {
   flexDirection: 'row',
   borderWidth: 1,
-  p: 16,
   borderRadius: 4,
   alignItems: 'center',
 
   variants: {
+    size: {
+      small: {
+        p: 8,
+      },
+      default: {
+        p: 16,
+      },
+      large: {
+        p: 24,
+      },
+    },
     type: {
       error: {
         bg: '$error777',
@@ -56,6 +72,7 @@ const StyledAlert = styled(View, {
   },
   defaultVariants: {
     type: 'info',
+    size: 'default',
   } as const,
 });
 

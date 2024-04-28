@@ -223,6 +223,7 @@ export function FuseListView({
             listStyle={{
               paddingTop: 4,
               paddingBottom: 8,
+              paddingHorizontal: 8,
             }}
           />
         </View>

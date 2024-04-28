@@ -1,6 +1,4 @@
 import { Tags } from '@tamagui/lucide-icons';
-import { Image } from 'expo-image';
-import { StyleSheet } from 'react-native';
 import { Stack, View, type ViewProps, XStack, YStack } from 'tamagui';
 
 import { StyledImage } from 'components/Image';
@@ -27,7 +25,6 @@ export function TrackRow({
       accessibilityRole="button"
       onPress={onPress}
       pressStyle={{ bg: '$primary600', borderRadius: 4, opacity: 0.5 }}
-      px={8}
       {...props}
     >
       <XStack h={height} w="100%">
