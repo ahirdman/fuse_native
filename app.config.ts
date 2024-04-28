@@ -28,6 +28,9 @@ const common: Partial<ExpoConfig> = {
     config: {
       usesNonExemptEncryption: false,
     },
+    infoPlist: {
+      LSApplicationQueriesSchemes: ['spotify'],
+    },
   },
   experiments: {
     tsconfigPaths: true,

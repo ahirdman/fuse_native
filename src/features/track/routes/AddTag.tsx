@@ -7,6 +7,8 @@ import { Text } from 'components/Text';
 import type { RootStackScreenProps } from 'navigation.types';
 import { hapticFeedback } from 'util/haptic';
 
+import { ListEmptyComponent } from 'components/ListEmptyComponent';
+import { ListFooterComponent } from 'components/ListFooter';
 import { TagRow } from 'tag/components/TagRow';
 import { useGetTagsWithTrackIds } from 'tag/queries/getTags';
 import { useAddTagToTrack } from 'track/queries/tagTrack';
@@ -31,7 +33,9 @@ export function AddTag({
   const [selectMultiple, setSelectMultiple] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
-  const { data } = useGetTagsWithTrackIds({ excledeTrackId: trackId });
+  const { data, isFetching, isError } = useGetTagsWithTrackIds({
+    excledeTrackId: trackId,
+  });
   const { mutateAsync: addTag } = useAddTagToTrack();
 
   const insets = useSafeAreaInsets();
@@ -114,6 +118,17 @@ export function AddTag({
         extraData={{ selecteble: selectMultiple, selectedTags: selectedTagIds }}
         renderItem={renderItem}
         estimatedItemSize={33}
+        ListEmptyComponent={
+          isFetching ? null : (
+            <ListEmptyComponent
+              isError={isError}
+              isFiltered={false}
+              defaultLabel="No tags created"
+              size="small"
+            />
+          )
+        }
+        ListFooterComponent={isFetching ? <ListFooterComponent /> : null}
         ItemSeparatorComponent={ItemSeparatorComponent}
         contentContainerStyle={{ padding: 8 }}
       />

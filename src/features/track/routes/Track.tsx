@@ -1,4 +1,5 @@
 import { ArrowLeft } from '@tamagui/lucide-icons';
+import * as Linking from 'expo-linking';
 import { type ReactNode, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -21,7 +22,12 @@ import { TagBadge } from 'tag/components/TagBadge';
 import { useAlbumCoverColors } from 'track/queries/getAlbumColors';
 import { useGetTrack } from 'track/queries/getTrack';
 import { useGetTrackTags } from 'track/queries/getTrackTags';
+import { useIsSpotifyInstalled } from 'track/queries/isSpotifyInstalled';
 import { useRemoveTagFromTrack } from 'track/queries/removeTagFromTrack';
+
+const spotifyIcon = require('../../../../assets/icons/Spotify_Icon_White.png');
+const spotifyAppStoreUrl =
+  'https://apps.apple.com/id/app/spotify-music-and-podcasts/id324684580';
 
 export function Track({
   route: {
@@ -34,6 +40,8 @@ export function Track({
   const { data: albumColors } = useAlbumCoverColors(
     track?.albumCovers[0]?.url ?? '',
   );
+  const { data: isSpotifyInstalled, isLoading: isLoadingSpotifyStatus } =
+    useIsSpotifyInstalled(track?.uri);
   const {
     data: trackTags,
     isLoading: trackTagsLoading,
@@ -42,6 +50,12 @@ export function Track({
 
   const insets = useSafeAreaInsets();
   const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
+
+  function handleOpenSpotify(trackUri: string) {
+    const url = isSpotifyInstalled ? trackUri : spotifyAppStoreUrl;
+
+    Linking.openURL(url);
+  }
 
   if (isLoading || !albumColors) {
     return (
@@ -100,6 +114,36 @@ export function Track({
         <Text fontSize="$4" fontWeight="600" color="$lightHeader">
           {track.artist}
         </Text>
+
+        <XStack
+          alignSelf="flex-end"
+          gap={8}
+          alignItems="center"
+          bg="$primary600"
+          py={4}
+          px={8}
+          borderRadius={8}
+          pressStyle={{ bg: '$brandDark' }}
+          onPress={track.uri ? () => handleOpenSpotify(track.uri) : undefined}
+        >
+          <StyledImage source={spotifyIcon} h={20} w={20} />
+
+          <Text
+            fontSize="$4"
+            fontWeight="600"
+            color="$lightHeader"
+            textAlign="right"
+            textTransform="uppercase"
+          >
+            {isLoadingSpotifyStatus ? (
+              <Spinner />
+            ) : isSpotifyInstalled ? (
+              'open spotify'
+            ) : (
+              'get spotify free'
+            )}
+          </Text>
+        </XStack>
       </YStack>
 
       <YStack justifyContent="space-between" flex={1}>
@@ -156,7 +200,11 @@ export function Track({
               ))
             ) : (
               <YStack w="$full" h="$full">
-                <Alert type="info" label="No tags for this track yet" />
+                <Alert
+                  type="info"
+                  label="No tags for this track yet"
+                  size="small"
+                />
               </YStack>
             )}
           </ScrollView>
