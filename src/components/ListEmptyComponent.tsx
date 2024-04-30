@@ -1,5 +1,4 @@
 import { Alert, type StyledAlertProps } from 'components/Alert';
-import { YStack } from 'tamagui';
 
 interface ListEmptyComponentProps extends StyledAlertProps {
   isError: boolean;
@@ -12,6 +11,7 @@ export function ListEmptyComponent({
   isFiltered,
   defaultLabel,
   size = 'default',
+  ...props
 }: ListEmptyComponentProps) {
   const alertLabel = isError
     ? 'Error fetching tracks'
@@ -20,8 +20,11 @@ export function ListEmptyComponent({
       : defaultLabel;
 
   return (
-    <YStack p={16}>
-      <Alert label={alertLabel} type={isError ? 'error' : 'info'} size={size} />
-    </YStack>
+    <Alert
+      label={alertLabel}
+      type={isError ? 'error' : 'info'}
+      size={size}
+      {...props}
+    />
   );
 }

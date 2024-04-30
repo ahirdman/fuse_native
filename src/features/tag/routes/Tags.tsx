@@ -5,22 +5,20 @@ import PagerView from 'react-native-pager-view';
 import { H6, Paragraph, XStack, YStack } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database-generated.types';
-import type { TagListScreenProps } from 'navigation.types';
+import type { TagTabScreenProps } from 'navigation.types';
 
 import { SectionButton } from 'components/SectionButton';
 import { type FuseTagRowRes, useGetFuseLists } from 'fuse/queries/getFuseLists';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagRow } from 'tag/components/TagRow';
 import { useGetTags } from 'tag/queries/getTags';
 
 const AnimatedPager = Animated.createAnimatedComponent(PagerView);
 
-export function TagListView({ navigation }: TagListScreenProps<'TagList'>) {
+export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
 
-  const insets = useSafeAreaInsets();
   const pagerRef = useRef<PagerView>(null);
 
   function handleCreateFuse() {
@@ -45,23 +43,7 @@ export function TagListView({ navigation }: TagListScreenProps<'TagList'>) {
   );
 
   return (
-    <YStack
-      fullscreen
-      bg="$primary700"
-      paddingTop={insets.top}
-      px={12}
-      gap={12}
-    >
-      <H6
-        fontWeight="bold"
-        fontSize="$10"
-        lineHeight="$10"
-        textTransform="uppercase"
-        color="$brandDark"
-      >
-        Lists
-      </H6>
-
+    <YStack fullscreen bg="$primary700" px={12} pt={8} gap={12}>
       <XStack justifyContent="space-between" bg="$colorTransparent">
         <SectionButton title="Create Tag" onPress={handleCreateTag} />
         <SectionButton title="Create Fuse" onPress={handleCreateFuse} />
@@ -85,7 +67,7 @@ export function TagListView({ navigation }: TagListScreenProps<'TagList'>) {
               color: '$brandDark',
             }}
           >
-            Tag Lists
+            Tags
           </H6>
 
           <H6

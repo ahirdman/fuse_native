@@ -8,12 +8,15 @@
     "baseUrl": "src",
     "paths": {
       "common/*": ["features/common/*"],
+      "fuse/*": ["features/fuse/*"],
+      "navigation/*": ["features/navigation/*"],
+      "social/*": ["features/social/*"],
       "subscription/*": ["features/subscription/*"],
       "tag/*": ["features/tag/*"],
-      "fuse/*": ["features/fuse/*"],
       "track/*": ["features/track/*"],
       "user/*": ["features/user/*"],
-      "config": ["config/index.ts"]
+      "config": ["config/index.ts"],
+      "test-utils": ["../__test__/test-utils.tsx"]
     },
     "types": ["bun-types"]
   },

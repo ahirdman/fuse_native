@@ -10,12 +10,12 @@ jobs:
       - name: 🛒 Check out Git repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun 🚀
+      - name: 📦 Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Install packages
+      - name: 💾 Install Packages
         run: bun install
 
       - name: 🧬 Setup Biome
@@ -23,64 +23,8 @@ jobs:
         with:
           version: 1.4.0
 
-      - name: 🔍 Run verify
+      - name: 🔍 Run Verify
         run: bun run verify
 
-  # create-preview:
-  #   needs: [lint-and-test]
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: read
-  #     pull-requests: write
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version-file: '.nvmrc'
-  #         cache: 'npm'
-  #
-  #     - name: Setup EAS
-  #       uses: expo/expo-github-action@v8
-  #       with:
-  #         eas-version: latest
-  #         token: ${{ secrets.EXPO_TOKEN }}
-  #
-  #     - name: Install dependencies
-  #       run: npm ci
-  #
-  #     - name: Create preview
-  #       uses: expo/expo-github-action/preview@v8
-  #       with:
-  #         command: eas update --channel test --platform ios --message="${{ github.event.head_commit.message }}"
-  #         comment: false
-  #       id: preview
-  #
-  #     - name: comment PR
-  #       uses: unsplash/comment-on-pr@v1.3.0
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         msg: >
-  #           ### Preview Changes:
-  #
-  #           <br>
-  #
-  #           <table>
-  #           <tr>
-  #             <td><b>Runtime Version
-  #             <td><b>Branch
-  #             <td><b>Update Group
-  #           <tr>
-  #             <td>${{ steps.preview.outputs.runtimeVersion }}
-  #             <td>${{ steps.preview.outputs.branchName }}
-  #             <td><a href="${{ steps.preview.outputs.link }}">${{ steps.preview.outputs.groupId }}</a>
-  #           </table>
-  #
-  #           <br>
-  #           <img src="https://qr.expo.dev/eas-update?appScheme=${{ steps.preview.outputs.projectSlug }}&projectId=${{ steps.preview.outputs.projectId }}&groupId=${{ steps.preview.outputs.groupId }}" height="256" width="256" />
-  #         check_for_duplicate_msg: false
-  #         delete_prev_regex_msg: '3'
-  #         duplicate_msg_pattern: 'Preview Changes'
+      - name: 🧪 Run Tests
+        run: bun run test

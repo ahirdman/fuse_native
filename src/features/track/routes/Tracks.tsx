@@ -3,11 +3,10 @@ import { Search } from '@tamagui/lucide-icons';
 import { useCallback, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Dimensions, LayoutAnimation, RefreshControl } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { XStack, YStack } from 'tamagui';
 
 import { useDebounce } from 'hooks/useDebounce';
-import type { RootTabScreenProps } from 'navigation.types';
+import type { LibraryTabScreenProps } from 'navigation.types';
 
 import { StyledImage } from 'components/Image';
 import { InputField } from 'components/InputField';
@@ -26,7 +25,7 @@ const SEPERATOR_HEIGHT = 8;
 const ROW_HEIGHT = ITEM_HEIGHT + SEPERATOR_HEIGHT / 2;
 const spotifyLogo = require('../../../../assets/icons/Spotify_Logo_White.png');
 
-export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
+export function Tracks({ navigation }: LibraryTabScreenProps<'Tracks'>) {
   const [availableRows, setAvailableRows] = useState<number>();
   const [filterTaggedTracks, setFilterTaggedTracks] = useState(false);
   const { control, watch } = useForm({
@@ -37,7 +36,6 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
 
   const formValue = watch();
   const debouncedTrackFilter = useDebounce(formValue.trackFilter, 300);
-  const insets = useSafeAreaInsets();
   const listRef = useRef<FlashList<SpotifyTrack> | null>(null);
 
   const { data: trackIds } = useGetTaggedTrackIds();
@@ -111,13 +109,12 @@ export function Tracks({ navigation }: RootTabScreenProps<'Tracks'>) {
   return (
     <YStack fullscreen bg="$primary700">
       <YStack
-        pt={insets.top}
         bg="$primary300"
         px={8}
         borderBottomColor="$border400"
         borderWidth={0.5}
         gap={15}
-        pb={8}
+        py={8}
       >
         <StyledImage
           source={spotifyLogo}

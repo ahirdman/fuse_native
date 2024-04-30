@@ -23,7 +23,7 @@ export async function updateUserSubscriptionData({
   }
 
   const { error: userError } = await supabase
-    .from('users')
+    .from('accounts')
     .upsert({ subscription: data.id });
 
   if (userError) {

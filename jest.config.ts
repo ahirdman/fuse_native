@@ -3,14 +3,12 @@ import type { Config } from 'jest';
 const config: Config = {
   rootDir: '.',
   preset: 'jest-expo',
-  setupFilesAfterEnv: ['./__test__/jest.setup.ts'],
-  verbose: true,
-  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['./__test__/setup.ts'],
   moduleNameMapper: {
-    '@/(.*)': '<rootDir>/src/$1',
+    'test-utils': '<rootDir>/__test__/test-utils',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-|sentry-expo)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|react-native-svg)',
+    'node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|react-native-svg|@legendapp|tamagui|@tamagui/.*|moti|react-native-reanimated|react-redux)',
   ],
 };
 

@@ -1,46 +1,45 @@
 import { useReactNavigationDevTools } from '@dev-plugins/react-navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
   NavigationContainer,
-  useNavigationContainerRef,
+  createNavigationContainerRef,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ChevronLeft, X } from '@tamagui/lucide-icons';
+import { X } from '@tamagui/lucide-icons';
 import { Paragraph, Progress, XStack } from 'tamagui';
 
 import type {
+  DrawerParamList,
   RootStackParamList,
-  RootTabParamList,
-  TagListParamList,
+  TabsParamList,
 } from 'navigation.types';
 import { useAppSelector } from 'store/hooks';
 import { isDefined } from 'util/assert';
 
-import { ModalHeader } from 'components/modal-header';
-
+import { CustomTabBar } from 'components/TabBar';
+import { Home } from 'features/dashboard/routes/Home';
+import { AppDrawer } from 'features/navigation/components/Drawer';
+import { FullScreenHeader } from 'features/navigation/components/FullScreenHeader';
+import { ModalHeader } from 'features/navigation/components/ModalHeader';
+import { SocialStack } from 'features/social/social.stack';
+import { AddFuseTag } from 'fuse/routes/AddFuse';
+import { TagStack } from 'tag/tag.stack';
+import { LibraryStack } from 'track/library.stack';
+import { AddTag } from 'track/routes/AddTag';
+import { Track } from 'track/routes/Track';
 import { Profile } from 'user/routes/Profile';
+import { Settings } from 'user/routes/Settings';
 import { SignIn } from 'user/routes/SignIn';
 import { SignUpView } from 'user/routes/SignUp';
 
-import { TagView } from 'tag/routes/Tag';
-import { TagListView } from 'tag/routes/Tags';
-
-import { AddFuseTag } from 'fuse/routes/AddFuse';
-
-import { CustomTabBar } from 'components/TabBar';
-import { FuseListView } from 'fuse/routes/FuseList';
-import { AddTag } from 'track/routes/AddTag';
-import { Track } from 'track/routes/Track';
-import { Tracks } from 'track/routes/Tracks';
-
 const RootStack = createNativeStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<RootTabParamList>();
+const Tab = createBottomTabNavigator<TabsParamList>();
+const Drawer = createDrawerNavigator<DrawerParamList>();
 
-const TagStackNavigator = createNativeStackNavigator<TagListParamList>();
+export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 function RootNavigationStack() {
-  const navigationRef = useNavigationContainerRef();
-
   useReactNavigationDevTools(navigationRef);
 
   const { user, spotifyToken, subscription } = useAppSelector(
@@ -55,7 +54,7 @@ function RootNavigationStack() {
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {userReady ? (
           <>
-            <RootStack.Screen name="Root" component={RootTabStack} />
+            <RootStack.Screen name="Root" component={DrawerStack} />
             <RootStack.Screen name="Track" component={Track} />
             <RootStack.Screen
               name="AddFuseTag"
@@ -143,51 +142,68 @@ function RootNavigationStack() {
   );
 }
 
-function TagListStack() {
+function DrawerStack() {
   return (
-    <TagStackNavigator.Navigator>
-      <TagStackNavigator.Screen
-        name="TagList"
-        component={TagListView}
-        options={{ headerShown: false }}
-      />
-      <TagStackNavigator.Screen
-        name="Tag"
-        component={TagView}
-        options={(props) => {
-          return {
-            headerStyle: { backgroundColor: '#232323' },
-            headerLeft: () => (
-              <XStack onPress={() => props.navigation.goBack()}>
-                <ChevronLeft />
-              </XStack>
-            ),
-            headerTitleStyle: { color: '#FFFFFF' },
-            headerTitle: 'Tag',
-          };
+    <Drawer.Navigator
+      initialRouteName="Tabs"
+      id="appDrawer"
+      drawerContent={(props) => <AppDrawer {...props} />}
+      screenOptions={{
+        drawerActiveTintColor: '#F4753F',
+        drawerInactiveTintColor: '#FFFFFF',
+        headerShown: false,
+        headerStyle: {
+          height: 110,
+        },
+      }}
+    >
+      <Drawer.Screen
+        name="Tabs"
+        component={TabStack}
+        options={() => {
+          let swipeEnabled = true;
+
+          const drawerSwipeEnabledScreens = [
+            'Home',
+            'Tags',
+            'Library',
+            'Social',
+            'Root',
+            'Friends',
+            'Tracks',
+            'TagList',
+          ];
+
+          if (navigationRef.isReady()) {
+            swipeEnabled = drawerSwipeEnabledScreens.some(
+              (tabRoute) => tabRoute === navigationRef.getCurrentRoute()?.name,
+            );
+          }
+
+          return { swipeEnabled };
         }}
       />
-      <TagStackNavigator.Screen
-        name="FuseList"
-        component={FuseListView}
-        options={(props) => {
-          return {
-            headerStyle: { backgroundColor: '#232323' },
-            headerLeft: () => (
-              <XStack onPress={() => props.navigation.goBack()}>
-                <ChevronLeft />
-              </XStack>
-            ),
-            headerTitleStyle: { color: '#FFFFFF' },
-            headerTitle: 'Fuse List',
-          };
+      <Drawer.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          headerShown: true,
+          header: (props) => <FullScreenHeader {...props} />,
         }}
       />
-    </TagStackNavigator.Navigator>
+      <Drawer.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          headerShown: true,
+          header: (props) => <FullScreenHeader {...props} />,
+        }}
+      />
+    </Drawer.Navigator>
   );
 }
 
-function RootTabStack() {
+function TabStack() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -198,9 +214,18 @@ function RootTabStack() {
       }}
       tabBar={(props) => <CustomTabBar {...props} />}
     >
-      <Tab.Screen name="Tracks" component={Tracks} />
-      <Tab.Screen name="Lists" component={TagListStack} />
-      <Tab.Screen name="Profile" component={Profile} />
+      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen name="Tags" navigationKey="tags-tab" component={TagStack} />
+      <Tab.Screen
+        name="Library"
+        navigationKey="libray-tab"
+        component={LibraryStack}
+      />
+      <Tab.Screen
+        name="Social"
+        navigationKey="social-tab"
+        component={SocialStack}
+      />
     </Tab.Navigator>
   );
 }

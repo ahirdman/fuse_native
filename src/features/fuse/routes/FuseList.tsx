@@ -22,7 +22,7 @@ import {
 } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database-generated.types';
-import type { TagListScreenProps } from 'navigation.types';
+import type { TagTabScreenProps } from 'navigation.types';
 import { formatMsDuration } from 'util/index';
 
 import { Alert } from 'components/Alert';
@@ -41,7 +41,7 @@ import { showToast } from 'util/toast';
 export function FuseListView({
   navigation,
   route: { params },
-}: TagListScreenProps<'FuseList'>) {
+}: TagTabScreenProps<'FuseList'>) {
   const [infoSheetVisible, setInfoSheetVisible] = useState(false);
   const [fuseStatus, setFuseStatus] = useState<TagSyncStatus>();
 

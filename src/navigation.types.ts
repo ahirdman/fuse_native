@@ -1,4 +1,5 @@
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { DrawerScreenProps } from '@react-navigation/drawer';
 import type {
   CompositeScreenProps,
   NavigatorScreenParams,
@@ -10,7 +11,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
  * */
 
 export type RootStackParamList = {
-  Root: NavigatorScreenParams<RootTabParamList>;
+  Root: NavigatorScreenParams<DrawerParamList>;
   SignIn: undefined;
   SignUp: undefined;
   Track: {
@@ -26,26 +27,76 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
   NativeStackScreenProps<RootStackParamList, T>;
 
 /*
- *  Tab Navigator Root
+ *  Drawer Stack
  * */
 
-export type RootTabParamList = {
-  Tracks: undefined;
-  Lists: NavigatorScreenParams<TagListParamList>;
-  Profile: undefined;
+export type DrawerParamList = {
+  Tabs: NavigatorScreenParams<TabsParamList>;
+  Profile: { userId: string };
+  Settings: undefined;
 };
 
-export type RootTabScreenProps<T extends keyof RootTabParamList> =
+export type DrawerStackScreenProps<T extends keyof DrawerParamList> =
   CompositeScreenProps<
-    BottomTabScreenProps<RootTabParamList, T>,
+    DrawerScreenProps<DrawerParamList, T>,
     RootStackScreenProps<keyof RootStackParamList>
   >;
 
 /*
- * Tag List Navigatior Stack
+ *  Tab Stack
  * */
 
-export type TagListParamList = {
+export type TabsParamList = {
+  Home: undefined;
+  Library: NavigatorScreenParams<LibraryParamList>;
+  Tags: NavigatorScreenParams<TagTabParamList>;
+  Social: NavigatorScreenParams<FriendsTabParamList>;
+};
+
+export type RootTabScreenProps<T extends keyof TabsParamList> =
+  CompositeScreenProps<
+    BottomTabScreenProps<TabsParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+  >;
+
+/*
+ * Library Stack
+ * */
+
+export type LibraryParamList = {
+  Tracks: undefined;
+};
+
+export type LibraryTabScreenProps<T extends keyof LibraryParamList> =
+  CompositeScreenProps<
+    BottomTabScreenProps<LibraryParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+  >;
+
+/*
+ * Social Stack
+ * */
+
+export type FriendsTabParamList = {
+  Friends: undefined;
+  Search: undefined;
+  Profile: { userId: string };
+};
+
+export type FriendsTabScreenProps<T extends keyof FriendsTabParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<FriendsTabParamList, T>,
+    CompositeScreenProps<
+      DrawerScreenProps<DrawerParamList>,
+      RootStackScreenProps<keyof RootStackParamList>
+    >
+  >;
+
+/*
+ * Tag Stack
+ * */
+
+export type TagTabParamList = {
   TagList: undefined;
   Tag: {
     id: number;
@@ -58,9 +109,9 @@ export type TagListParamList = {
   };
 };
 
-export type TagListScreenProps<T extends keyof TagListParamList> =
+export type TagTabScreenProps<T extends keyof TagTabParamList> =
   CompositeScreenProps<
-    NativeStackScreenProps<TagListParamList, T>,
+    NativeStackScreenProps<TagTabParamList, T>,
     RootStackScreenProps<keyof RootStackParamList>
   >;
 

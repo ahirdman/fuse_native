@@ -55,7 +55,7 @@ export async function handleAuthStateSignIn(
 ) {
   try {
     await Purchases.logIn(session.user.id);
-    const dbUserData = await selectUserData();
+    const dbUserData = await selectAccountData();
 
     if (!dbUserData) {
       dispatch(signIn({ id: session.user.id, email: session.user.email }));
@@ -100,9 +100,9 @@ export async function handleAuthStateSignIn(
   }
 }
 
-async function selectUserData() {
+async function selectAccountData() {
   const { data, error } = await supabase
-    .from('users')
+    .from('accounts')
     .select('*,subscriptions(*)')
     .single();
 

@@ -1,8 +1,9 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { Home, Tags, User } from '@tamagui/lucide-icons';
+import { Book, Home, Tags, User, Users } from '@tamagui/lucide-icons';
 import { Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, type GetProps, View } from 'tamagui';
+
 import { hapticFeedback } from 'util/haptic';
 
 export const CustomTabBar = View.styleable<BottomTabBarProps>(
@@ -36,12 +37,20 @@ export const CustomTabBar = View.styleable<BottomTabBarProps>(
           };
 
           const Icon = (props: GetProps<typeof Tags>) => {
-            if (route.name === 'Tracks') {
+            if (route.name === 'Home') {
               return <Home {...props} />;
             }
 
-            if (route.name === 'Lists') {
+            if (route.name === 'Library') {
+              return <Book {...props} />;
+            }
+
+            if (route.name === 'Tags') {
               return <Tags {...props} />;
+            }
+
+            if (route.name === 'Social') {
+              return <Users {...props} />;
             }
 
             return <User {...props} />;

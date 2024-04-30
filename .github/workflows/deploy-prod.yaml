@@ -13,19 +13,19 @@ jobs:
       - name: 🛒 Check out Git repository
         uses: actions/checkout@v4
 
-      - name: Setup Bun 🚀
+      - name: 📦 Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
-      - name: Install packages
+      - name: 💾 Install Packages
         run: bun install
 
-      - name: Setup Expo and EAS
+      - name: 📱 Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build and Submit All
+      - name: 🛠️ Build and Submit All
         run: eas build --profile production --platform ios --non-interactive --no-wait

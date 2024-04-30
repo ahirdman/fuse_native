@@ -8,9 +8,15 @@ import type { Session, User } from '@supabase/supabase-js';
 import { emailSchema, passwordSchema } from 'user/queries/signIn';
 import { signIn } from 'user/user.slice';
 
+const userNameSchmea = z
+  .string()
+  .min(2, { message: 'Username cannot be shorter than 2 characters' })
+  .max(24, { message: 'Username cannot be longer than 24 characters' });
+
 export const signUpInputSchema = z
   .object({
     email: emailSchema,
+    userName: userNameSchmea,
     password: passwordSchema,
     confirmPassword: passwordSchema,
   })
@@ -25,8 +31,13 @@ export type SignUpArgs = Omit<SignUpInput, 'confirmPassword'>;
 async function signUpSupabase({
   email,
   password,
+  userName,
 }: SignUpArgs): Promise<{ user: User; session: Session }> {
-  const { error, data } = await supabase.auth.signUp({ email, password });
+  const { error, data } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { name: userName } },
+  });
 
   if (error) {
     throw new Error(error.message);
