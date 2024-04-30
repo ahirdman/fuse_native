@@ -85,7 +85,7 @@ spotifyService.interceptors.response.use(
 
 async function getDbSpotifyRefreshToken(): Promise<string> {
   const { data, error } = await supabase
-    .from('users')
+    .from('accounts')
     .select('spotify_refresh_token')
     .single();
 

@@ -34,11 +34,93 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          id: string
+          spotify_refresh_token: string | null
+          spotify_token_data: Json | null
+          spotify_user_id: string | null
+          subscription: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          spotify_refresh_token?: string | null
+          spotify_token_data?: Json | null
+          spotify_user_id?: string | null
+          subscription?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          spotify_refresh_token?: string | null
+          spotify_token_data?: Json | null
+          spotify_user_id?: string | null
+          subscription?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "accounts_subscription_fkey"
+            columns: ["subscription"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      friend_requests: {
+        Row: {
+          created_at: string
+          id: number
+          receiver_user_id: string
+          sender_user_id: string
+          status: Database["public"]["Enums"]["friend_request_status"]
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          receiver_user_id?: string
+          sender_user_id?: string
+          status: Database["public"]["Enums"]["friend_request_status"]
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          receiver_user_id?: string
+          sender_user_id?: string
+          status?: Database["public"]["Enums"]["friend_request_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friend_requests_receiver_user_id_fkey"
+            columns: ["receiver_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friend_requests_sender_user_id_fkey"
+            columns: ["sender_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fuseTags: {
         Row: {
           created_at: string
           id: number
           latest_snapshot_id: string | null
+          name: string
           spotify_playlist_id: string | null
           spotify_playlist_uri: string | null
           synced_at: string | null
@@ -51,6 +133,7 @@ export type Database = {
           created_at?: string
           id?: number
           latest_snapshot_id?: string | null
+          name: string
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
           synced_at?: string | null
@@ -63,6 +146,7 @@ export type Database = {
           created_at?: string
           id?: number
           latest_snapshot_id?: string | null
+          name?: string
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
           synced_at?: string | null
@@ -118,6 +202,36 @@ export type Database = {
             foreignKeyName: "public_fuseTags_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -212,39 +326,6 @@ export type Database = {
           },
         ]
       }
-      tracks: {
-        Row: {
-          album: string | null
-          album_covers: string[] | null
-          artist: string | null
-          duration: number
-          explicit: boolean
-          id: string
-          name: string | null
-          uri: string
-        }
-        Insert: {
-          album?: string | null
-          album_covers?: string[] | null
-          artist?: string | null
-          duration: number
-          explicit?: boolean
-          id: string
-          name?: string | null
-          uri?: string
-        }
-        Update: {
-          album?: string | null
-          album_covers?: string[] | null
-          artist?: string | null
-          duration?: number
-          explicit?: boolean
-          id?: string
-          name?: string | null
-          uri?: string
-        }
-        Relationships: []
-      }
       trackTags: {
         Row: {
           created_at: string
@@ -298,44 +379,44 @@ export type Database = {
           },
         ]
       }
-      users: {
+      user_friends: {
         Row: {
-          id: string
-          spotify_refresh_token: string | null
-          spotify_token_data: Json | null
-          spotify_user_id: string | null
-          subscription: string | null
-          updated_at: string
+          created_at: string
+          friend_user_id: string
+          id: number
+          request_id: number
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
-          id?: string
-          spotify_refresh_token?: string | null
-          spotify_token_data?: Json | null
-          spotify_user_id?: string | null
-          subscription?: string | null
-          updated_at?: string
+          created_at?: string
+          friend_user_id?: string
+          id?: number
+          request_id: number
+          updated_at?: string | null
+          user_id?: string
         }
         Update: {
-          id?: string
-          spotify_refresh_token?: string | null
-          spotify_token_data?: Json | null
-          spotify_user_id?: string | null
-          subscription?: string | null
-          updated_at?: string
+          created_at?: string
+          friend_user_id?: string
+          id?: number
+          request_id?: number
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "public_users_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
+            foreignKeyName: "user_friends_friend_user_id_fkey"
+            columns: ["friend_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "users_subscription_fkey"
-            columns: ["subscription"]
+            foreignKeyName: "user_friends_request_id_fkey"
+            columns: ["request_id"]
             isOneToOne: false
-            referencedRelation: "subscriptions"
+            referencedRelation: "friend_requests"
             referencedColumns: ["id"]
           },
         ]
@@ -438,7 +519,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      friend_request_status: "pending" | "rejected" | "accepted"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -556,6 +637,101 @@ export type Database = {
           },
         ]
       }
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          in_progress_size: number
+          key: string
+          owner_id: string | null
+          upload_signature: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id: string
+          in_progress_size?: number
+          key: string
+          owner_id?: string | null
+          upload_signature: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          in_progress_size?: number
+          key?: string
+          owner_id?: string | null
+          upload_signature?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          etag: string
+          id: string
+          key: string
+          owner_id: string | null
+          part_number: number
+          size: number
+          upload_id: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          etag: string
+          id?: string
+          key: string
+          owner_id?: string | null
+          part_number: number
+          size?: number
+          upload_id: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          etag?: string
+          id?: string
+          key?: string
+          owner_id?: string | null
+          part_number?: number
+          size?: number
+          upload_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "s3_multipart_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -593,6 +769,37 @@ export type Database = {
         Returns: {
           size: number
           bucket_id: string
+        }[]
+      }
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          next_key_token?: string
+          next_upload_token?: string
+        }
+        Returns: {
+          key: string
+          id: string
+          created_at: string
+        }[]
+      }
+      list_objects_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          start_after?: string
+          next_token?: string
+        }
+        Returns: {
+          name: string
+          id: string
+          metadata: Json
+          updated_at: string
         }[]
       }
       search: {

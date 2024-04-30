@@ -14,7 +14,7 @@ export async function upsertUserSpotifyData({
 }: InsertUserDataArgs) {
   //TODO: verify that undefined refresh token does not overwrite an existing refresh token
   const { data, error } = await supabase
-    .from('users')
+    .from('accounts')
     .upsert({
       spotify_token_data: tokenData,
       spotify_refresh_token: refreshToken,

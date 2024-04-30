@@ -16,6 +16,7 @@ export function CreateUserPage() {
   const { control, handleSubmit, setError } = useForm<SignUpInput>({
     defaultValues: {
       email: '',
+      userName: '',
       password: '',
       confirmPassword: '',
     },
@@ -24,9 +25,9 @@ export function CreateUserPage() {
 
   const insets = useSafeAreaInsets();
 
-  async function onSubmit({ email, password }: SignUpArgs) {
+  async function onSubmit({ email, userName, password }: SignUpArgs) {
     signUp(
-      { email, password },
+      { email, password, userName },
       {
         onError: (error) => {
           setError('email', { message: error.message });
@@ -50,6 +51,14 @@ export function CreateUserPage() {
           placeholder="Email"
           keyboardType="email-address"
           controlProps={{ control, name: 'email' }}
+        />
+
+        <InputField
+          label="Username"
+          secureTextEntry={!__DEV__}
+          placeholder="Username"
+          textContentType="username"
+          controlProps={{ control, name: 'userName' }}
         />
 
         <InputField

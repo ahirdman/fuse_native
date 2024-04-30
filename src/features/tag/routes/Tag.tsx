@@ -23,7 +23,7 @@ import {
 } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database-generated.types';
-import type { TagListScreenProps } from 'navigation.types';
+import type { TagTabScreenProps } from 'navigation.types';
 import { formatMsDuration } from 'util/index';
 import { showToast } from 'util/toast';
 
@@ -43,7 +43,7 @@ import { TracksList } from 'track/components/TrackList';
 export function TagView({
   navigation,
   route: { params },
-}: TagListScreenProps<'Tag'>) {
+}: TagTabScreenProps<'Tag'>) {
   const [editTagSheetVisible, setEditTagSheetVisible] = useState(false);
   const [infoSheetVisible, setInfoSheetVisible] = useState(false);
   const [tagStatus, setTagStatus] = useState<TagSyncStatus>();
@@ -198,6 +198,8 @@ export function TagView({
                   isError={isTracksError}
                   isFiltered={false}
                   defaultLabel={`No tracks tagged with ${params.name}`}
+                  size="small"
+                  m={8}
                 />
               )
             }
