@@ -15,6 +15,7 @@
       "tag/*": ["features/tag/*"],
       "track/*": ["features/track/*"],
       "user/*": ["features/user/*"],
+      "auth/*": ["features/auth/*"],
       "config": ["config/index.ts"],
       "test-utils": ["../__test__/test-utils.tsx"]
     },

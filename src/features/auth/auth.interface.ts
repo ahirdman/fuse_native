@@ -4,11 +4,9 @@ import { subscriptionSchema } from 'subscription/subscription.interface';
 
 export const spotifyTokenSchema = z.object({
   accessToken: z.string(),
-  tokenType: z.string(),
-  expiresIn: z.number().optional(),
-  scope: z.string().optional(),
-  idToken: z.string().optional(),
-  issuedAt: z.number().optional(),
+  refreshToken: z.string(),
+  expiresIn: z.number(),
+  issuedAt: z.number(),
 });
 
 export type SpotifyToken = z.infer<typeof spotifyTokenSchema>;

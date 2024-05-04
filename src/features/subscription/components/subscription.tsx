@@ -1,11 +1,11 @@
-import { Button, H3, ScrollView, Spinner, Text, YStack } from 'tamagui';
+import { Button, H3, ScrollView, Spinner, Text, View, YStack } from 'tamagui';
 
 import { useAppDispatch } from 'store/hooks';
 
+import { updateSubscription } from 'auth/auth.slice';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SubscriptionCard } from 'subscription/components/SubscriptionCard';
 import { useSubscription } from 'subscription/queries/useSubscription';
-import { updateSubscription } from 'user/user.slice';
 
 export function PickSubscription() {
   const dispatch = useAppDispatch();
@@ -21,8 +21,10 @@ export function PickSubscription() {
   }
 
   return (
-    <YStack
-      fullscreen
+    <View
+      key="subscription"
+      w="$full"
+      h="$full"
       pb={insets.bottom}
       justifyContent="space-between"
       bg="$primary700"
@@ -72,6 +74,6 @@ export function PickSubscription() {
           Skip
         </Button>
       </YStack>
-    </YStack>
+    </View>
   );
 }

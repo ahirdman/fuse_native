@@ -5,7 +5,7 @@ import { queryClient } from 'lib/query/init';
 import { supabase } from 'lib/supabase/supabase.init';
 import { store } from 'store';
 
-import { signOut } from 'user/user.slice';
+import { signOut } from 'auth/auth.slice';
 
 export async function signOutSupabase() {
   const { error } = await supabase.auth.signOut();

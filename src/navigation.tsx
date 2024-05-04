@@ -7,7 +7,7 @@ import {
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { X } from '@tamagui/lucide-icons';
-import { Paragraph, Progress, XStack } from 'tamagui';
+import { XStack } from 'tamagui';
 
 import type {
   DrawerParamList,
@@ -17,11 +17,12 @@ import type {
 import { useAppSelector } from 'store/hooks';
 import { isDefined } from 'util/assert';
 
+import { SignIn } from 'auth/routes/SignIn';
+import { SignUpView } from 'auth/routes/SignUp';
 import { CustomTabBar } from 'components/TabBar';
 import { Home } from 'features/dashboard/routes/Home';
 import { AppDrawer } from 'features/navigation/components/Drawer';
 import { FullScreenHeader } from 'features/navigation/components/FullScreenHeader';
-import { ModalHeader } from 'features/navigation/components/ModalHeader';
 import { SocialStack } from 'features/social/social.stack';
 import { AddFuseTag } from 'fuse/routes/AddFuse';
 import { TagStack } from 'tag/tag.stack';
@@ -30,8 +31,6 @@ import { AddTag } from 'track/routes/AddTag';
 import { Track } from 'track/routes/Track';
 import { Profile } from 'user/routes/Profile';
 import { Settings } from 'user/routes/Settings';
-import { SignIn } from 'user/routes/SignIn';
-import { SignUpView } from 'user/routes/SignUp';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabsParamList>();
@@ -43,7 +42,7 @@ function RootNavigationStack() {
   useReactNavigationDevTools(navigationRef);
 
   const { user, spotifyToken, subscription } = useAppSelector(
-    (state) => state.user,
+    (state) => state.auth,
   );
 
   const userReady =
@@ -99,42 +98,7 @@ function RootNavigationStack() {
               component={SignIn}
               options={{ animationTypeForReplace: 'pop' }}
             />
-            <RootStack.Screen
-              name="SignUp"
-              component={SignUpView}
-              options={{
-                presentation: 'modal',
-                headerShown: true,
-                header: (props) => {
-                  const progress = isDefined(subscription)
-                    ? 100
-                    : spotifyToken
-                      ? 66
-                      : user
-                        ? 33
-                        : 0;
-
-                  return (
-                    <ModalHeader
-                      centerElement={
-                        <Progress size="$2" value={progress} bg="#505050">
-                          <Progress.Indicator animation="lazy" bg="#F3640B" />
-                        </Progress>
-                      }
-                      rightElement={
-                        <Paragraph
-                          onPress={() => props.navigation.goBack()}
-                          fontWeight="bold"
-                        >
-                          Cancel
-                        </Paragraph>
-                      }
-                      {...props}
-                    />
-                  );
-                },
-              }}
-            />
+            <RootStack.Screen name="SignUp" component={SignUpView} />
           </>
         )}
       </RootStack.Navigator>

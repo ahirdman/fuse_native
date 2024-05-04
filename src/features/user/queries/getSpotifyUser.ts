@@ -1,5 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
-
 import { spotifyService } from 'services/spotify.api';
 
 interface GetSpotifyUserRes {
@@ -21,7 +19,7 @@ interface SpotifyUserImage {
   width: number | null;
 }
 
-export async function getSpotifyUser(token?: string | undefined) {
+async function getSpotifyUser(token?: string | undefined) {
   const result = await spotifyService.get<GetSpotifyUserRes>('/me', {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
@@ -29,8 +27,4 @@ export async function getSpotifyUser(token?: string | undefined) {
   return result.data;
 }
 
-export const useGetSpotifyUser = () =>
-  useQuery({
-    queryKey: ['spotifyUser'],
-    queryFn: () => getSpotifyUser(),
-  });
+export { getSpotifyUser };

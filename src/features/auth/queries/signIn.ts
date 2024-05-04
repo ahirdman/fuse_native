@@ -7,9 +7,9 @@ import { z } from 'zod';
 import { supabase } from 'lib/supabase/supabase.init';
 import { store } from 'store';
 
+import { type UserState, spotifyTokenSchema } from 'auth/auth.interface';
+import { hydrateAuthState, signIn, signOut } from 'auth/auth.slice';
 import { spotifyService } from 'services/spotify.api';
-import { type UserState, spotifyTokenSchema } from 'user/user.interface';
-import { hydrateAuthState, signIn, signOut } from 'user/user.slice';
 import { showToast } from 'util/toast';
 
 export const emailSchema = z.string().email({ message: 'Invalid Email' });

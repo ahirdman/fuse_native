@@ -10,7 +10,7 @@ async function getFriends() {
 
   const { data, error } = await supabase
     .from('user_friends')
-    .select('request_id, profiles!inner(id, name)')
+    .select('request_id, profiles!inner(id, name, avatar_url)')
     .eq('user_id', userData.user.id);
 
   if (error) {
@@ -23,6 +23,7 @@ async function getFriends() {
     .map((dto) => ({ requestID: dto.request_id, ...dto.profiles })) as {
     id: string;
     name: string;
+    avatar_url: string | null;
     requestID: number;
   }[];
 

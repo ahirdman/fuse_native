@@ -5,9 +5,9 @@ import { z } from 'zod';
 
 import { showToast } from 'util/toast';
 
+import { passwordSchema } from 'auth/queries/signIn';
+import { useUpdatePassword } from 'auth/queries/updatePassword';
 import { InputField } from 'components/InputField';
-import { passwordSchema } from 'user/queries/signIn';
-import { useUpdatePassword } from 'user/queries/updatePassword';
 
 const passwordChangeSchema = z
   .object({

@@ -1,12 +1,12 @@
 import type { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { UserAvatar } from 'components/UserAvatar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, H6, XStack, YStack } from 'tamagui';
 
+import { useSignOut } from 'auth/queries/signOut';
 import { ConfirmDialog } from 'components/ConfirmDialog';
 import { Text } from 'components/Text';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGetCurrentUserProfile } from 'user/queries/getCurrentUserProfile';
-import { useSignOut } from 'user/queries/signOut';
 
 interface AppDrawerProps extends DrawerContentComponentProps {}
 

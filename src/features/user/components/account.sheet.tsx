@@ -17,7 +17,7 @@ type AccountOption = 'passwordChange' | 'deleteAccount' | undefined;
 export function AccountSheet({ onClose, title }: SheetProps) {
   const [optionSelected, setOptionSelected] =
     useState<AccountOption>(undefined);
-  const user = useAppSelector((state) => state.user.user);
+  const user = useAppSelector((state) => state.auth.user);
 
   const sheetTitle = !optionSelected
     ? title
