@@ -9,7 +9,7 @@ import type {
   SpotifyUser,
   User,
   UserState,
-} from './user.interface';
+} from './auth.interface';
 
 const initialState: UserState = {
   user: undefined,
@@ -18,8 +18,8 @@ const initialState: UserState = {
   spotifyUser: undefined,
 };
 
-export const userSlice = createSlice({
-  name: 'user',
+export const authSlice = createSlice({
+  name: 'auth',
   initialState,
   reducers: {
     signIn: (state, action: PayloadAction<User>) => {
@@ -48,9 +48,9 @@ export const {
   updateSubscription,
   updateSpotifyUserId,
   hydrateAuthState,
-} = userSlice.actions;
+} = authSlice.actions;
 
-export default userSlice.reducer;
+export default authSlice.reducer;
 
 export const selectSpotifyUserId = (state: RootState) =>
-  state.user.spotifyUser?.id;
+  state.auth.spotifyUser?.id;

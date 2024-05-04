@@ -2,8 +2,8 @@ import { supabase } from 'lib/supabase/supabase.init';
 import { store } from 'store';
 
 import { useMutation } from '@tanstack/react-query';
+import { selectSpotifyUserId } from 'auth/auth.slice';
 import { spotifyService } from 'services/spotify.api';
-import { selectSpotifyUserId } from 'user/user.slice';
 import { showToast } from 'util/toast';
 
 export async function isLatestSnapshotId(

@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-import { isAxiosError } from 'axios';
+import axios, { isAxiosError } from 'axios';
 import { config } from 'config';
 import * as AuthSession from 'expo-auth-session';
 
@@ -8,9 +6,10 @@ import { supabase } from 'lib/supabase/supabase.init';
 import { store } from 'store';
 import { showToast } from 'util/toast';
 
-import { signOutSupabase } from 'user/queries/signOut';
-import { upsertUserSpotifyData as upsertDbSpotifyData } from 'user/queries/updateSpotifyCredentials';
-import { updateSpotifyToken } from 'user/user.slice';
+import { spotifyTokenSchema } from 'auth/auth.interface';
+import { updateSpotifyToken } from 'auth/auth.slice';
+import { signOutSupabase } from 'auth/queries/signOut';
+import { upsertSpotifyToken } from 'auth/queries/upsertSpotifyToken';
 
 export const spotifyService = axios.create({
   baseURL: config.spotify.baseUrl,
@@ -38,33 +37,22 @@ spotifyService.interceptors.response.use(
           config.expoAuth.discovery,
         );
 
-        const {
-          refreshToken,
-          accessToken,
-          tokenType,
-          expiresIn,
-          scope,
-          issuedAt,
-        } = request;
+        const parsedToken = spotifyTokenSchema.parse(request);
 
         store.dispatch(
           updateSpotifyToken({
-            accessToken,
-            tokenType,
-            expiresIn,
-            scope,
-            issuedAt,
+            accessToken: parsedToken.accessToken,
+            expiresIn: parsedToken.expiresIn,
+            issuedAt: parsedToken.issuedAt,
+            refreshToken: parsedToken.refreshToken,
           }),
         );
 
-        await upsertDbSpotifyData({
-          tokenData: { accessToken, tokenType, expiresIn, scope, issuedAt },
-          refreshToken,
-        });
+        await upsertSpotifyToken(parsedToken);
 
-        spotifyService.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+        spotifyService.defaults.headers.common.Authorization = `Bearer ${parsedToken.accessToken}`;
       } catch (_e) {
-        //TODO: Refersh token sometimes revoked, needs re-authorization
+        // WARN: Refersh token sometimes revoked, needs re-authorization
         await signOutSupabase();
 
         spotifyService.defaults.headers.common.Authorization = undefined;

@@ -5,13 +5,13 @@ import { Button, H1, Spinner, YStack } from 'tamagui';
 
 import type { RootStackScreenProps } from 'navigation.types';
 
-import { HorizontalDivider } from 'components/Divider';
-import { InputField } from 'components/InputField';
 import {
   type SignInInput,
   signInInputSchema,
   useSignIn,
-} from 'user/queries/signIn';
+} from 'auth/queries/signIn';
+import { HorizontalDivider } from 'components/Divider';
+import { InputField } from 'components/InputField';
 
 export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   const { control, handleSubmit, setError } = useForm<SignInInput>({
@@ -46,7 +46,7 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
       pt={insets.top}
       pb={insets.bottom}
     >
-      <YStack w="100%">
+      <YStack gap={18}>
         <H1
           color="$brandDark"
           textAlign="center"

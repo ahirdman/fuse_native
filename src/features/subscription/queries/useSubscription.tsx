@@ -10,7 +10,7 @@ import Purchases, {
 import { useAppDispatch } from 'store/hooks';
 import { showToast } from 'util/toast';
 
-import { updateSubscription } from 'user/user.slice';
+import { updateSubscription } from 'auth/auth.slice';
 import { updateUserSubscriptionData } from './update';
 
 export interface MakePurchaseRes {

@@ -2,29 +2,19 @@ import { ChevronRight, DollarSign, UserCog } from '@tamagui/lucide-icons';
 import { Sheet } from '@tamagui/sheet';
 import * as Application from 'expo-application';
 import { useState } from 'react';
-import {
-  Avatar,
-  Button,
-  H6,
-  ListItem,
-  Paragraph,
-  YGroup,
-  YStack,
-} from 'tamagui';
+import { Button, H6, ListItem, Paragraph, YGroup, YStack } from 'tamagui';
 
 import { ConfirmDialog } from 'components/ConfirmDialog';
 import { config } from 'config';
 
+import { useSignOut } from 'auth/queries/signOut';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SubscriptionSheet } from 'subscription/components/subscription.sheet';
 import { AccountSheet } from 'user/components/account.sheet';
-import { useGetSpotifyUser } from 'user/queries/getSpotifyUser';
-import { useSignOut } from 'user/queries/signOut';
 
 type SheetComponent = 'account' | 'subscription' | undefined;
 
 export function Settings() {
-  const { data } = useGetSpotifyUser();
   const { mutate: signOut } = useSignOut();
   const insets = useSafeAreaInsets();
 
@@ -56,24 +46,6 @@ export function Settings() {
             >
               spotify account
             </H6>
-            <ListItem
-              title={data?.display_name}
-              subTitle={data?.email}
-              icon={
-                <Avatar
-                  circular
-                  size="$4"
-                  borderWidth={1}
-                  borderColor="$primary400"
-                  bg="$primary400"
-                  elevate
-                >
-                  <Avatar.Image src={data?.images[1]?.url} />
-                  <Avatar.Fallback bc="$brand" />
-                </Avatar>
-              }
-              radiused
-            />
           </YStack>
 
           <YStack>

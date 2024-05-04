@@ -13,7 +13,7 @@ interface SheetProps {
 }
 
 export function SubscriptionSheet({ onClose, title }: SheetProps) {
-  const subscriptionData = useAppSelector((state) => state.user.subscription);
+  const subscriptionData = useAppSelector((state) => state.auth.subscription);
 
   return (
     <YStack gap={16}>

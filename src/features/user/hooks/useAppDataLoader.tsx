@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from 'lib/supabase/supabase.init';
 import { store } from 'store';
 
-import { handleAuthStateSignIn } from 'user/queries/signIn';
+import { handleAuthStateSignIn } from 'auth/queries/signIn';
 
 export function useAppDataLoader() {
   const [appReady, setAppReady] = useState(false);
