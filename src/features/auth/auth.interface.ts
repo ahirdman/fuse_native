@@ -24,11 +24,22 @@ const spotifyUserSchema = z.object({
 
 export type SpotifyUser = z.infer<typeof spotifyUserSchema>;
 
-const userStateSchema = z.object({
-  user: userSchema.optional(),
-  spotifyToken: spotifyTokenSchema.optional(),
-  subscription: subscriptionSchema.optional(),
-  spotifyUser: spotifyUserSchema.optional(),
+export const profileSchema = z.object({
+  username: z
+    .string()
+    .min(2, { message: 'Username cannot be shorter than 2 characters' })
+    .max(24, { message: 'Username cannot be longer than 24 characters' }),
+  avatarUrl: z.string().optional(),
+});
+
+export type Profile = z.infer<typeof profileSchema>;
+
+export const userStateSchema = z.object({
+  user: userSchema,
+  profile: profileSchema,
+  spotifyToken: spotifyTokenSchema,
+  subscription: subscriptionSchema,
+  spotifyUser: spotifyUserSchema,
 });
 
 export type UserState = z.infer<typeof userStateSchema>;

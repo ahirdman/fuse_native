@@ -9,7 +9,8 @@ import { showToast } from 'util/toast';
 import { spotifyTokenSchema } from 'auth/auth.interface';
 import { updateSpotifyToken } from 'auth/auth.slice';
 import { signOutSupabase } from 'auth/queries/signOut';
-import { upsertSpotifyToken } from 'auth/queries/upsertSpotifyToken';
+import { updateSpotifyToken as updateSpotifyTokenDb } from 'auth/queries/updateSpotifyToken';
+import { stringSchema } from 'schemas';
 
 export const spotifyService = axios.create({
   baseURL: config.spotify.baseUrl,
@@ -27,8 +28,8 @@ spotifyService.interceptors.response.use(
 
     if (error.response?.status === 401) {
       try {
-        const currentRefreshToken = await getDbSpotifyRefreshToken();
-
+        const userId = stringSchema.parse(store.getState().auth.user?.id);
+        const currentRefreshToken = await getDbSpotifyRefreshToken(); // TODO: Get from local storage
         const request = await AuthSession.refreshAsync(
           {
             clientId: config.spotify.clientId,
@@ -40,6 +41,7 @@ spotifyService.interceptors.response.use(
         const parsedToken = spotifyTokenSchema.parse(request);
 
         store.dispatch(
+          // TODO: Just store in local storage
           updateSpotifyToken({
             accessToken: parsedToken.accessToken,
             expiresIn: parsedToken.expiresIn,
@@ -48,7 +50,7 @@ spotifyService.interceptors.response.use(
           }),
         );
 
-        await upsertSpotifyToken(parsedToken);
+        await updateSpotifyTokenDb({ tokenData: parsedToken, userId });
 
         spotifyService.defaults.headers.common.Authorization = `Bearer ${parsedToken.accessToken}`;
       } catch (_e) {

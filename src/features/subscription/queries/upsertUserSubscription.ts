@@ -1,10 +1,11 @@
 import { supabase } from 'lib/supabase/supabase.init';
-import type { MakePurchaseRes } from './useSubscription';
 
-export async function updateUserSubscriptionData({
+import type { MakePurchaseRes } from 'subscription/queries/makePurchase';
+
+export async function upsertUserSubscriptionData({
   activePackage,
   customer,
-}: MakePurchaseRes) {
+}: MakePurchaseRes): Promise<void> {
   const { data, error } = await supabase
     .from('subscriptions')
     .upsert({
@@ -19,16 +20,17 @@ export async function updateUserSubscriptionData({
     .single();
 
   if (error || !data) {
-    return { error: { message: 'Error writing to subscriptions table ' } };
+    throw new Error(error.message ?? 'No data returned');
   }
 
   const { error: userError } = await supabase
     .from('accounts')
-    .upsert({ subscription: data.id });
+    .update({
+      subscription: data.id,
+    })
+    .eq('id', data.user_id);
 
   if (userError) {
-    return { error: { message: 'Error writing to user table ' } };
+    throw new Error(userError.message);
   }
-
-  return data;
 }

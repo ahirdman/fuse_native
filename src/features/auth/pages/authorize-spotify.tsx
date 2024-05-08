@@ -5,26 +5,20 @@ import { Text } from 'components/Text';
 
 import { useSignUp } from 'auth/proivders/signUp.provider';
 import { useAuthorizeSpotify } from 'auth/queries/authorizeSpotify';
+import { StyledImage } from 'components/Image';
 
 export function AuthorizeSpotifyPage() {
   const { dispatch, nextPage } = useSignUp();
   const { mutateAsync, isPending } = useAuthorizeSpotify();
+
   const insets = useSafeAreaInsets();
 
   async function onAuthorize() {
     await mutateAsync(undefined, {
-      onSuccess: (data) => {
+      onSuccess: ({ spotifyToken, spotifyUser }) => {
         dispatch({
           type: 'submitSpotifyToken',
-          payload: {
-            spotifyUserId: data.id,
-            tokenData: {
-              accessToken: data.accessToken,
-              refreshToken: data.refreshToken,
-              expiresIn: data.expiresIn,
-              issuedAt: data.issuedAt,
-            },
-          },
+          payload: { spotifyUser, spotifyToken },
         });
 
         nextPage();
@@ -39,17 +33,31 @@ export function AuthorizeSpotifyPage() {
       h="$full"
       justifyContent="space-between"
       bg="$primary700"
-      px={16}
+      pt={24}
       pb={insets.bottom}
+      px={24}
     >
-      <YStack gap={16} pt={16}>
-        <H3 textAlign="center">Connect to Spotify</H3>
+      <YStack>
+        <H3>Connect to Spotify</H3>
         <Text>
           In order to use FUSE, we need access to your spotify library
         </Text>
       </YStack>
 
-      <Button mb={16} fontWeight="bold" bg="$brandDark" onPress={onAuthorize}>
+      <StyledImage
+        source={require('../../../../assets/icons/Spotify_Icon_White.png')}
+        flex={1}
+        contentFit="contain"
+        mx={48}
+      />
+
+      <Button
+        fontWeight="bold"
+        fontSize="$5"
+        mb={16}
+        bg="$brandDark"
+        onPress={onAuthorize}
+      >
         {isPending && (
           <Button.Icon>
             <Spinner />

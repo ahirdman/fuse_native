@@ -1,22 +1,15 @@
 import { useMutation } from '@tanstack/react-query';
+import type { Profile } from 'auth/auth.interface';
 import { decode } from 'base64-arraybuffer';
 import { readAsStringAsync } from 'expo-file-system';
-import { z } from 'zod';
 
 import { supabase } from 'lib/supabase/supabase.init';
 import { showToast } from 'util/toast';
 
-const profileSchmea = z.object({
-  username: z
-    .string()
-    .min(2, { message: 'Username cannot be shorter than 2 characters' })
-    .max(24, { message: 'Username cannot be longer than 24 characters' }),
-  avatarUrl: z.string().url().optional(),
-});
-
-type Profile = z.infer<typeof profileSchmea>;
-
-async function createProfile({ username, avatarUrl }: Profile): Promise<void> {
+async function createProfile({
+  username,
+  avatarUrl,
+}: Profile): Promise<{ remoteAvatarUrl?: string | undefined } | undefined> {
   const { error: userError, data: userData } = await supabase.auth.getUser();
 
   if (userError) {
@@ -57,9 +50,11 @@ async function createProfile({ username, avatarUrl }: Profile): Promise<void> {
   if (error) {
     throw new Error(error.message);
   }
+
+  return { remoteAvatarUrl: data.path };
 }
 
-const useCreateProfile = () =>
+export const useCreateProfile = () =>
   useMutation({
     mutationFn: createProfile,
     onError: () => {
@@ -69,5 +64,3 @@ const useCreateProfile = () =>
       });
     },
   });
-
-export { useCreateProfile, profileSchmea, type Profile };

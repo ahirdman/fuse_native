@@ -4,7 +4,7 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
 type ExpoPlugins = (string | [] | [string] | [string, any])[];
 
 function expoPlugins(env: string): ExpoPlugins {
-  const common = ['expo-build-properties', 'expo-font', 'expo-secure-store'];
+  const common = ['expo-build-properties', 'expo-font'];
 
   switch (env) {
     default:

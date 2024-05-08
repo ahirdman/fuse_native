@@ -1,4 +1,5 @@
 import { X } from '@tamagui/lucide-icons';
+import { useRef } from 'react';
 import PagerView from 'react-native-pager-view';
 import {
   useAnimatedStyle,
@@ -9,17 +10,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, H3, Stack, XStack, YStack } from 'tamagui';
 
 import { usePager } from 'hooks/usePager';
+import type { RootStackScreenProps } from 'navigation.types';
 import { AnimatedView } from 'primitives/AnimatedView';
 
 import { AuthorizeSpotifyPage } from 'auth/pages/authorize-spotify';
 import { CreateProfilePage } from 'auth/pages/create-profile';
 import { CreateUserPage } from 'auth/pages/create-user';
+import { PickSubscription } from 'auth/pages/pick-subscription';
 import { SignUpProvider } from 'auth/proivders/signUp.provider';
 import { BottomSheet, type BottomSheetMethods } from 'components/BottomSheet';
 import { Text } from 'components/Text';
-import type { RootStackScreenProps } from 'navigation.types';
-import { useRef } from 'react';
-import { PickSubscription } from 'subscription/components/subscription';
+import { withHapticFeedback } from 'util/haptic';
 
 type Props = RootStackScreenProps<'SignUp'>;
 
@@ -88,7 +89,13 @@ function SignUpHeader({
 
   return (
     <XStack pt={insets.top} px={24} bg="$primary700">
-      <Stack jc="center" flex={1} w="100%" h={height} onPress={onClose}>
+      <Stack
+        jc="center"
+        flex={1}
+        w="100%"
+        h={height}
+        onPress={withHapticFeedback(onClose, 'Medium')}
+      >
         <X size={28} />
       </Stack>
 

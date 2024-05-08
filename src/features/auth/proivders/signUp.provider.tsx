@@ -1,32 +1,42 @@
-import { type ReactNode, createContext, useContext, useReducer } from 'react';
+import {
+  type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useReducer,
+} from 'react';
 
-import type { SpotifyToken, User } from 'auth/auth.interface';
-import type { Profile } from 'auth/queries/createProfile';
-import type { MakePurchaseRes } from 'subscription/queries/useSubscription';
+import { useAppDispatch } from 'store/hooks';
+import { showToast } from 'util/toast';
 
-interface SpotifyCredentials {
-  tokenData: SpotifyToken;
-  spotifyUserId: string;
-}
+import {
+  type Profile,
+  type SpotifyToken,
+  type SpotifyUser,
+  type User,
+  type UserState,
+  userStateSchema,
+} from 'auth/auth.interface';
+import { signIn } from 'auth/auth.slice';
+import type { AppSubscription } from 'subscription/subscription.interface';
 
-interface State {
-  user?: User | undefined;
-  profile?: Profile | undefined;
-  spotifyTokenData?: SpotifyCredentials | undefined;
-  subscription?: MakePurchaseRes | undefined;
-}
+type State = Partial<UserState>;
 
 type Action =
   | { type: 'submitUser'; payload: User }
   | { type: 'submitProfile'; payload: Profile }
-  | { type: 'submitSpotifyToken'; payload: SpotifyCredentials }
-  | { type: 'submitSubscription'; payload: MakePurchaseRes }
+  | {
+      type: 'submitSpotifyToken';
+      payload: { spotifyUser: SpotifyUser; spotifyToken: SpotifyToken };
+    }
+  | { type: 'submitSubscription'; payload: AppSubscription }
   | { type: 'cancel' };
 
-interface SignUpContext {
-  state: State;
+export interface SignUpContext {
   dispatch(action: Action): void;
   nextPage(): void;
+  state: State;
 }
 
 interface SignUpProviderProps {
@@ -35,6 +45,14 @@ interface SignUpProviderProps {
 }
 
 const SignUpContext = createContext<SignUpContext | undefined>(undefined);
+
+const initialState: State = {
+  user: undefined,
+  profile: undefined,
+  spotifyUser: undefined,
+  spotifyToken: undefined,
+  subscription: undefined,
+};
 
 function signUpReducer(state: State, action: Action): State {
   switch (action.type) {
@@ -46,7 +64,11 @@ function signUpReducer(state: State, action: Action): State {
     }
 
     case 'submitSpotifyToken': {
-      return { ...state, spotifyTokenData: action.payload };
+      return {
+        ...state,
+        spotifyToken: action.payload.spotifyToken,
+        spotifyUser: action.payload.spotifyUser,
+      };
     }
 
     case 'submitSubscription': {
@@ -54,13 +76,7 @@ function signUpReducer(state: State, action: Action): State {
     }
 
     case 'cancel': {
-      return {
-        ...state,
-        user: undefined,
-        profile: undefined,
-        spotifyTokenData: undefined,
-        subscription: undefined,
-      };
+      return initialState;
     }
 
     default:
@@ -68,12 +84,28 @@ function signUpReducer(state: State, action: Action): State {
   }
 }
 
-function SignUpProvider({ children, nextPage }: SignUpProviderProps) {
-  const [state, dispatch] = useReducer(signUpReducer, {
-    user: undefined,
-    spotifyTokenData: undefined,
-    subscription: undefined,
-  });
+export function SignUpProvider({ children, nextPage }: SignUpProviderProps) {
+  const [state, dispatch] = useReducer(signUpReducer, initialState);
+  const globalDispatch = useAppDispatch();
+
+  const completeSignUp = useCallback(() => {
+    try {
+      const parsedState = userStateSchema.parse(state);
+
+      globalDispatch(signIn(parsedState));
+    } catch (_) {
+      showToast({
+        title: 'Something went wrong',
+        preset: 'error',
+      });
+    }
+  }, [state, globalDispatch]);
+
+  useEffect(() => {
+    if (state.subscription) {
+      completeSignUp();
+    }
+  }, [state.subscription, completeSignUp]);
 
   return (
     <SignUpContext.Provider value={{ state, dispatch, nextPage }}>
@@ -82,7 +114,7 @@ function SignUpProvider({ children, nextPage }: SignUpProviderProps) {
   );
 }
 
-function useSignUp() {
+export function useSignUp() {
   const context = useContext(SignUpContext);
   if (context === undefined) {
     throw new Error('useSignUp must be used within a SignUpProvider');
@@ -90,5 +122,3 @@ function useSignUp() {
 
   return context;
 }
-
-export { type SignUpContext, SignUpProvider, useSignUp };

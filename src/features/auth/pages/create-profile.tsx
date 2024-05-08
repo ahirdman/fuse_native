@@ -4,16 +4,14 @@ import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, H3, Spinner, View, YStack } from 'tamagui';
 
+import { showToast } from 'util/toast';
+
+import { type Profile, profileSchema } from 'auth/auth.interface';
 import { useSignUp } from 'auth/proivders/signUp.provider';
-import {
-  type Profile,
-  profileSchmea,
-  useCreateProfile,
-} from 'auth/queries/createProfile';
+import { useCreateProfile } from 'auth/queries/createProfile';
 import { InputField } from 'components/InputField';
 import { Text } from 'components/Text';
 import { UserAvatar } from 'components/UserAvatar';
-import { showToast } from 'util/toast';
 
 function CreateProfilePage() {
   const { dispatch, nextPage } = useSignUp();
@@ -23,7 +21,7 @@ function CreateProfilePage() {
       username: '',
       avatarUrl: undefined,
     },
-    resolver: zodResolver(profileSchmea),
+    resolver: zodResolver(profileSchema),
   });
 
   const { avatarUrl } = watch();
@@ -40,12 +38,9 @@ function CreateProfilePage() {
     }
   }
 
-  async function onSubmit(data: Profile) {
+  async function onSubmit({ username, avatarUrl }: Profile) {
     createProfile(
-      {
-        username: data.username,
-        avatarUrl: data.avatarUrl,
-      },
+      { username, avatarUrl },
       {
         onError: () => {
           showToast({
@@ -53,8 +48,14 @@ function CreateProfilePage() {
             preset: 'error',
           });
         },
-        onSuccess: (_, input) => {
-          dispatch({ type: 'submitProfile', payload: input });
+        onSuccess: (data, input) => {
+          dispatch({
+            type: 'submitProfile',
+            payload: {
+              username: input.username,
+              avatarUrl: data?.remoteAvatarUrl,
+            },
+          });
           nextPage();
         },
       },
@@ -86,6 +87,7 @@ function CreateProfilePage() {
         badge="edit"
         onPress={handleSelectImage}
       />
+
       <InputField
         stackProps={{ w: '$full' }}
         label="Username"
@@ -93,6 +95,7 @@ function CreateProfilePage() {
       />
 
       <Button
+        mb={16}
         bg="$brandDark"
         fontWeight="bold"
         fontSize="$5"

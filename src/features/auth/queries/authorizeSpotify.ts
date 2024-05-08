@@ -12,9 +12,14 @@ import {
 import { config } from 'config';
 import { showToast } from 'util/toast';
 
-import { spotifyTokenSchema } from 'auth/auth.interface';
+import {
+  type SpotifyToken,
+  type SpotifyUser,
+  spotifyTokenSchema,
+} from 'auth/auth.interface';
 import { getSpotifyUser } from 'user/queries/getSpotifyUser';
-import { upsertSpotifyToken } from './upsertSpotifyToken';
+import { insertSpotifyCredentials } from './insertSpotifyCredentials';
+import { updateSpotifyToken } from './updateSpotifyToken';
 
 async function authorizeSpotify(): Promise<TokenResponse | undefined> {
   const redirectUri = makeRedirectUri({
@@ -67,18 +72,19 @@ function generateShortUUID() {
 
 export const useAuthorizeSpotify = () =>
   useMutation({
-    mutationFn: async () => {
+    mutationFn: async (): Promise<{
+      spotifyToken: SpotifyToken;
+      spotifyUser: SpotifyUser;
+    }> => {
       const token = await authorizeSpotify();
-
       const parsedToken = spotifyTokenSchema.parse(token);
+      const spotifyUser = await getSpotifyUser(parsedToken.accessToken);
 
-      const spotifyUser = await getSpotifyUser(parsedToken.accessToken); // TODO: When to get spotofy user id
-
-      await upsertSpotifyToken(parsedToken);
+      await insertSpotifyCredentials({ spotifyUser, tokenData: parsedToken });
 
       return {
-        ...parsedToken,
-        ...spotifyUser,
+        spotifyToken: parsedToken,
+        spotifyUser,
       };
     },
     onError: () => {

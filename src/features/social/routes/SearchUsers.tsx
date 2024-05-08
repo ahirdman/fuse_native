@@ -38,7 +38,7 @@ export function SearchUsersView() {
     return (
       <UserRow
         username={item.name}
-        avatarUrl={undefined}
+        avatarUrl={item.avatar_url ?? undefined}
         iconAfter={
           <XStack
             bg="$primary700"

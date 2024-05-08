@@ -93,6 +93,7 @@ export function CreateUserPage() {
         onPress={handleSubmit(onSubmit)}
         bg="$brandDark"
         fontWeight="bold"
+        fontSize="$5"
       >
         {isPending && (
           <Button.Icon>
