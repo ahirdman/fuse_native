@@ -1,22 +1,20 @@
 import { useEffect, useState } from 'react';
 
 import { supabase } from 'lib/supabase/supabase.init';
-import { store } from 'store';
-
-import { handleAuthStateSignIn } from 'auth/queries/signIn';
 
 export function useAppDataLoader() {
   const [appReady, setAppReady] = useState(false);
+
+  // TODO: Hydrate state from local storage
+  // - If a session is stored on local storage, so should all other neccessary user data
+  // - Only when signing out and then in - should a fetch to db be done
 
   useEffect(() => {
     void supabase.auth
       .getSession()
       .then(async (fetchedSession) => {
         if (fetchedSession.data.session) {
-          await handleAuthStateSignIn(
-            fetchedSession.data.session,
-            store.dispatch,
-          );
+          console.log('Get data from local storage');
         }
       })
       .finally(() => setAppReady(true));

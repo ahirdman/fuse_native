@@ -1,10 +1,8 @@
 import type { DrawerContentComponentProps } from '@react-navigation/drawer';
 import { UserAvatar } from 'components/UserAvatar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, H6, XStack, YStack } from 'tamagui';
+import { H6, XStack, YStack } from 'tamagui';
 
-import { useSignOut } from 'auth/queries/signOut';
-import { ConfirmDialog } from 'components/ConfirmDialog';
 import { Text } from 'components/Text';
 import { useGetCurrentUserProfile } from 'user/queries/getCurrentUserProfile';
 
@@ -12,8 +10,6 @@ interface AppDrawerProps extends DrawerContentComponentProps {}
 
 export function AppDrawer({ descriptors, navigation, state }: AppDrawerProps) {
   const { data: user } = useGetCurrentUserProfile();
-  const { mutate: signOut } = useSignOut();
-
   const insets = useSafeAreaInsets();
 
   const drawerLinks = state.routes.map((route) => {
@@ -21,20 +17,13 @@ export function AppDrawer({ descriptors, navigation, state }: AppDrawerProps) {
   });
 
   return (
-    <YStack
-      fullscreen
-      bg="$black"
-      pt={insets.top}
-      pb={insets.bottom}
-      pl={18}
-      jc="space-between"
-    >
+    <YStack fullscreen bg="$black" pt={insets.top} pb={insets.bottom} pl={18}>
       <XStack gap={12} ai="center">
         <UserAvatar />
         <H6>{user?.name}</H6>
       </XStack>
 
-      <YStack gap={12}>
+      <YStack gap={12} flex={1} jc="center">
         {drawerLinks.map((link, index) => {
           if (!link) {
             return null;
@@ -60,13 +49,6 @@ export function AppDrawer({ descriptors, navigation, state }: AppDrawerProps) {
           );
         })}
       </YStack>
-
-      <ConfirmDialog
-        title="Sign out"
-        description="Are you sure?"
-        action={() => signOut()}
-        renderTrigger={() => <Button unstyled>Sign Out</Button>}
-      />
     </YStack>
   );
 }

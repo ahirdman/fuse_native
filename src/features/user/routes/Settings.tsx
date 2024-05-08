@@ -1,13 +1,23 @@
 import { ChevronRight, DollarSign, UserCog } from '@tamagui/lucide-icons';
 import { Sheet } from '@tamagui/sheet';
 import * as Application from 'expo-application';
-import { useState } from 'react';
-import { Button, H6, ListItem, Paragraph, YGroup, YStack } from 'tamagui';
+import { useRef, useState } from 'react';
+import {
+  Button,
+  H3,
+  H6,
+  ListItem,
+  Paragraph,
+  XStack,
+  YGroup,
+  YStack,
+} from 'tamagui';
 
-import { ConfirmDialog } from 'components/ConfirmDialog';
 import { config } from 'config';
 
 import { useSignOut } from 'auth/queries/signOut';
+import { BottomSheet, type BottomSheetMethods } from 'components/BottomSheet';
+import { Text } from 'components/Text';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SubscriptionSheet } from 'subscription/components/subscription.sheet';
 import { AccountSheet } from 'user/components/account.sheet';
@@ -15,10 +25,11 @@ import { AccountSheet } from 'user/components/account.sheet';
 type SheetComponent = 'account' | 'subscription' | undefined;
 
 export function Settings() {
-  const { mutate: signOut } = useSignOut();
-  const insets = useSafeAreaInsets();
-
   const [sheet, setSheet] = useState<SheetComponent>(undefined);
+  const { mutate: signOut } = useSignOut();
+
+  const insets = useSafeAreaInsets();
+  const bottomSheetRef = useRef<BottomSheetMethods>(null);
 
   const appVersion = `Version ${config.meta.appVersion} (${Application.nativeBuildVersion})`;
 
@@ -33,7 +44,7 @@ export function Settings() {
         bg="$primary700"
         px={16}
         pt={insets.top}
-        pb={24}
+        pb={insets.bottom}
         justifyContent="space-between"
       >
         <YStack gap={16}>
@@ -83,24 +94,42 @@ export function Settings() {
           <Paragraph textAlign="center" color="$lightText">
             {appVersion}
           </Paragraph>
-          <ConfirmDialog
-            title="Sign out"
-            description="Are you sure?"
-            action={() => signOut()}
-            renderTrigger={() => (
-              <Button
-                bg="$error777"
-                borderColor="$error600"
-                color="$error700"
-                width="100%"
-              >
-                {' '}
-                Sign Out
-              </Button>
-            )}
-          />
+
+          <Button
+            bg="$error777"
+            borderColor="$error600"
+            color="$error700"
+            onPress={() => bottomSheetRef.current?.expand()}
+          >
+            Sign Out
+          </Button>
         </YStack>
       </YStack>
+
+      <BottomSheet ref={bottomSheetRef}>
+        <YStack>
+          <H3 textAlign="center" pb={24}>
+            Are you sure?
+          </H3>
+
+          <XStack w="$full" jc="space-evenly" gap={24} px={18}>
+            <Button
+              onPress={() => {
+                signOut();
+              }}
+              flex={1}
+              bg="$error400"
+              borderColor="$error500"
+            >
+              <Text color="$error700">Sign Out</Text>
+            </Button>
+
+            <Button onPress={() => bottomSheetRef.current?.close()} flex={1}>
+              Cancel
+            </Button>
+          </XStack>
+        </YStack>
+      </BottomSheet>
 
       <Sheet
         modal
