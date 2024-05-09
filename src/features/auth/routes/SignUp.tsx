@@ -12,15 +12,16 @@ import { Button, H3, Stack, XStack, YStack } from 'tamagui';
 import { usePager } from 'hooks/usePager';
 import type { RootStackScreenProps } from 'navigation.types';
 import { AnimatedView } from 'primitives/AnimatedView';
+import { withHapticFeedback } from 'util/haptic';
 
 import { AuthorizeSpotifyPage } from 'auth/pages/authorize-spotify';
 import { CreateProfilePage } from 'auth/pages/create-profile';
 import { CreateUserPage } from 'auth/pages/create-user';
 import { PickSubscription } from 'auth/pages/pick-subscription';
-import { SignUpProvider } from 'auth/proivders/signUp.provider';
+import { SignUpProvider, useSignUp } from 'auth/proivders/signUp.provider';
+import { useDeleteUser } from 'auth/queries/deleteUser';
 import { BottomSheet, type BottomSheetMethods } from 'components/BottomSheet';
 import { Text } from 'components/Text';
-import { withHapticFeedback } from 'util/haptic';
 
 type Props = RootStackScreenProps<'SignUp'>;
 
@@ -29,7 +30,6 @@ export function SignUpView({ navigation }: Props) {
   const bottomSheetRef = useRef<BottomSheetMethods>(null);
 
   function handleOnClose() {
-    // Handle any database and context cleanup
     navigation.goBack();
   }
 
@@ -53,27 +53,10 @@ export function SignUpView({ navigation }: Props) {
       </PagerView>
 
       <BottomSheet ref={bottomSheetRef}>
-        <YStack>
-          <H3 textAlign="center">Are you sure?</H3>
-          <Text textAlign="center" pb={24}>
-            Your progress will be <Text color="$error700">deleted</Text>
-          </Text>
-
-          <XStack w="$full" jc="space-evenly" gap={24} px={18}>
-            <Button
-              onPress={handleOnClose}
-              flex={1}
-              bg="$error400"
-              borderColor="$error500"
-            >
-              <Text color="$error700">Close</Text>
-            </Button>
-
-            <Button onPress={() => bottomSheetRef.current?.close()} flex={1}>
-              Return
-            </Button>
-          </XStack>
-        </YStack>
+        <CancelSignUpSheetContent
+          handleClose={handleOnClose}
+          handleResume={() => bottomSheetRef.current?.close()}
+        />
       </BottomSheet>
     </SignUpProvider>
   );
@@ -122,5 +105,48 @@ function SignUpHeader({
 
       <Stack flex={1} w="$full" jc="center" ai="flex-end" />
     </XStack>
+  );
+}
+
+interface CancelSignUpSheetContentProps {
+  handleClose(): void;
+  handleResume(): void;
+}
+
+function CancelSignUpSheetContent(props: CancelSignUpSheetContentProps) {
+  const { dispatch } = useSignUp();
+  const { mutate: deleteUser } = useDeleteUser();
+
+  function handleDeleteUser() {
+    deleteUser({}, {
+      onSettled() {
+        dispatch({ type: 'cancel' });
+        props.handleClose();
+      },
+    });
+  }
+
+  return (
+    <YStack>
+      <H3 textAlign="center">Are you sure?</H3>
+      <Text textAlign="center" pb={24}>
+        Your progress will be <Text color="$error700">deleted</Text>
+      </Text>
+
+      <XStack w="$full" jc="space-evenly" gap={24} px={18}>
+        <Button
+          onPress={handleDeleteUser}
+          flex={1}
+          bg="$error400"
+          borderColor="$error500"
+        >
+          <Text color="$error700">Close</Text>
+        </Button>
+
+        <Button onPress={props.handleResume} flex={1}>
+          Return
+        </Button>
+      </XStack>
+    </YStack>
   );
 }

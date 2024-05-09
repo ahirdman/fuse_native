@@ -19,12 +19,8 @@ export const addSignOutDispatchListener = (
         queryClient.clear();
 
         await Purchases.logOut(); // NOTE: Figure out how to handle authentication with revenue cat
+        await supabase.auth.signOut();
 
-        const { error } = await supabase.auth.signOut();
-
-        if (error) {
-          throw new Error(error.message);
-        }
       } catch (error) {
         console.error(error);
       }
