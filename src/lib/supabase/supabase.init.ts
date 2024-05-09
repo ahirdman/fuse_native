@@ -4,12 +4,12 @@ import { MMKV } from 'react-native-mmkv'
 import { config } from 'config';
 import type { Database } from 'lib/supabase/database.interface';
 
-const storage = new MMKV({ id: 'supabase-storage' })
+export const authSessionStorage = new MMKV({ id: 'supabase-storage' })
 
 const mmkvStorageConfig = {
-  setItem: (key: string, data: string) => storage.set(key, data),
-  getItem: (key: string) => storage.getString(key) ?? null,
-  removeItem: (key: string) => storage.delete(key),
+  setItem: (key: string, data: string) => authSessionStorage.set(key, data),
+  getItem: (key: string) => authSessionStorage.getString(key) ?? null,
+  removeItem: (key: string) => authSessionStorage.delete(key),
 }
 
 export const supabase = createClient<Database>(
