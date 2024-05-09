@@ -87,7 +87,7 @@ export function FuseListView({
     const tagSyncStatus = getTagSyncStatus({
       ...selectedFuse,
       updated_at: selectedFuse.created_at,
-    }); // TODO: Fix
+    }); // HACK: Status check really smells
 
     setFuseStatus(tagSyncStatus);
   }, [selectedFuse]);

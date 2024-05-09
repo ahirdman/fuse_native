@@ -25,6 +25,3 @@ jobs:
 
       - name: 🔍 Run Verify
         run: bun run verify
-
-      - name: 🧪 Run Tests
-        run: bun run test

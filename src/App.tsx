@@ -1,4 +1,5 @@
 import { init } from '@aptabase/react-native';
+import { useMMKVDevTools } from '@dev-plugins/react-native-mmkv';
 import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import {
   Mulish_200ExtraLight,
@@ -26,7 +27,7 @@ import { store } from 'store';
 import tamaguiConfig from '../tamagui.config';
 import RootNavigationStack from './navigation';
 
-import { useAppDataLoader } from 'user/hooks/useAppDataLoader';
+import { useAppDataLoader } from 'auth/hooks/useAppDataLoader';
 
 init(config.aptabase.apiKey);
 void SplashScreen.preventAutoHideAsync();
@@ -36,6 +37,7 @@ export default function App() {
   Purchases.configure({ apiKey: config.revenueCat.apiKey });
 
   useReactQueryDevTools(queryClient);
+  useMMKVDevTools();
 
   const [appReady] = useAppDataLoader();
 

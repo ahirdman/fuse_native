@@ -2,6 +2,7 @@ import { ChevronRight, DollarSign, UserCog } from '@tamagui/lucide-icons';
 import { Sheet } from '@tamagui/sheet';
 import * as Application from 'expo-application';
 import { useRef, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Button,
   H3,
@@ -14,11 +15,11 @@ import {
 } from 'tamagui';
 
 import { config } from 'config';
+import { useAppDispatch } from 'store/hooks';
 
-import { useSignOut } from 'auth/queries/signOut';
+import { signOut } from 'auth/auth.slice';
 import { BottomSheet, type BottomSheetMethods } from 'components/BottomSheet';
 import { Text } from 'components/Text';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SubscriptionSheet } from 'subscription/components/subscription.sheet';
 import { AccountSheet } from 'user/components/account.sheet';
 
@@ -26,7 +27,7 @@ type SheetComponent = 'account' | 'subscription' | undefined;
 
 export function Settings() {
   const [sheet, setSheet] = useState<SheetComponent>(undefined);
-  const { mutate: signOut } = useSignOut();
+  const dispatch = useAppDispatch();
 
   const insets = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheetMethods>(null);
@@ -115,7 +116,7 @@ export function Settings() {
           <XStack w="$full" jc="space-evenly" gap={24} px={18}>
             <Button
               onPress={() => {
-                signOut();
+                dispatch(signOut());
               }}
               flex={1}
               bg="$error400"

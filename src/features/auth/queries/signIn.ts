@@ -1,11 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import Purchases from 'react-native-purchases';
 import { z } from 'zod';
 
 import { supabase } from 'lib/supabase/supabase.init';
 
 import {
-  SpotifyToken,
   type UserState,
   spotifyTokenSchema,
   userStateSchema,
@@ -24,6 +22,12 @@ export const passwordSchema = z
 export const signInInputSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
+});
+
+const spotifyTokenJsonSchema = z.object({
+  issuedAt: z.number(),
+  expiresIn: z.number(),
+  accessToken: z.string(),
 });
 
 export type SignInInput = z.infer<typeof signInInputSchema>;
@@ -54,13 +58,19 @@ async function signInSupabase({
   const { error: profileError, data: userProfile } = await supabase
     .from('profiles')
     .select()
+    .eq('id', userData.user.id)
     .single();
 
   if (profileError) {
     throw new Error(profileError.message);
   }
 
-  const spotifyToken = spotifyTokenSchema.parse(userAccount.spotify_token_data); // WARN: This will not work
+  const refreshToken = userAccount.spotify_refresh_token;
+  const tokenData = spotifyTokenJsonSchema.parse(
+    userAccount.spotify_token_data,
+  );
+  const spotifyToken = spotifyTokenSchema.parse({ ...tokenData, refreshToken });
+
   const partialUserState: DeepTruePartial<UserState> = {
     user: {
       id: userData.user.id,
@@ -84,9 +94,7 @@ async function signInSupabase({
     },
   };
 
-  const parsedUserState = userStateSchema.required().parse(partialUserState);
-
-  await Purchases.logIn(userData.user.id); // HACK: Figure out how to handle this
+  const parsedUserState = userStateSchema.parse(partialUserState);
 
   return parsedUserState;
 }
