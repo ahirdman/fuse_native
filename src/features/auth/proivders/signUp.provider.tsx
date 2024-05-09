@@ -19,6 +19,7 @@ import {
   userStateSchema,
 } from 'auth/auth.interface';
 import { signIn } from 'auth/auth.slice';
+import { deleteAuthStorageValue, setAuthStorageValue } from 'auth/auth.storage';
 import type { AppSubscription } from 'subscription/subscription.interface';
 
 type State = Partial<UserState>;
@@ -57,13 +58,20 @@ const initialState: State = {
 function signUpReducer(state: State, action: Action): State {
   switch (action.type) {
     case 'submitUser':
+      setAuthStorageValue('user', action.payload);
+
       return { ...state, user: action.payload };
 
     case 'submitProfile': {
+      setAuthStorageValue('profile', action.payload);
+
       return { ...state, profile: action.payload };
     }
 
     case 'submitSpotifyToken': {
+      setAuthStorageValue('spotifyToken', action.payload.spotifyToken);
+      setAuthStorageValue('spotifyUser', action.payload.spotifyUser);
+
       return {
         ...state,
         spotifyToken: action.payload.spotifyToken,
@@ -72,10 +80,14 @@ function signUpReducer(state: State, action: Action): State {
     }
 
     case 'submitSubscription': {
+      setAuthStorageValue('subscription', action.payload);
+
       return { ...state, subscription: action.payload };
     }
 
     case 'cancel': {
+      deleteAuthStorageValue('all');
+
       return initialState;
     }
 

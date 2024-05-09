@@ -5,6 +5,7 @@ import { Button, H1, Spinner, YStack } from 'tamagui';
 
 import type { RootStackScreenProps } from 'navigation.types';
 
+import { signIn as reduxSignIn } from 'auth/auth.slice';
 import {
   type SignInInput,
   signInInputSchema,
@@ -12,8 +13,10 @@ import {
 } from 'auth/queries/signIn';
 import { HorizontalDivider } from 'components/Divider';
 import { InputField } from 'components/InputField';
+import { useAppDispatch } from 'store/hooks';
 
 export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
+  const { mutate: logIn, isPending } = useSignIn();
   const { control, handleSubmit, setError } = useForm<SignInInput>({
     defaultValues: {
       email: '',
@@ -23,15 +26,19 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   });
 
   const insets = useSafeAreaInsets();
-  const { mutate: logIn, isPending } = useSignIn();
+  const dispatch = useAppDispatch();
 
   function submit({ email, password }: SignInInput) {
     logIn(
       { email, password },
       {
         onError: (error) => {
+          // TODO: Dont displasy PostGres errors here, only AuthErrors
           setError('password', { message: error.message });
           setError('email', { message: error.message });
+        },
+        onSuccess: (data) => {
+          dispatch(reduxSignIn(data));
         },
       },
     );

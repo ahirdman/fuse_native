@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import type { PreloadedState } from '@reduxjs/toolkit';
 
 import authReducer from 'auth/auth.slice';
+import { authListener } from './middleware';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -12,7 +13,9 @@ export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
     reducer: rootReducer,
     preloadedState,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({ serializableCheck: { warnAfter: 160 } }),
+      getDefaultMiddleware({ serializableCheck: { warnAfter: 160 } }).prepend(
+        authListener.middleware,
+      ),
   });
 };
 

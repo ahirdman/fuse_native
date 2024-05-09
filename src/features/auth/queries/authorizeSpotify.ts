@@ -19,7 +19,6 @@ import {
 } from 'auth/auth.interface';
 import { getSpotifyUser } from 'user/queries/getSpotifyUser';
 import { insertSpotifyCredentials } from './insertSpotifyCredentials';
-import { updateSpotifyToken } from './updateSpotifyToken';
 
 async function authorizeSpotify(): Promise<TokenResponse | undefined> {
   const redirectUri = makeRedirectUri({
