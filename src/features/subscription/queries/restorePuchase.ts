@@ -3,6 +3,7 @@ import Purchases from 'react-native-purchases';
 
 import { showToast } from 'util/toast';
 
+import { upsertUserSubscriptionData } from 'subscription/queries/upsertUserSubscription';
 import type { AppSubscription } from 'subscription/subscription.interface';
 
 async function restorePurchase(): Promise<AppSubscription> {
@@ -22,6 +23,11 @@ async function restorePurchase(): Promise<AppSubscription> {
     productId: activeEntitlement.productIdentifier,
     willRenew: activeEntitlement.willRenew,
   };
+
+  await upsertUserSubscriptionData({
+    activePackage: activeEntitlement,
+    customer: { ...result },
+  });
 
   return restoredSubscription;
 }
