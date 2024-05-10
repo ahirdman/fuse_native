@@ -1,21 +1,93 @@
 import axios, { isAxiosError } from 'axios';
-import { config } from 'config';
-import * as AuthSession from 'expo-auth-session';
+import { TokenResponse } from 'expo-auth-session';
 
-import { stringSchema } from 'schema';
+import { config } from 'config';
+import { authorizeSpotify } from 'lib/expo/expo.auth';
 import { store } from 'store';
 import { showToast } from 'util/toast';
 
 import { spotifyTokenSchema } from 'auth/auth.interface';
-import { signOut, updateSpotifyToken } from 'auth/auth.slice';
+import {
+  signOut,
+  updateSpotifyToken as updateTokenState,
+} from 'auth/auth.slice';
 
 export const spotifyService = axios.create({
   baseURL: config.spotify.baseUrl,
   timeout: 10000,
 });
 
+spotifyService.interceptors.request.use(async (request) => {
+  const controller = new AbortController();
+  const { spotifyToken, user } = store.getState().auth;
+
+  if (!spotifyToken || !user) {
+    throw new Error('State is not properly hydrated');
+  }
+
+  try {
+    const currentToken = new TokenResponse(spotifyToken);
+    const tokenNeedsRefresh = currentToken.shouldRefresh();
+
+    if (tokenNeedsRefresh) {
+      const refreshedToken = await currentToken.refreshAsync(
+        {
+          clientId: config.spotify.clientId,
+        },
+        { tokenEndpoint: config.expoAuth.discovery.tokenEndpoint },
+      );
+
+      const parsedToken = spotifyTokenSchema.parse(refreshedToken);
+      store.dispatch(updateTokenState(parsedToken));
+
+      request.headers.set('Authorization', `Bearer ${parsedToken.accessToken}`);
+    } else {
+      request.headers.set(
+        'Authorization',
+        `Bearer ${currentToken.accessToken}`,
+      );
+    }
+
+    return request;
+  } catch (error) {
+    function abortAndClear() {
+      store.dispatch(signOut());
+
+      controller.abort(error);
+      request.headers.clear('Authorization');
+
+      return {
+        ...request,
+        signal: controller.signal,
+      };
+    }
+
+    if (!isSpotifyGrantError(error)) {
+      return abortAndClear();
+    }
+
+    const newRefreshToken = await authorizeSpotify();
+    // NOTE: Could be a little confising
+    // - Consider showing an alert or other pop up
+    //   describing why the user needs to authorize again
+
+    if (!newRefreshToken) {
+      return abortAndClear();
+    }
+
+    const parsedToken = spotifyTokenSchema.parse(newRefreshToken);
+    store.dispatch(updateTokenState(parsedToken));
+    request.headers.set(
+      'Authorization',
+      `Bearer ${newRefreshToken.accessToken}`,
+    );
+
+    return request;
+  }
+});
+
 spotifyService.interceptors.response.use(
-  (response) => {
+  async (response) => {
     return response;
   },
   async (error) => {
@@ -24,46 +96,24 @@ spotifyService.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
-      try {
-        const currentRefreshToken = stringSchema.parse(
-          store.getState().auth.spotifyToken?.refreshToken,
-        );
-        const request = await AuthSession.refreshAsync(
-          {
-            clientId: config.spotify.clientId,
-            refreshToken: currentRefreshToken,
-          },
-          config.expoAuth.discovery,
-        );
+      store.dispatch(signOut());
+      spotifyService.defaults.headers.common.Authorization = undefined;
 
-        const parsedToken = spotifyTokenSchema.parse(request);
-
-        store.dispatch(
-          updateSpotifyToken({
-            accessToken: parsedToken.accessToken,
-            expiresIn: parsedToken.expiresIn,
-            issuedAt: parsedToken.issuedAt,
-            refreshToken: parsedToken.refreshToken,
-          }),
-        );
-
-        spotifyService.defaults.headers.common.Authorization = `Bearer ${parsedToken.accessToken}`;
-      } catch (_e) {
-        // WARN: Refersh token sometimes revoked, needs re-authorization
-        store.dispatch(signOut());
-
-        spotifyService.defaults.headers.common.Authorization = undefined;
-
-        showToast({
-          title: 'Something went wrong',
-          preset: 'error',
-          message: 'Refreshing Spotify token did not work...',
-        });
-
-        return Promise.reject(error);
-      }
+      showToast({
+        title: 'Something went wrong',
+        preset: 'error',
+        message: 'Refreshing Spotify token did not work...',
+      });
     } else {
       return Promise.reject(error);
     }
   },
 );
+
+function isSpotifyGrantError(error: unknown): boolean {
+  if (error && typeof error === 'object' && 'code' in error) {
+    return error.code === 'invalid_grant';
+  }
+
+  return false;
+}

@@ -3,6 +3,7 @@ import type { TypedStartListening } from '@reduxjs/toolkit';
 import {
   addSignInDispatchListener,
   addSignOutDispatchListener,
+  addSpotifyTokenUpdateListener,
 } from 'auth/auth.listeners';
 
 import type { AppDispatch, RootState } from 'store';
@@ -13,3 +14,4 @@ export const authListener = createListenerMiddleware();
 
 addSignOutDispatchListener(authListener.startListening as AppStartListening);
 addSignInDispatchListener(authListener.startListening as AppStartListening);
+addSpotifyTokenUpdateListener(authListener.startListening as AppStartListening);
