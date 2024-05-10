@@ -34,7 +34,6 @@ export function useAppDataLoader() {
     } catch {
       deleteAuthStorageValue('all');
       await supabase.auth.signOut();
-
     } finally {
       setAppReady(true);
     }

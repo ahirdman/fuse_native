@@ -26,7 +26,7 @@ async function deleteUser({ password }: DeleteUserArgs) {
     }
   }
 
-  authSessionStorage.clearAll()
+  authSessionStorage.clearAll();
 }
 
 export const useDeleteUser = () =>
