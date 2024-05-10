@@ -11,7 +11,7 @@ export function TabHeader(props: Props) {
   const canGoBack = props.navigation.canGoBack();
 
   return (
-    <XStack pt={insets.top} bg="$black" pb={12} ai="center">
+    <XStack pt={insets.top} bg="$primary700" pb={12} ai="center">
       <Stack f={1} jc="center" ai="center">
         {props.options.headerLeft ? (
           props.options.headerLeft({ canGoBack })

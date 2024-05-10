@@ -31,3 +31,11 @@ export default authSlice.reducer;
 
 export const selectSpotifyUserId = (state: RootState) =>
   state.auth.spotifyUser?.id;
+
+export const selectUserId = (state: RootState): string => {
+  if (!state.auth.user) {
+    throw new Error('User is null');
+  }
+
+  return state.auth.user.id;
+};
