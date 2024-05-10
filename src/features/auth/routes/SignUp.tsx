@@ -118,12 +118,15 @@ function CancelSignUpSheetContent(props: CancelSignUpSheetContentProps) {
   const { mutate: deleteUser } = useDeleteUser();
 
   function handleDeleteUser() {
-    deleteUser({}, {
-      onSettled() {
-        dispatch({ type: 'cancel' });
-        props.handleClose();
+    deleteUser(
+      {},
+      {
+        onSettled() {
+          dispatch({ type: 'cancel' });
+          props.handleClose();
+        },
       },
-    });
+    );
   }
 
   return (

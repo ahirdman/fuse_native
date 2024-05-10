@@ -1,18 +1,21 @@
 import { useMutation } from '@tanstack/react-query';
-import { supabase } from 'lib/supabase/supabase.init';
 import Purchases, {
   type CustomerInfo,
   type PurchasesEntitlementInfo,
   type PurchasesPackage,
 } from 'react-native-purchases';
-import type { AppSubscription } from 'subscription/subscription.interface';
+
 import { showToast } from 'util/toast';
+
+import type { AppSubscription } from 'subscription/subscription.interface';
 import { upsertUserSubscriptionData } from './upsertUserSubscription';
 
 export interface MakePurchaseRes {
   activePackage: PurchasesEntitlementInfo;
   customer: Omit<CustomerInfo, 'entitlements'>;
 }
+
+// TODO: Handle a user canceling without raising an error
 
 async function makePurchase(
   subscriptionPackage: PurchasesPackage,

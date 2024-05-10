@@ -5,9 +5,9 @@ import { Button, Paragraph, YStack } from 'tamagui';
 import { useAppDispatch } from 'store/hooks';
 import { showToast } from 'util/toast';
 
+import { signOut } from 'auth/auth.slice';
 import { type DeleteUserArgs, useDeleteUser } from 'auth/queries/deleteUser';
 import { InputField } from 'components/InputField';
-import { signOut } from 'auth/auth.slice';
 
 // TODO: Show info about spotify connection and what happens with subscription post deletion
 
@@ -19,7 +19,7 @@ export function DeleteAccountForm() {
     },
   });
 
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   function onSubmit({ password }: DeleteUserArgs) {
     deleteUser(
@@ -29,8 +29,8 @@ export function DeleteAccountForm() {
           showToast({ title: 'Your account has been deleted', preset: 'done' });
         },
         onSettled: () => {
-          dispatch(signOut())
-        }
+          dispatch(signOut());
+        },
       },
     );
   }
