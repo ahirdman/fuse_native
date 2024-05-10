@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { launchImageLibraryAsync } from 'expo-image-picker';
 import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, H3, Spinner, View, YStack } from 'tamagui';
+import { Button, H3, Spinner, YStack } from 'tamagui';
 
 import { showToast } from 'util/toast';
 
@@ -12,11 +12,12 @@ import { useCreateProfile } from 'auth/queries/createProfile';
 import { InputField } from 'components/InputField';
 import { Text } from 'components/Text';
 import { UserAvatar } from 'components/UserAvatar';
+import { KeyboardView } from 'primitives/KeyboardView';
 
-function CreateProfilePage() {
+export function CreateProfilePage() {
   const { dispatch, nextPage } = useSignUp();
   const { mutate: createProfile, isPending } = useCreateProfile();
-  const { control, setValue, watch, handleSubmit } = useForm<Profile>({
+  const { control, setValue, watch, handleSubmit, setError } = useForm<Profile>({
     defaultValues: {
       username: '',
       avatarUrl: undefined,
@@ -42,11 +43,17 @@ function CreateProfilePage() {
     createProfile(
       { username, avatarUrl },
       {
-        onError: () => {
-          showToast({
-            title: 'Could not create profile',
-            preset: 'error',
-          });
+        onError: (error) => {
+          const invalidUsername = error.message.match(/users_name_key/g)
+
+          if (invalidUsername) {
+            setError("username", { message: "Username is already taken" })
+          } else {
+            showToast({
+              title: 'Could not create profile',
+              preset: 'error',
+            });
+          }
         },
         onSuccess: (data, input) => {
           dispatch({
@@ -63,7 +70,7 @@ function CreateProfilePage() {
   }
 
   return (
-    <View
+    <KeyboardView
       key="create-profile"
       bg="$primary700"
       w="$full"
@@ -108,8 +115,6 @@ function CreateProfilePage() {
         )}
         Continue
       </Button>
-    </View>
+    </KeyboardView>
   );
 }
-
-export { CreateProfilePage };

@@ -30,7 +30,7 @@ async function createUser({
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw error
   }
 
   if (data.session && data.user) {

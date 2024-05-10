@@ -12,6 +12,8 @@ import {
 } from 'auth/queries/createUser';
 import { InputField } from 'components/InputField';
 import { Text } from 'components/Text';
+import { isAuthError } from '@supabase/supabase-js';
+import { showToast } from 'util/toast';
 
 export function CreateUserPage() {
   const { mutate: createUser, isPending } = useCreateUser();
@@ -32,7 +34,14 @@ export function CreateUserPage() {
       { email, password },
       {
         onError: (error) => {
-          setError('email', { message: error.message });
+          if (isAuthError(error)) {
+            setError('email', { message: error.message });
+          } else {
+            showToast({
+              title: "Something went wrong",
+              preset: "error"
+            })
+          }
         },
         onSuccess: ({ user }) => {
           dispatch({

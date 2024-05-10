@@ -1,10 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import type { Profile } from 'auth/auth.interface';
 import { decode } from 'base64-arraybuffer';
 import { readAsStringAsync } from 'expo-file-system';
 
 import { supabase } from 'lib/supabase/supabase.init';
-import { showToast } from 'util/toast';
+
+import type { Profile } from 'auth/auth.interface';
 
 async function createProfile({
   username,
@@ -56,11 +56,5 @@ async function createProfile({
 
 export const useCreateProfile = () =>
   useMutation({
-    mutationFn: createProfile,
-    onError: () => {
-      showToast({
-        title: 'Error creating profile',
-        preset: 'error',
-      });
-    },
+    mutationFn: createProfile
   });

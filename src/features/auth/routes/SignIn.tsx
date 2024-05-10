@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, H1, Spinner, YStack } from 'tamagui';
+import { isAuthError } from '@supabase/supabase-js';
 
 import type { RootStackScreenProps } from 'navigation.types';
 
@@ -14,6 +15,7 @@ import {
 import { HorizontalDivider } from 'components/Divider';
 import { InputField } from 'components/InputField';
 import { useAppDispatch } from 'store/hooks';
+import { showToast } from 'util/toast';
 
 export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
   const { mutate: logIn, isPending } = useSignIn();
@@ -33,9 +35,15 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
       { email, password },
       {
         onError: (error) => {
-          // TODO: Dont displasy PostGres errors here, only AuthErrors
-          setError('password', { message: error.message });
-          setError('email', { message: error.message });
+          if (isAuthError(error)) {
+            setError('password', { message: error.message });
+            setError('email', { message: error.message });
+          } else {
+            showToast({
+              title: "Something went wrong",
+              preset: "error"
+            })
+          }
         },
         onSuccess: (data) => {
           dispatch(reduxSignIn(data));
