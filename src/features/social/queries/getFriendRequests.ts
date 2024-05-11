@@ -23,7 +23,7 @@ async function getFriendRequests(): Promise<RecievedFriendRequest[]> {
         id,
         created_at,
         status,
-        sender_profile:profiles!friend_requests_sender_user_id_fkey (id, name)
+        sender_profile:profiles!friend_requests_sender_user_id_fkey (id, name, avatar_url)
       `)
     .neq('sender_user_id', userData.user.id)
     .eq('status', 'pending');

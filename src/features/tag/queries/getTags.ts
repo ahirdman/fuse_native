@@ -15,8 +15,11 @@ type TagsWithTrackIdsQuery = {
   user_id: string;
 };
 
-async function getTags(): Promise<Tables<'tags'>[]> {
-  const { data, error } = await supabase.from('tags').select();
+async function getTags(userId: string): Promise<Tables<'tags'>[]> {
+  const { data, error } = await supabase
+    .from('tags')
+    .select()
+    .eq('user_id', userId);
 
   if (error) {
     throw new Error(error.message);
@@ -25,21 +28,35 @@ async function getTags(): Promise<Tables<'tags'>[]> {
   return data;
 }
 
-export const useGetTags = <T = Tables<'tags'>[]>(
-  select?: (data: Tables<'tags'>[]) => T,
-) =>
+export const useGetTags = (userId: string) =>
   useQuery({
-    queryKey: tagKeys.lists(),
-    queryFn: getTags,
-    select,
+    queryKey: tagKeys.lists(), // TODO: Add userId as query key variable
+    queryFn: () => getTags(userId),
   });
 
 interface UseGetTagArgs {
   id: number;
 }
 
+async function getTag(id: number): Promise<Tables<'tags'>> {
+  const { data, error } = await supabase
+    .from('tags')
+    .select()
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
 export const useGetTag = ({ id }: UseGetTagArgs) =>
-  useGetTags((data) => data.find((tag) => tag.id === id));
+  useQuery({
+    queryKey: tagKeys.detail(id),
+    queryFn: () => getTag(id),
+  });
 
 async function getTagsWithTrackIds() {
   const { data, error } = await supabase

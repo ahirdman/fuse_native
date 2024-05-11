@@ -6,7 +6,9 @@ import { H6, Paragraph, XStack, YStack } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database-generated.types';
 import type { TagTabScreenProps } from 'navigation.types';
+import { useAppSelector } from 'store/hooks';
 
+import { selectUserId } from 'auth/auth.slice';
 import { SectionButton } from 'components/SectionButton';
 import { type FuseTagRowRes, useGetFuseLists } from 'fuse/queries/getFuseLists';
 import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
@@ -115,7 +117,8 @@ interface TagListProps {
 }
 
 function TagList({ onRowPress }: TagListProps) {
-  const { data, refetch, isFetching, isLoading } = useGetTags();
+  const userId = useAppSelector(selectUserId);
+  const { data, refetch, isFetching, isLoading } = useGetTags(userId);
   const isRefreshing = isFetching && !isLoading;
 
   function handleRefetch() {
