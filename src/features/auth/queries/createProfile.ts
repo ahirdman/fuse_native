@@ -56,5 +56,5 @@ async function createProfile({
 
 export const useCreateProfile = () =>
   useMutation({
-    mutationFn: createProfile
+    mutationFn: createProfile,
   });

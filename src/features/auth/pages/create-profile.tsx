@@ -17,13 +17,15 @@ import { KeyboardView } from 'primitives/KeyboardView';
 export function CreateProfilePage() {
   const { dispatch, nextPage } = useSignUp();
   const { mutate: createProfile, isPending } = useCreateProfile();
-  const { control, setValue, watch, handleSubmit, setError } = useForm<Profile>({
-    defaultValues: {
-      username: '',
-      avatarUrl: undefined,
+  const { control, setValue, watch, handleSubmit, setError } = useForm<Profile>(
+    {
+      defaultValues: {
+        username: '',
+        avatarUrl: undefined,
+      },
+      resolver: zodResolver(profileSchema),
     },
-    resolver: zodResolver(profileSchema),
-  });
+  );
 
   const { avatarUrl } = watch();
   const insets = useSafeAreaInsets();
@@ -44,10 +46,10 @@ export function CreateProfilePage() {
       { username, avatarUrl },
       {
         onError: (error) => {
-          const invalidUsername = error.message.match(/users_name_key/g)
+          const invalidUsername = error.message.match(/users_name_key/g);
 
           if (invalidUsername) {
-            setError("username", { message: "Username is already taken" })
+            setError('username', { message: 'Username is already taken' });
           } else {
             showToast({
               title: 'Could not create profile',

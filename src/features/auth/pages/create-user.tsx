@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, H3, Spinner, View, YStack } from 'tamagui';
 
+import { isAuthError } from '@supabase/supabase-js';
 import { useSignUp } from 'auth/proivders/signUp.provider';
 import {
   type CreateUserArgs,
@@ -12,7 +13,6 @@ import {
 } from 'auth/queries/createUser';
 import { InputField } from 'components/InputField';
 import { Text } from 'components/Text';
-import { isAuthError } from '@supabase/supabase-js';
 import { showToast } from 'util/toast';
 
 export function CreateUserPage() {
@@ -38,9 +38,9 @@ export function CreateUserPage() {
             setError('email', { message: error.message });
           } else {
             showToast({
-              title: "Something went wrong",
-              preset: "error"
-            })
+              title: 'Something went wrong',
+              preset: 'error',
+            });
           }
         },
         onSuccess: ({ user }) => {
