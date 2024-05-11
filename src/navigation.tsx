@@ -1,4 +1,3 @@
-import { useReactNavigationDevTools } from '@dev-plugins/react-navigation';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
@@ -39,8 +38,6 @@ const Drawer = createDrawerNavigator<DrawerParamList>();
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
 function RootNavigationStack() {
-  useReactNavigationDevTools(navigationRef);
-
   const { user, spotifyToken, subscription } = useAppSelector(
     (state) => state.auth,
   );

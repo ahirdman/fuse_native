@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { isAuthError } from '@supabase/supabase-js';
 import { useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, H1, Spinner, YStack } from 'tamagui';
-import { isAuthError } from '@supabase/supabase-js';
 
 import type { RootStackScreenProps } from 'navigation.types';
 
@@ -40,9 +40,9 @@ export function SignIn({ navigation }: RootStackScreenProps<'SignIn'>) {
             setError('email', { message: error.message });
           } else {
             showToast({
-              title: "Something went wrong",
-              preset: "error"
-            })
+              title: 'Something went wrong',
+              preset: 'error',
+            });
           }
         },
         onSuccess: (data) => {
