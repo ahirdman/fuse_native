@@ -13,7 +13,7 @@ async function getPendingFriendRequests(): Promise<Tables<'profiles'>[]> {
   const { data, error } = await supabase
     .from('friend_requests')
     .select(`
-        sender_profile:profiles!friend_requests_receiver_user_id_fkey (id, name)
+        sender_profile:profiles!friend_requests_receiver_user_id_fkey (id, name, avatar_url)
   `)
     .neq('status', 'accepted')
     .eq('sender_user_id', currentUser.user.id);

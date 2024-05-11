@@ -107,10 +107,24 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "friend_requests_receiver_user_id_fkey"
+            columns: ["receiver_user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_relation"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "friend_requests_sender_user_id_fkey"
             columns: ["sender_user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friend_requests_sender_user_id_fkey"
+            columns: ["sender_user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_relation"
             referencedColumns: ["id"]
           }
         ]
@@ -409,6 +423,13 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "user_friends_friend_user_id_fkey"
+            columns: ["friend_user_id"]
+            isOneToOne: false
+            referencedRelation: "users_with_relation"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "user_friends_request_id_fkey"
             columns: ["request_id"]
             isOneToOne: false
@@ -437,13 +458,6 @@ export interface Database {
         Relationships: [
           {
             foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["initial_tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
             columns: ["id"]
             isOneToOne: false
             referencedRelation: "tags"
@@ -453,26 +467,33 @@ export interface Database {
             foreignKeyName: "trackTags_tag_id_fkey"
             columns: ["initial_tag_id"]
             isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
             referencedRelation: "initial_tags_with_matches"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["initial_tag_id"]
+            columns: ["id"]
             isOneToOne: false
             referencedRelation: "tags_with_track_ids"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["id"]
+            columns: ["initial_tag_id"]
             isOneToOne: false
             referencedRelation: "initial_tags_with_matches"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["id"]
+            columns: ["initial_tag_id"]
             isOneToOne: false
             referencedRelation: "tags_with_track_ids"
             referencedColumns: ["id"]
@@ -504,6 +525,23 @@ export interface Database {
         }
         Relationships: []
       }
+      users_with_relation: {
+        Row: {
+          avatar_url: string | null
+          id: string | null
+          name: string | null
+          relation: Database["public"]["Enums"]["relation_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Functions: {
       change_user_password: {
@@ -526,6 +564,7 @@ export interface Database {
     }
     Enums: {
       friend_request_status: "pending" | "rejected" | "accepted"
+      relation_type: "friend" | "requested_by" | "requested_to" | "none"
     }
     CompositeTypes: {
       [_ in never]: never

@@ -28,5 +28,9 @@ export const useAcceptFriendRequest = () =>
         ['friendRequests'],
         (prev) => prev?.filter((req) => req.id !== friendRequestId),
       );
+
+      queryClient.invalidateQueries({
+        queryKey: ['friends'],
+      });
     },
   });

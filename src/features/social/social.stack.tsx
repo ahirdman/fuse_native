@@ -1,15 +1,21 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { TabHeader } from 'features/navigation/components/TabHeader';
 import type { FriendsTabParamList } from 'navigation.types';
 import { AvatarButton } from 'navigation/components/AvatarButton';
+import { useAppSelector } from 'store/hooks';
+
+import { TabHeader } from 'features/navigation/components/TabHeader';
 import { Profile } from 'user/routes/Profile';
+import { useGetAvatarUrl } from './queries/getSignedAvatarUrl';
 import { SearchUsersView } from './routes/SearchUsers';
 import { Social } from './routes/social';
 
 const SocialNav = createNativeStackNavigator<FriendsTabParamList>();
 
 export function SocialStack() {
+  const avatarUrl = useAppSelector((state) => state.auth.profile?.avatarUrl);
+  const userAvatar = useGetAvatarUrl(avatarUrl);
+
   return (
     <SocialNav.Navigator
       initialRouteName="Friends"
@@ -22,7 +28,10 @@ export function SocialStack() {
         component={Social}
         options={(props) => ({
           headerLeft: () => (
-            <AvatarButton onPress={() => props.navigation.openDrawer()} />
+            <AvatarButton
+              onPress={() => props.navigation.openDrawer()}
+              imageUrl={userAvatar.data}
+            />
           ),
         })}
       />

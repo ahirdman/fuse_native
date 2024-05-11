@@ -3,23 +3,20 @@ import { useQuery } from '@tanstack/react-query';
 import type { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
 
-async function getUsers(): Promise<Tables<'profiles'>[]> {
-  const { data: user, error: userError } = await supabase.auth.getUser();
+export type UserRelation = 'friend' | 'requested_by' | 'requested_to' | 'none';
 
-  if (userError) {
-    throw new Error(userError?.message);
-  }
+export interface UsersView extends Tables<'profiles'> {
+  relation: UserRelation;
+}
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select()
-    .neq('id', user.user.id);
+async function getUsers(): Promise<UsersView[]> {
+  const { data, error } = await supabase.from('users_with_relation').select();
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data;
+  return data as UsersView[];
 }
 
 export const useGetUsers = () =>
