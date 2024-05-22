@@ -1,15 +1,18 @@
 import { FlashList } from '@shopify/flash-list';
+import { selectUserId } from 'auth/auth.slice';
 import { ListEmptyComponent } from 'components/ListEmptyComponent';
 import type { Tables } from 'lib/supabase/database.interface';
 import { RefreshControl } from 'react-native';
 import { UserRow } from 'social/components/UserRow';
 import { useGetPendingFriendRequests } from 'social/queries/getPendingRequests';
 import type { CommonPageProps } from 'social/routes/social';
+import { useAppSelector } from 'store/hooks';
 import { Spinner, View } from 'tamagui';
 
 export function SentRequestsPage(props: CommonPageProps) {
+  const userId = useAppSelector(selectUserId);
   const { data, isRefetching, refetch, isError, isFetching } =
-    useGetPendingFriendRequests();
+    useGetPendingFriendRequests(userId);
 
   function renderSentRequest({ item }: { item: Tables<'profiles'> }) {
     return (

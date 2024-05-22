@@ -4,13 +4,17 @@ import { Spinner, View } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database.interface';
 
+import { selectUserId } from 'auth/auth.slice';
 import { ListEmptyComponent } from 'components/ListEmptyComponent';
 import { UserRow } from 'social/components/UserRow';
 import { useGetFriends } from 'social/queries/getFriends';
 import type { CommonPageProps } from 'social/routes/social';
+import { useAppSelector } from 'store/hooks';
 
 export function FriendsPage(props: CommonPageProps) {
-  const { data, isError, isFetching, isRefetching, refetch } = useGetFriends();
+  const userId = useAppSelector(selectUserId);
+  const { data, isError, isFetching, isRefetching, refetch } =
+    useGetFriends(userId);
 
   const renderFriend = ({ item }: { item: Tables<'profiles'> }) => (
     <UserRow
