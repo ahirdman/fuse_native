@@ -7,8 +7,10 @@ import { Text } from 'components/Text';
 import type { RootStackScreenProps } from 'navigation.types';
 import { hapticFeedback } from 'util/haptic';
 
+import { selectUserId } from 'auth/auth.slice';
 import { ListEmptyComponent } from 'components/ListEmptyComponent';
 import { ListFooterComponent } from 'components/ListFooter';
+import { useAppSelector } from 'store/hooks';
 import { TagRow } from 'tag/components/TagRow';
 import { useGetTagsWithTrackIds } from 'tag/queries/getTags';
 import { useAddTagToTrack } from 'track/queries/tagTrack';
@@ -30,11 +32,13 @@ export function AddTag({
   },
   navigation,
 }: Props) {
+  const userId = useAppSelector(selectUserId);
   const [selectMultiple, setSelectMultiple] = useState(false);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
 
   const { data, isFetching, isError } = useGetTagsWithTrackIds({
     excledeTrackId: trackId,
+    userId,
   });
   const { mutateAsync: addTag } = useAddTagToTrack();
 
@@ -67,7 +71,7 @@ export function AddTag({
           : setSelectedTagIds((prev) => [...prev, tagId]);
       } else {
         addTag(
-          { trackId, tagIds: [tagId] },
+          { trackId, tagIds: [tagId], userId },
           {
             onSuccess: () => {
               navigation.goBack();
@@ -76,7 +80,14 @@ export function AddTag({
         );
       }
     },
-    [selectMultiple, trackId, selectedTagIds, navigation.goBack, addTag],
+    [
+      selectMultiple,
+      trackId,
+      selectedTagIds,
+      userId,
+      navigation.goBack,
+      addTag,
+    ],
   );
 
   function renderItem({ item, extraData }: RenderItemProps) {
@@ -102,7 +113,7 @@ export function AddTag({
   function onSelectPress() {
     hapticFeedback('Medium');
     addTag(
-      { trackId, tagIds: selectedTagIds },
+      { trackId, tagIds: selectedTagIds, userId },
       {
         onSuccess: () => {
           navigation.goBack();

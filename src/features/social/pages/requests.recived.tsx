@@ -39,7 +39,7 @@ export function FriendRequestPage(props: CommonPageProps) {
       avatarUrl={item.sender_profile.avatar_url}
       onPress={() => props.onRowPress(item.sender_profile.id)}
       renderRight={() => (
-        <XStack gap={8}>
+        <XStack gap={12}>
           <XStack
             px={12}
             py={4}
@@ -50,7 +50,7 @@ export function FriendRequestPage(props: CommonPageProps) {
             borderColor="$success600"
             onPress={() => acceptRequest(item.id)}
           >
-            <Check size={18} color="$success600" />
+            <Check size={18} color="$white" />
           </XStack>
           <XStack
             bg="$error777"

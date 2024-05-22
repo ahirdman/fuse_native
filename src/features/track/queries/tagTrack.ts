@@ -11,6 +11,7 @@ import { trackTagKeys } from 'track/queries/keys';
 interface AddTagToTrackArgs {
   trackId: string;
   tagIds: number[];
+  userId: string;
 }
 
 async function addTagToTrack({ trackId, tagIds }: AddTagToTrackArgs) {
@@ -53,7 +54,7 @@ export const useAddTagToTrack = () =>
       });
 
       queryClient.invalidateQueries({
-        queryKey: tagKeys.list(variables.trackId),
+        queryKey: tagKeys.list(variables.userId, variables.trackId),
       });
     },
   });
