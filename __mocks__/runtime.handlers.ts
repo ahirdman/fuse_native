@@ -1,4 +1,5 @@
 //import type { Session, User } from '@supabase/supabase-js';
+import { config } from 'config';
 import { http, HttpResponse } from 'msw';
 
 // const supaBaseUser: User = {
@@ -34,6 +35,10 @@ import { http, HttpResponse } from 'msw';
 
 export const handlers = [
   http.post('url', () => {
+    return new HttpResponse(null, { status: 200 });
+  }),
+
+  http.get(`${config.spotify.baseUrl}*`, () => {
     return new HttpResponse(null, { status: 200 });
   }),
 ];

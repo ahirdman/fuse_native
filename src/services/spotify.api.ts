@@ -20,10 +20,10 @@ export const spotifyService = axios.create({
 spotifyService.interceptors.request.use(async (request) => {
   const controller = new AbortController();
   const { spotifyToken } = store.getState().auth;
-  const authHeader = request.headers.get("Authorization")
+  const authHeader = request.headers.get('Authorization');
 
   if (authHeader) {
-    return request
+    return request;
   }
 
   if (!spotifyToken) {

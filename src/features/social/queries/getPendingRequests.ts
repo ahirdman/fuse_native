@@ -2,21 +2,16 @@ import { useQuery } from '@tanstack/react-query';
 import type { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
 
-async function getPendingFriendRequests(): Promise<Tables<'profiles'>[]> {
-  const { data: currentUser, error: currentUserError } =
-    await supabase.auth.getUser();
-
-  if (currentUserError) {
-    throw new Error(currentUserError.message);
-  }
-
+async function getPendingFriendRequests(
+  userId: string,
+): Promise<Tables<'profiles'>[]> {
   const { data, error } = await supabase
     .from('friend_requests')
     .select(`
         sender_profile:profiles!friend_requests_receiver_user_id_fkey (id, name, avatar_url)
   `)
     .neq('status', 'accepted')
-    .eq('sender_user_id', currentUser.user.id);
+    .eq('sender_user_id', userId);
 
   if (error) {
     throw new Error(error.message);
@@ -29,8 +24,8 @@ async function getPendingFriendRequests(): Promise<Tables<'profiles'>[]> {
   return res;
 }
 
-export const useGetPendingFriendRequests = () =>
+export const useGetPendingFriendRequests = (userId: string) =>
   useQuery({
     queryKey: ['friendRequestsSent'],
-    queryFn: getPendingFriendRequests,
+    queryFn: () => getPendingFriendRequests(userId),
   });

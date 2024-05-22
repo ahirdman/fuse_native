@@ -9,8 +9,19 @@ export interface UsersView extends Tables<'profiles'> {
   relation: UserRelation;
 }
 
-async function getUsers(): Promise<UsersView[]> {
-  const { data, error } = await supabase.from('users_with_relation').select();
+interface GetUsersArg {
+  searchQuery: string;
+}
+
+async function getUsers({ searchQuery }: GetUsersArg): Promise<UsersView[]> {
+  if (searchQuery.length === 0) {
+    return Promise.resolve([]);
+  }
+
+  const { data, error } = await supabase
+    .from('users_with_relation')
+    .select()
+    .ilike('name', `%${searchQuery}%`);
 
   if (error) {
     throw new Error(error.message);
@@ -19,8 +30,8 @@ async function getUsers(): Promise<UsersView[]> {
   return data as UsersView[];
 }
 
-export const useGetUsers = () =>
+export const useGetUsers = (args: GetUsersArg) =>
   useQuery({
-    queryKey: ['getUsers'],
-    queryFn: getUsers,
+    queryKey: ['getUsers', args.searchQuery],
+    queryFn: () => getUsers(args),
   });

@@ -1,5 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { Check, X } from '@tamagui/lucide-icons';
+import { selectUserId } from 'auth/auth.slice';
 import { ListEmptyComponent } from 'components/ListEmptyComponent';
 import { RefreshControl } from 'react-native';
 import { UserRow } from 'social/components/UserRow';
@@ -9,12 +10,14 @@ import {
   useGetFriendRequests,
 } from 'social/queries/getFriendRequests';
 import type { CommonPageProps } from 'social/routes/social';
+import { useAppSelector } from 'store/hooks';
 import { Spinner, View, XStack } from 'tamagui';
 import { showToast } from 'util/toast';
 
 export function FriendRequestPage(props: CommonPageProps) {
+  const userId = useAppSelector(selectUserId);
   const { data, isRefetching, refetch, isError, isFetching } =
-    useGetFriendRequests();
+    useGetFriendRequests(userId);
   const { mutateAsync: acceptFriendRequest } = useAcceptFriendRequest();
 
   async function acceptRequest(requestId: number) {

@@ -1,17 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from 'lib/supabase/supabase.init';
 
-async function getFriends() {
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-
-  if (userError) {
-    throw new Error(userError.message);
-  }
-
+async function getFriends(userId: string) {
   const { data, error } = await supabase
     .from('user_friends')
     .select('request_id, profiles!inner(id, name, avatar_url)')
-    .eq('user_id', userData.user.id);
+    .eq('user_id', userId);
 
   if (error) {
     throw new Error(error.message);
@@ -30,8 +24,8 @@ async function getFriends() {
   return res;
 }
 
-export const useGetFriends = () =>
+export const useGetFriends = (userId: string) =>
   useQuery({
     queryKey: ['friends'],
-    queryFn: getFriends,
+    queryFn: () => getFriends(userId),
   });

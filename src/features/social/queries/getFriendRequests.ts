@@ -10,13 +10,9 @@ export interface RecievedFriendRequest {
   sender_profile: Tables<'profiles'>;
 }
 
-async function getFriendRequests(): Promise<RecievedFriendRequest[]> {
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-
-  if (userError) {
-    throw new Error(userError.message);
-  }
-
+async function getFriendRequests(
+  userId: string,
+): Promise<RecievedFriendRequest[]> {
   const { data, error } = await supabase
     .from('friend_requests')
     .select(`
@@ -25,7 +21,7 @@ async function getFriendRequests(): Promise<RecievedFriendRequest[]> {
         status,
         sender_profile:profiles!friend_requests_sender_user_id_fkey (id, name, avatar_url)
       `)
-    .neq('sender_user_id', userData.user.id)
+    .neq('sender_user_id', userId)
     .eq('status', 'pending');
 
   if (error) {
@@ -37,8 +33,8 @@ async function getFriendRequests(): Promise<RecievedFriendRequest[]> {
   ) as RecievedFriendRequest[];
 }
 
-export const useGetFriendRequests = () =>
+export const useGetFriendRequests = (userId: string) =>
   useQuery({
     queryKey: ['friendRequests'],
-    queryFn: getFriendRequests,
+    queryFn: () => getFriendRequests(userId),
   });
