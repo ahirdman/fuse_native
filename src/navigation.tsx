@@ -24,11 +24,11 @@ import { AppDrawer } from 'features/navigation/components/Drawer';
 import { FullScreenHeader } from 'features/navigation/components/FullScreenHeader';
 import { SocialStack } from 'features/social/social.stack';
 import { AddFuseTag } from 'fuse/routes/AddFuse';
+import { Profile } from 'social/routes/Profile';
 import { TagStack } from 'tag/tag.stack';
 import { LibraryStack } from 'track/library.stack';
 import { AddTag } from 'track/routes/AddTag';
 import { Track } from 'track/routes/Track';
-import { Profile } from 'user/routes/Profile';
 import { Settings } from 'user/routes/Settings';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();

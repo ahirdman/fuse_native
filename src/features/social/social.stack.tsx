@@ -5,7 +5,7 @@ import { AvatarButton } from 'navigation/components/AvatarButton';
 import { useAppSelector } from 'store/hooks';
 
 import { TabHeader } from 'features/navigation/components/TabHeader';
-import { Profile } from 'user/routes/Profile';
+import { Profile } from 'social/routes/Profile';
 import { useGetAvatarUrl } from './queries/getSignedAvatarUrl';
 import { SearchUsersView } from './routes/SearchUsers';
 import { Social } from './routes/social';

@@ -30,7 +30,7 @@ async function getTags(userId: string): Promise<Tables<'tags'>[]> {
 
 export const useGetTags = (userId: string) =>
   useQuery({
-    queryKey: tagKeys.lists(), // TODO: Add userId as query key variable
+    queryKey: tagKeys.lists(userId),
     queryFn: () => getTags(userId),
   });
 
@@ -58,10 +58,11 @@ export const useGetTag = ({ id }: UseGetTagArgs) =>
     queryFn: () => getTag(id),
   });
 
-async function getTagsWithTrackIds() {
+async function getTagsWithTrackIds(userId: string) {
   const { data, error } = await supabase
     .from('tags_with_track_ids')
     .select()
+    .eq('user_id', userId)
     .returns<TagsWithTrackIdsQuery[]>();
 
   if (error) {
@@ -73,14 +74,16 @@ async function getTagsWithTrackIds() {
 
 interface UseGetTagsWithTrackIdsArgs {
   excledeTrackId: string;
+  userId: string;
 }
 
 export const useGetTagsWithTrackIds = ({
   excledeTrackId,
+  userId,
 }: UseGetTagsWithTrackIdsArgs) =>
   useQuery({
-    queryKey: tagKeys.list(excledeTrackId),
-    queryFn: getTagsWithTrackIds,
+    queryKey: tagKeys.list(userId, excledeTrackId),
+    queryFn: () => getTagsWithTrackIds(userId),
     select: (data) =>
       data.filter(
         (tag) => !tag.track_ids?.some((trackId) => trackId === excledeTrackId),

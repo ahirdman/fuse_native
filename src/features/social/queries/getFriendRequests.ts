@@ -33,8 +33,25 @@ async function getFriendRequests(
   ) as RecievedFriendRequest[];
 }
 
-export const useGetFriendRequests = (userId: string) =>
+export const useGetFriendRequests = <T = RecievedFriendRequest[]>(
+  userId: string,
+  select?: (data: RecievedFriendRequest[]) => T,
+) =>
   useQuery({
     queryKey: ['friendRequests'],
     queryFn: () => getFriendRequests(userId),
+    select,
   });
+
+interface IsPendingRequestArgs {
+  userId: string;
+  profileId: string;
+}
+
+export const useIsPendingRequest = ({
+  userId,
+  profileId,
+}: IsPendingRequestArgs) =>
+  useGetFriendRequests(userId, (data) =>
+    data.find((request) => request.sender_profile.id === profileId),
+  );
