@@ -19,9 +19,14 @@ export const spotifyService = axios.create({
 
 spotifyService.interceptors.request.use(async (request) => {
   const controller = new AbortController();
-  const { spotifyToken, user } = store.getState().auth;
+  const { spotifyToken } = store.getState().auth;
+  const authHeader = request.headers.get("Authorization")
 
-  if (!spotifyToken || !user) {
+  if (authHeader) {
+    return request
+  }
+
+  if (!spotifyToken) {
     throw new Error('State is not properly hydrated');
   }
 
