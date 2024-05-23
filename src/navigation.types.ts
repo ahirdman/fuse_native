@@ -81,15 +81,17 @@ export type FriendsTabParamList = {
   Friends: undefined;
   Search: undefined;
   Profile: { userId: string };
+  Tag: {
+    id: number;
+    name: string;
+    color: string;
+  };
 };
 
 export type FriendsTabScreenProps<T extends keyof FriendsTabParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<FriendsTabParamList, T>,
-    CompositeScreenProps<
-      DrawerScreenProps<DrawerParamList>,
-      RootStackScreenProps<keyof RootStackParamList>
-    >
+    RootStackScreenProps<keyof RootStackParamList>
   >;
 
 /*
