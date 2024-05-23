@@ -5,4 +5,5 @@ export const tagKeys = {
     [...tagKeys.lists(userId), { filter }] as const,
   details: () => [...tagKeys.all, 'detail'] as const,
   detail: (id: number) => [...tagKeys.details(), id] as const,
+  tracks: (tagId: number) => [...tagKeys.detail(tagId), 'tracks'],
 };
