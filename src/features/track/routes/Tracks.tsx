@@ -8,7 +8,6 @@ import { XStack, YStack } from 'tamagui';
 import { useDebounce } from 'hooks/useDebounce';
 import type { LibraryTabScreenProps } from 'navigation.types';
 
-import { StyledImage } from 'components/Image';
 import { InputField } from 'components/InputField';
 import { ListEmptyComponent } from 'components/ListEmptyComponent';
 import { ListFooterComponent } from 'components/ListFooter';
@@ -23,7 +22,6 @@ import type { SpotifyTrack } from 'track/track.interface';
 const ITEM_HEIGHT = 44;
 const SEPERATOR_HEIGHT = 8;
 const ROW_HEIGHT = ITEM_HEIGHT + SEPERATOR_HEIGHT / 2;
-const spotifyLogo = require('../../../../assets/icons/Spotify_Logo_White.png');
 
 export function Tracks({ navigation }: LibraryTabScreenProps<'Tracks'>) {
   const [availableRows, setAvailableRows] = useState<number>();
@@ -108,41 +106,28 @@ export function Tracks({ navigation }: LibraryTabScreenProps<'Tracks'>) {
 
   return (
     <YStack fullscreen bg="$primary700">
-      <YStack
+      <XStack
         bg="$primary300"
         px={8}
         borderBottomColor="$border400"
         borderWidth={0.5}
-        gap={15}
         py={8}
+        onLayout={(event) => handleListHeight(event.nativeEvent.layout.height)}
+        gap={8}
       >
-        <StyledImage
-          source={spotifyLogo}
-          h={30}
-          width="$full"
-          contentFit="contain"
+        <FilterMenu
+          filterTags={filterTaggedTracks}
+          setFilterTags={onFilterToggle}
         />
-
-        <XStack
-          onLayout={(event) =>
-            handleListHeight(event.nativeEvent.layout.height)
-          }
-          gap={8}
-        >
-          <FilterMenu
-            filterTags={filterTaggedTracks}
-            setFilterTags={onFilterToggle}
-          />
-          <InputField
-            controlProps={{ control, name: 'trackFilter' }}
-            placeholder="Search for artists or track names"
-            autoCorrect={false}
-            autoCapitalize="none"
-            stackProps={{ flex: 3 }}
-            iconLeft={<Search color="$border300" size={18} />}
-          />
-        </XStack>
-      </YStack>
+        <InputField
+          controlProps={{ control, name: 'trackFilter' }}
+          placeholder="Search for artists or track names"
+          autoCorrect={false}
+          autoCapitalize="none"
+          stackProps={{ flex: 3 }}
+          iconLeft={<Search color="$border300" size={18} />}
+        />
+      </XStack>
 
       <FlashList
         data={tracks ?? []}

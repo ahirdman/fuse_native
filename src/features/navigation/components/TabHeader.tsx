@@ -29,16 +29,21 @@ export function TabHeader(props: Props) {
       </Stack>
 
       <Stack f={4}>
-        <H6
-          fontWeight="bold"
-          fontSize="$8"
-          lineHeight="$8"
-          textAlign="center"
-          textTransform="uppercase"
-          color="$brandDark"
-        >
-          {props.route.name}
-        </H6>
+        {props.options.headerTitle &&
+        typeof props.options.headerTitle !== 'string' ? (
+          props.options.headerTitle({ children: '' })
+        ) : (
+          <H6
+            fontWeight="bold"
+            fontSize="$8"
+            lineHeight="$8"
+            textAlign="center"
+            textTransform="uppercase"
+            color="$brandDark"
+          >
+            {props.route.name}
+          </H6>
+        )}
       </Stack>
 
       <Stack f={1} jc="center" ai="center">
