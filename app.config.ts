@@ -40,7 +40,7 @@ const common: Partial<ExpoConfig> = {
   },
   platforms: ['ios'],
   runtimeVersion: {
-    policy: 'nativeVersion',
+    policy: 'fingerprint',
   },
   extra: {
     eas: {
