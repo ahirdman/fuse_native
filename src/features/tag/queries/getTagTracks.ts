@@ -34,7 +34,7 @@ interface UseGetTagTracksArgs {
 
 export const useGetTagTracks = ({ tagId }: UseGetTagTracksArgs) =>
   useQuery({
-    queryKey: tagKeys.detail(tagId),
+    queryKey: tagKeys.tracks(tagId),
     queryFn: () => getTagTracks(tagId),
     select: (data) => {
       return sanitizeSpotifyTracks(data);
