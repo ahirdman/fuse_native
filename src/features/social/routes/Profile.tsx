@@ -3,7 +3,7 @@ import { Check, X } from '@tamagui/lucide-icons';
 import { Button, H1, XStack, YStack } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database.interface';
-import type { DrawerStackScreenProps } from 'navigation.types';
+import type { FriendsTabScreenProps } from 'navigation.types';
 
 import { selectUserId } from 'auth/auth.slice';
 import { Alert } from 'components/Alert';
@@ -20,13 +20,17 @@ import { TagRow } from 'tag/components/TagRow';
 import { useGetTags } from 'tag/queries/getTags';
 import { showToast } from 'util/toast';
 
-type Props = DrawerStackScreenProps<'Profile'>;
+type Props = FriendsTabScreenProps<'Profile'>;
 
-export function Profile({ route }: Props) {
+export function Profile({ route, navigation }: Props) {
   const { data: user } = useGetUser(route.params.userId);
   const { data: avatarUrl } = useGetAvatarUrl(user?.avatar_url);
 
   const isFriend = user?.relation === 'friend';
+
+  function onTagPresa(id: number, name: string, color: string) {
+    navigation.push('Tag', { id, name, color });
+  }
 
   if (!user) {
     return (
@@ -57,7 +61,7 @@ export function Profile({ route }: Props) {
       </YStack>
 
       {isFriend ? (
-        <FriendProfile user={user} />
+        <FriendProfile user={user} onTagPress={onTagPresa} />
       ) : (
         <NonFriendProfile user={user} />
       )}
@@ -67,11 +71,22 @@ export function Profile({ route }: Props) {
 
 type ProfileProps = { user: UsersView };
 
-function FriendProfile({ user }: ProfileProps) {
+function FriendProfile({
+  user,
+  onTagPress,
+}: ProfileProps & {
+  onTagPress(id: number, name: string, color: string): void;
+}) {
   const { data } = useGetTags(user.id);
 
   function renderItem({ item }: { item: Tables<'tags'> }) {
-    return <TagRow color={item.color} name={item.name} />;
+    return (
+      <TagRow
+        color={item.color}
+        name={item.name}
+        onPress={() => onTagPress(item.id, item.name, item.color)}
+      />
+    );
   }
 
   return (

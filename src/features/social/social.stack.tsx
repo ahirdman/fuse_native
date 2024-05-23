@@ -6,6 +6,7 @@ import { useAppSelector } from 'store/hooks';
 
 import { TabHeader } from 'features/navigation/components/TabHeader';
 import { Profile } from 'social/routes/Profile';
+import { TagView } from 'tag/routes/Tag';
 import { useGetAvatarUrl } from './queries/getSignedAvatarUrl';
 import { SearchUsersView } from './routes/SearchUsers';
 import { Social } from './routes/social';
@@ -37,6 +38,7 @@ export function SocialStack() {
       />
       <SocialNav.Screen name="Search" component={SearchUsersView} />
       <SocialNav.Screen name="Profile" component={Profile} />
+      <SocialNav.Screen name="Tag" component={TagView} />
     </SocialNav.Navigator>
   );
 }

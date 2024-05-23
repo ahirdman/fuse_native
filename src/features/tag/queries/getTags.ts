@@ -46,8 +46,11 @@ async function getTag(id: number): Promise<Tables<'tags'>> {
     .single();
 
   if (error) {
+    console.error(error);
     throw new Error(error.message);
   }
+
+  console.debug('DATA', data);
 
   return data;
 }
@@ -66,8 +69,11 @@ async function getTagsWithTrackIds(userId: string) {
     .returns<TagsWithTrackIdsQuery[]>();
 
   if (error) {
+    console.error('TRACK ERR', error);
     throw new Error(error.message);
   }
+
+  console.debug('TRACKS', data);
 
   return data;
 }
