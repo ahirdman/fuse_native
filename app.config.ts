@@ -38,6 +38,7 @@ const common: Partial<ExpoConfig> = {
   updates: {
     url: 'https://u.expo.dev/deeb4c71-d291-4e30-b509-43b38582400a',
   },
+  platforms: ['ios'],
   runtimeVersion: {
     policy: 'nativeVersion',
   },
