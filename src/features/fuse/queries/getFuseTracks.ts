@@ -86,13 +86,15 @@ async function getFuseTracks({ id }: { id: number }) {
     throw new Error(tag2Error.message);
   }
 
-  const commonTracks = tag1TrackIds
-    .filter(({ track_id: id1 }) =>
-      tag2TrackIds.some(({ track_id: id2 }) => id1 === id2),
-    )
-    .map((item) => item.track_id);
+  // const commonTracks = tag1TrackIds
+  //   .filter(({ track_id: id1 }) =>
+  //     tag2TrackIds.some(({ track_id: id2 }) => id1 === id2),
+  //   )
+  //   .map((item) => item.track_id);
 
-  const result = await getSpotifyTracks(commonTracks);
+  const tag1ids = tag1TrackIds.map((tag) => tag.track_id);
+  const tag2ids = tag2TrackIds.map((tag) => tag.track_id);
+  const result = await getSpotifyTracks([...tag1ids, ...tag2ids]);
 
   return result;
 }

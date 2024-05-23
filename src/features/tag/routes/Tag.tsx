@@ -33,13 +33,15 @@ import { Alert } from 'components/Alert';
 import { BottomSheet, type BottomSheetMethods } from 'components/BottomSheet';
 import { ListFooterComponent } from 'components/ListFooter';
 import { Text } from 'components/Text';
+import { useCreateFuseTag } from 'fuse/queries/createFuse';
 import { useAppSelector } from 'store/hooks';
+import { TagBadge } from 'tag/components/TagBadge';
 import { TagRow } from 'tag/components/TagRow';
 import { TagForm } from 'tag/components/Tagform';
 import { TagEditMenu } from 'tag/components/tag.menu';
 import { useDeleteTag } from 'tag/queries/deleteTag';
 import { useGetTagTracks } from 'tag/queries/getTagTracks';
-import { useGetTag } from 'tag/queries/getTags';
+import { useGetTag, useGetTags } from 'tag/queries/getTags';
 import { type TagSyncStatus, useSyncPlaylist } from 'tag/queries/playlist';
 import { useUpdateTag } from 'tag/queries/updateTag';
 import { TracksList } from 'track/components/TrackList';
@@ -63,6 +65,7 @@ export function TagView({
   } = useGetTagTracks({ tagId: params.id });
 
   const infoBottomSheet = useRef<BottomSheetMethods>(null);
+  const fuseBottomSheet = useRef<BottomSheetMethods>(null);
 
   const listDuration = formatMsDuration(
     selectedTagTracks
@@ -109,6 +112,12 @@ export function TagView({
             tagTracks={selectedTagTracks}
             openInfoSheet={() => infoBottomSheet.current?.expand()}
           />
+        )}
+
+        {isFriendsTag && (
+          <Button onPress={() => fuseBottomSheet.current?.expand()}>
+            Fuse Tag
+          </Button>
         )}
       </YStack>
 
@@ -165,6 +174,12 @@ export function TagView({
 
       {!isFriendsTag && <EditTagSheet tag={selectedTag} />}
 
+      {isFriendsTag && (
+        <BottomSheet ref={fuseBottomSheet}>
+          <FuseSheet tagId={selectedTag.id} />
+        </BottomSheet>
+      )}
+
       <BottomSheet ref={infoBottomSheet}>
         <YStack gap={12}>
           <H4>Syncing Playlists</H4>
@@ -175,6 +190,33 @@ export function TagView({
           </Paragraph>
         </YStack>
       </BottomSheet>
+    </YStack>
+  );
+}
+
+interface FuseSheetProps {
+  tagId: number;
+}
+
+function FuseSheet({ tagId }: FuseSheetProps) {
+  const userId = useAppSelector(selectUserId);
+  const { mutate: createFuse } = useCreateFuseTag();
+  const { data } = useGetTags(userId);
+
+  return (
+    <YStack gap={12}>
+      <H4>Select Tag to Fuse with</H4>
+
+      {data?.map((tag) => (
+        <TagBadge
+          name={tag.name}
+          color={tag.color}
+          key={tag.id}
+          onPress={() =>
+            createFuse({ initialTagId: tagId, matchedTagId: tag.id })
+          }
+        />
+      ))}
     </YStack>
   );
 }

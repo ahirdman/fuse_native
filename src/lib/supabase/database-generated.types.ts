@@ -458,13 +458,6 @@ export interface Database {
         Relationships: [
           {
             foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
             columns: ["initial_tag_id"]
             isOneToOne: false
             referencedRelation: "tags"
@@ -474,26 +467,33 @@ export interface Database {
             foreignKeyName: "trackTags_tag_id_fkey"
             columns: ["id"]
             isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trackTags_tag_id_fkey"
+            columns: ["initial_tag_id"]
+            isOneToOne: false
             referencedRelation: "initial_tags_with_matches"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["id"]
+            columns: ["initial_tag_id"]
             isOneToOne: false
             referencedRelation: "tags_with_track_ids"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["initial_tag_id"]
+            columns: ["id"]
             isOneToOne: false
             referencedRelation: "initial_tags_with_matches"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["initial_tag_id"]
+            columns: ["id"]
             isOneToOne: false
             referencedRelation: "tags_with_track_ids"
             referencedColumns: ["id"]
