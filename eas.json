@@ -12,12 +12,16 @@
       "distribution": "internal",
       "developmentClient": true,
       "ios": {
+        "image": "latest",
         "simulator": true
       }
     },
     "test": {
       "env": {
         "EAS_ENV": "test"
+      },
+      "ios": {
+        "image": "latest"
       },
       "channel": "test",
       "distribution": "internal",
@@ -27,6 +31,9 @@
       "channel": "production",
       "env": {
         "EAS_ENV": "production"
+      },
+      "ios": {
+        "image": "latest"
       }
     }
   },
