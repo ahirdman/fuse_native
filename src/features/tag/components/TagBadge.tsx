@@ -11,8 +11,8 @@ export function TagBadge({ name, color, ...props }: TagProps) {
   const badgeBackgroundColor = hexToRGBA(color, 0.1);
 
   return (
-    <StyledTag borderColor={color} bg={badgeBackgroundColor} {...props}>
-      <Paragraph color={color}>{name}</Paragraph>
+    <StyledTag bg={badgeBackgroundColor} {...props}>
+      <Paragraph fontWeight="bold" color={color}>{name}</Paragraph>
     </StyledTag>
   );
 }
