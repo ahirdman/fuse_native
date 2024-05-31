@@ -1,8 +1,8 @@
 import { FlashList } from '@shopify/flash-list';
-import { useCallback, useRef, useState } from 'react';
-import { Animated, RefreshControl, StyleSheet } from 'react-native';
+import { useState } from 'react';
+import { RefreshControl, StyleSheet } from 'react-native';
 import PagerView from 'react-native-pager-view';
-import { H6, Paragraph, XStack, YStack } from 'tamagui';
+import { Paragraph, XStack, YStack } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database-generated.types';
 import type { TagTabScreenProps } from 'navigation.types';
@@ -11,17 +11,18 @@ import { useAppSelector } from 'store/hooks';
 import { selectUserId } from 'auth/auth.slice';
 import { SectionButton } from 'components/SectionButton';
 import { type FuseTagRowRes, useGetFuseLists } from 'fuse/queries/getFuseLists';
+import { usePager } from 'hooks/usePager';
+import { PagerChips } from 'social/components/PagerChips';
 import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagRow } from 'tag/components/TagRow';
 import { useGetTags } from 'tag/queries/getTags';
 
-const AnimatedPager = Animated.createAnimatedComponent(PagerView);
+const pagerScreens = ['tags', 'fuse tags'];
 
 export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
   const [activePageIndex, setActivePageIndex] = useState(0);
   const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
-
-  const pagerRef = useRef<PagerView>(null);
+  const { ref, setPage } = usePager();
 
   function handleCreateFuse() {
     navigation.navigate('AddFuseTag');
@@ -39,11 +40,6 @@ export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
     navigation.navigate('FuseList', { id, name });
   }
 
-  const setPage = useCallback(
-    (page: number) => pagerRef.current?.setPage(page),
-    [],
-  );
-
   return (
     <YStack fullscreen bg="$primary700" px={12} pt={8} gap={12}>
       <XStack justifyContent="space-between" bg="$colorTransparent">
@@ -51,46 +47,19 @@ export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
         <SectionButton title="Create Fuse" onPress={handleCreateFuse} />
       </XStack>
 
-      <YStack
-        flex={1}
-        bg="$primary800"
-        borderTopLeftRadius={12}
-        borderTopRightRadius={12}
-      >
-        <XStack p={12} mb={3}>
-          <H6
-            fontSize="$4"
-            textTransform="uppercase"
-            color={activePageIndex === 0 ? 'white' : '$border300'}
-            textAlign="center"
-            flex={1}
-            onPress={() => setPage(0)}
-            pressStyle={{
-              color: '$brandDark',
-            }}
-          >
-            Tags
-          </H6>
+      <YStack flex={1}>
+        <PagerChips
+          pages={pagerScreens}
+          activePageIndex={activePageIndex}
+          setPage={setPage}
+          mb={12}
+          mx={52}
+        />
 
-          <H6
-            fontSize="$4"
-            flex={1}
-            textTransform="uppercase"
-            color={activePageIndex === 1 ? 'white' : '$border300'}
-            textAlign="center"
-            onPress={() => setPage(1)}
-            pressStyle={{
-              color: '$brandDark',
-            }}
-          >
-            Fuse Lists
-          </H6>
-        </XStack>
-
-        <AnimatedPager
+        <PagerView
           initialPage={0}
           style={{ flex: 1 }}
-          ref={pagerRef}
+          ref={ref}
           onPageSelected={(e) => setActivePageIndex(e.nativeEvent.position)}
         >
           <YStack key="tag-lists" width="100%" height="100%" minHeight={40}>
@@ -100,7 +69,7 @@ export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
           <YStack key="fuse-lists" width="100%" height="100%">
             <FuseList onRowPress={handleFuseRowPress} />
           </YStack>
-        </AnimatedPager>
+        </PagerView>
       </YStack>
 
       <CreateTagSheet
@@ -190,7 +159,7 @@ function FuseList({ onRowPress }: FuseListProps) {
   const ItemSeparatorComponent = () => <XStack h={8} />;
 
   function ListEmpytComponent() {
-    return <Paragraph textAlign="center">No fuse lists created</Paragraph>;
+    return <Paragraph textAlign="center">No fuse tags created.</Paragraph>;
   }
 
   return (
