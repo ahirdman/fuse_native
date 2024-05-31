@@ -18,6 +18,8 @@ import { Text } from 'components/Text';
 import type { RootStackScreenProps } from 'navigation.types';
 
 import { Blur, Canvas, Image, useImage } from '@shopify/react-native-skia';
+import { selectUserId } from 'auth/auth.slice';
+import { useAppSelector } from 'store/hooks';
 import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagBadge } from 'tag/components/TagBadge';
 import { useGetTrack } from 'track/queries/getTrack';
@@ -117,7 +119,6 @@ function AlbumArtworkWithBackground({ image }: BlurImageFilterProps) {
   );
 }
 
-const spotifyIcon = require('../../../../assets/icons/Spotify_Icon_White.png');
 const spotifyAppStoreUrl =
   'https://apps.apple.com/id/app/spotify-music-and-podcasts/id324684580';
 
@@ -160,7 +161,11 @@ function TrackInfo({ track }: TrackInfoProps) {
         pressStyle={{ bg: '$brandDark' }}
         onPress={track.uri ? () => handleOpenSpotify(track.uri) : undefined}
       >
-        <StyledImage source={spotifyIcon} h={20} w={20} />
+        <StyledImage
+          source={require('../../../../assets/icons/Spotify_Icon_White.png')}
+          h={20}
+          w={20}
+        />
 
         <Text
           fontSize="$4"
@@ -187,12 +192,13 @@ interface TrackTagsProps {
 }
 
 function TrackTags({ trackId }: TrackTagsProps) {
+  const userId = useAppSelector(selectUserId);
   const { mutate: removeTagFromTrack } = useRemoveTagFromTrack();
   const {
     data: trackTags,
     isLoading: trackTagsLoading,
     isError: trackTagsError,
-  } = useGetTrackTags(trackId);
+  } = useGetTrackTags({ trackId, userId });
 
   return (
     <YStack justifyContent="space-between" flex={1}>

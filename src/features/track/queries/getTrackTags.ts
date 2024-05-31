@@ -5,15 +5,18 @@ import { trackTagKeys } from './keys';
 
 interface GetTrackTagsArgs {
   trackId: string;
+  userId: string;
 }
 
 async function getTrackTags({
   trackId,
+  userId,
 }: GetTrackTagsArgs): Promise<NonNullable<Tables<'tags'>[]>> {
   const { data, error } = await supabase
     .from('trackTags')
     .select('tags(*)')
-    .eq('track_id', trackId);
+    .eq('track_id', trackId)
+    .eq('user_id', userId);
 
   if (error) {
     throw new Error(error.message);
@@ -26,8 +29,8 @@ async function getTrackTags({
   return transformedData;
 }
 
-export const useGetTrackTags = (trackId: string) =>
+export const useGetTrackTags = ({ userId, trackId }: GetTrackTagsArgs) =>
   useQuery({
     queryKey: trackTagKeys.track(trackId),
-    queryFn: () => getTrackTags({ trackId }),
+    queryFn: () => getTrackTags({ trackId, userId }),
   });
