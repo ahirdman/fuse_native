@@ -11,7 +11,7 @@ import type { SpotifyTrackDto } from 'track/track.interface';
 async function getTagTracks(id: number): Promise<SpotifyTrackDto[]> {
   const { data, error } = await supabase
     .from('tags_with_track_ids')
-    .select('track_ids')
+    .select()
     .eq('id', id)
     .single();
 

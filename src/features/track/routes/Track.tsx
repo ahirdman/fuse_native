@@ -24,7 +24,7 @@ import { useGetTrack } from 'track/queries/getTrack';
 import { useGetTrackTags } from 'track/queries/getTrackTags';
 import { useIsSpotifyInstalled } from 'track/queries/isSpotifyInstalled';
 import { useRemoveTagFromTrack } from 'track/queries/removeTagFromTrack';
-import { SpotifyTrack } from 'track/track.interface';
+import type { SpotifyTrack } from 'track/track.interface';
 
 export function Track({
   route: {
@@ -33,7 +33,6 @@ export function Track({
   navigation,
 }: RootStackScreenProps<'Track'>) {
   const { data: track, isLoading, isError } = useGetTrack(trackId);
-
 
   const insets = useSafeAreaInsets();
   const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
@@ -54,7 +53,7 @@ export function Track({
     );
   }
 
-  const albumCoverUrl = track?.albumCovers[0]?.url
+  const albumCoverUrl = track?.albumCovers[0]?.url;
 
   return (
     <YStack bg="$primary700" fullscreen gap={12} pb={insets.bottom}>
@@ -80,10 +79,7 @@ export function Track({
         <Button flex={1} onPress={() => setCreateTagSheetOpen(true)}>
           Create new tag
         </Button>
-        <Button
-          flex={1}
-          onPress={() => navigation.push('AddTag', { trackId })}
-        >
+        <Button flex={1} onPress={() => navigation.push('AddTag', { trackId })}>
           Add existing tag
         </Button>
       </XStack>
@@ -103,7 +99,7 @@ interface BlurImageFilterProps {
 
 function AlbumArtworkWithBackground({ image }: BlurImageFilterProps) {
   const parsedImage = useImage(image);
-  const insets = useSafeAreaInsets()
+  const insets = useSafeAreaInsets();
   if (!image) {
     return null;
   }
@@ -126,7 +122,7 @@ const spotifyAppStoreUrl =
   'https://apps.apple.com/id/app/spotify-music-and-podcasts/id324684580';
 
 interface TrackInfoProps {
-  track?: SpotifyTrack | undefined
+  track?: SpotifyTrack | undefined;
 }
 
 function TrackInfo({ track }: TrackInfoProps) {
@@ -140,7 +136,7 @@ function TrackInfo({ track }: TrackInfoProps) {
   }
 
   if (!track) {
-    return null
+    return null;
   }
 
   return (
@@ -183,11 +179,11 @@ function TrackInfo({ track }: TrackInfoProps) {
         </Text>
       </XStack>
     </YStack>
-  )
+  );
 }
 
 interface TrackTagsProps {
-  trackId: string
+  trackId: string;
 }
 
 function TrackTags({ trackId }: TrackTagsProps) {
@@ -262,9 +258,8 @@ function TrackTags({ trackId }: TrackTagsProps) {
           )}
         </ScrollView>
       </YStack>
-
     </YStack>
-  )
+  );
 }
 
 interface TrackMetaDataRowProps {

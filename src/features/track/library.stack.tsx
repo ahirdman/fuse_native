@@ -7,10 +7,9 @@ import { useAppSelector } from 'store/hooks';
 import { StyledImage } from 'components/Image';
 import { TabHeader } from 'features/navigation/components/TabHeader';
 import { useGetAvatarUrl } from 'social/queries/getSignedAvatarUrl';
-import { View, XStack } from 'tamagui';
+import { XStack } from 'tamagui';
 import { Tracks } from 'track/routes/Tracks';
 
-const spotifyLogo = require('../../../assets/icons/Spotify_Logo_White.png');
 const LibraryNavigator = createNativeStackNavigator<LibraryParamList>();
 
 export function LibraryStack() {
@@ -36,7 +35,7 @@ export function LibraryStack() {
           headerTitle: () => (
             <XStack>
               <StyledImage
-                source={spotifyLogo}
+                source={require('../../../assets/icons/Spotify_Logo_White.png')}
                 h={30}
                 width="$full"
                 contentFit="contain"

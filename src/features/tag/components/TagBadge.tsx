@@ -12,14 +12,15 @@ export function TagBadge({ name, color, ...props }: TagProps) {
 
   return (
     <StyledTag bg={badgeBackgroundColor} {...props}>
-      <Paragraph fontWeight="bold" color={color}>{name}</Paragraph>
+      <Paragraph fontWeight="bold" color={color}>
+        {name}
+      </Paragraph>
     </StyledTag>
   );
 }
 
 const StyledTag = styled(View, {
   accessibilityRole: 'button',
-  borderWidth: 0.5,
   borderRadius: 4,
 
   variants: {
