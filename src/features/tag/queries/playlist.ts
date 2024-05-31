@@ -3,8 +3,10 @@ import { store } from 'store';
 
 import { useMutation } from '@tanstack/react-query';
 import { selectSpotifyUserId } from 'auth/auth.slice';
+import { queryClient } from 'lib/query/init';
 import { spotifyService } from 'services/spotify.api';
 import { showToast } from 'util/toast';
+import { tagKeys } from './keys';
 
 export async function isLatestSnapshotId(
   playlistId: string,
@@ -139,6 +141,11 @@ export const useSyncPlaylist = ({ tagStatus }: UseSyncPlaylistArgs) =>
         title: 'Something went wrong',
         preset: 'error',
         message: 'Could not create playlist',
+      });
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: tagKeys.detail(variables.id),
       });
     },
   });

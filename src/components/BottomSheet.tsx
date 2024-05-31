@@ -5,11 +5,9 @@ import React, {
   useImperativeHandle,
   useState,
 } from 'react';
-import { TouchableWithoutFeedback, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
-  type SharedValue,
-  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -90,14 +88,14 @@ const BottomSheet = forwardRef<BottomSheetMethods, BottomSheetProps>(
         }
       });
 
+    // <BackDrop
+    //   close={close}
+    //   translateY={translateY}
+    //   openHeight={openHeight}
+    //   closeHeight={closeHeight}
+    // />
     return (
       <>
-        <BackDrop
-          close={close}
-          translateY={translateY}
-          openHeight={openHeight}
-          closeHeight={closeHeight}
-        />
         <GestureDetector gesture={pan}>
           <AnimatedView
             position="absolute"
@@ -139,51 +137,51 @@ const BottomSheet = forwardRef<BottomSheetMethods, BottomSheetProps>(
   },
 );
 
-type BackDropProps = {
-  translateY: SharedValue<number>;
-  openHeight: number;
-  closeHeight: number;
-  close: () => void;
-};
-
-function BackDrop({
-  translateY,
-  openHeight,
-  closeHeight,
-  close,
-}: BackDropProps) {
-  const backDropAnimation = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      translateY.value,
-      [closeHeight, openHeight],
-      [0, 0.5],
-    );
-    const display = opacity === 0 ? 'none' : 'flex';
-
-    return {
-      opacity,
-      display,
-    };
-  });
-
-  return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        close();
-      }}
-    >
-      <AnimatedView
-        display="none"
-        bg="black"
-        position="absolute"
-        top={0}
-        left={0}
-        bottom={0}
-        right={0}
-        style={backDropAnimation}
-      />
-    </TouchableWithoutFeedback>
-  );
-}
-
+// type BackDropProps = {
+//   translateY: SharedValue<number>;
+//   openHeight: number;
+//   closeHeight: number;
+//   close: () => void;
+// };
+//
+// function BackDrop({
+//   translateY,
+//   openHeight,
+//   closeHeight,
+//   close,
+// }: BackDropProps) {
+//   const backDropAnimation = useAnimatedStyle(() => {
+//     const opacity = interpolate(
+//       translateY.value,
+//       [closeHeight, openHeight],
+//       [0, 0.5],
+//     );
+//     const display = opacity === 0 ? 'none' : 'flex';
+//
+//     return {
+//       opacity,
+//       display,
+//     };
+//   });
+//
+//   return (
+//     <TouchableWithoutFeedback
+//       onPress={() => {
+//         close();
+//       }}
+//     >
+//       <AnimatedView
+//         display="none"
+//         bg="black"
+//         position="absolute"
+//         top={0}
+//         left={0}
+//         bottom={0}
+//         right={0}
+//         style={backDropAnimation}
+//       />
+//     </TouchableWithoutFeedback>
+//   );
+// }
+//
 export { BottomSheet, type BottomSheetMethods };

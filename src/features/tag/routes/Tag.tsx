@@ -1,25 +1,27 @@
 import {
   AlertOctagon,
-  ArrowUpRight,
   CheckCircle2,
-  HelpCircle,
+  Disc,
+  Disc3,
+  Merge,
+  Plus,
   RefreshCw,
   SearchX,
+  Send,
+  Upload,
   XOctagon,
 } from '@tamagui/lucide-icons';
 import * as Linking from 'expo-linking';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { RefreshControl } from 'react-native';
 import {
-  Button,
   H4,
-  ListItem,
-  Paragraph,
   Separator,
   Spinner,
   View,
   XStack,
   YStack,
+  type YStackProps,
 } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database-generated.types';
@@ -31,12 +33,17 @@ import { useNavigation } from '@react-navigation/native';
 import { selectUserId } from 'auth/auth.slice';
 import { Alert } from 'components/Alert';
 import { BottomSheet, type BottomSheetMethods } from 'components/BottomSheet';
+import { CircleBUtton } from 'components/CircleButton';
+import { StyledImage } from 'components/Image';
 import { ListFooterComponent } from 'components/ListFooter';
+import { SectionBox } from 'components/SecitonBox';
 import { Text } from 'components/Text';
+import { UserAvatar } from 'components/UserAvatar';
 import { useCreateFuseTag } from 'fuse/queries/createFuse';
+import { useGetAvatarUrl } from 'social/queries/getSignedAvatarUrl';
+import { useGetUser } from 'social/queries/getUser';
 import { useAppSelector } from 'store/hooks';
 import { TagBadge } from 'tag/components/TagBadge';
-import { TagRow } from 'tag/components/TagRow';
 import { TagForm } from 'tag/components/Tagform';
 import { TagEditMenu } from 'tag/components/tag.menu';
 import { useDeleteTag } from 'tag/queries/deleteTag';
@@ -53,27 +60,26 @@ export function TagView({
 }: TagTabScreenProps<'Tag'>) {
   const userId = useAppSelector(selectUserId);
 
-  const { data: selectedTag, isLoading: selectedTagLoading } = useGetTag({
+  const { data: tag, isLoading: isTagLoading } = useGetTag({
     id: params.id,
   });
   const {
-    data: selectedTagTracks,
+    data: tracks,
     refetch: refetchTracks,
     isRefetching: isRefetchingTracks,
     isError: isTracksError,
     isFetching: isFetchingTracks,
   } = useGetTagTracks({ tagId: params.id });
 
-  const infoBottomSheet = useRef<BottomSheetMethods>(null);
   const fuseBottomSheet = useRef<BottomSheetMethods>(null);
 
   const listDuration = formatMsDuration(
-    selectedTagTracks
+    tracks
       ?.map((track) => track.duration)
       .reduce((acc, curr) => acc + curr, 0) ?? 0,
   );
 
-  if (selectedTagLoading) {
+  if (isTagLoading) {
     return (
       <YStack
         bg="%primary700"
@@ -86,7 +92,7 @@ export function TagView({
     );
   }
 
-  if (!selectedTag) {
+  if (!tag) {
     return (
       <YStack
         bg="%primary700"
@@ -99,124 +105,122 @@ export function TagView({
     );
   }
 
-  const isFriendsTag = selectedTag.user_id !== userId;
+  const isFriendsTag = tag.user_id !== userId;
 
   return (
     <YStack bg="$primary700" flex={1}>
+      <TagMetaData
+        tag={tag}
+        listDuration={listDuration}
+        isFriendsTag={isFriendsTag}
+      />
+
       <YStack gap={16} px={12} pt={12}>
-        <TagRow color={selectedTag.color} name={selectedTag.name} />
-
-        {selectedTagTracks && !isFriendsTag && (
-          <TagSyncSection
-            tag={selectedTag}
-            tagTracks={selectedTagTracks}
-            openInfoSheet={() => infoBottomSheet.current?.expand()}
-          />
-        )}
-
-        {isFriendsTag && (
-          <Button onPress={() => fuseBottomSheet.current?.expand()}>
-            Fuse Tag
-          </Button>
-        )}
+        <TagActions
+          tag={tag}
+          tracks={tracks}
+          isFriendsTag={isFriendsTag}
+          openFuseSheet={() => fuseBottomSheet.current?.expand()}
+        />
       </YStack>
 
-      <YStack mt={16}>
-        <XStack
-          justifyContent="space-between"
-          alignItems="center"
-          px={12}
-          gap={16}
-        >
-          <H4>Tracks</H4>
+      <Separator m={12} />
 
-          <Paragraph>{`${listDuration} min`}</Paragraph>
-        </XStack>
+      <View h="86%">
+        <TracksList
+          tracks={tracks}
+          tagId={params.id}
+          isSwipeable
+          //onEndReachedThreshold={0.3} - TODO: Paginate response from SupaBase
+          ListEmptyComponent={
+            <TagTracksListEmptyComponent
+              isError={isTracksError}
+              isFetching={isFetchingTracks}
+            />
+          }
+          ListFooterComponent={
+            isFetchingTracks && !isRefetchingTracks ? (
+              <ListFooterComponent />
+            ) : null
+          }
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetchingTracks}
+              onRefresh={refetchTracks}
+              tintColor="#F4753F"
+            />
+          }
+          onTrackPress={(trackId) =>
+            navigation.navigate('Track', {
+              trackId,
+            })
+          }
+          listStyle={{
+            paddingTop: 4,
+            paddingBottom: 8,
+          }}
+        />
+      </View>
 
-        <Separator mx={12} />
-
-        <View h="86%">
-          <TracksList
-            tracks={selectedTagTracks}
-            tagId={params.id}
-            isSwipeable
-            //onEndReachedThreshold={0.3} - TODO: Paginate response from SupaBase
-            ListEmptyComponent={
-              <TagTracksListEmptyComponent
-                isError={isTracksError}
-                isFetching={isFetchingTracks}
-              />
-            }
-            ListFooterComponent={
-              isFetchingTracks && !isRefetchingTracks ? (
-                <ListFooterComponent />
-              ) : null
-            }
-            refreshControl={
-              <RefreshControl
-                refreshing={isRefetchingTracks}
-                onRefresh={refetchTracks}
-                tintColor="#F4753F"
-              />
-            }
-            onTrackPress={(trackId) =>
-              navigation.navigate('Track', {
-                trackId,
-              })
-            }
-            listStyle={{
-              paddingTop: 4,
-              paddingBottom: 8,
-            }}
-          />
-        </View>
-      </YStack>
-
-      {!isFriendsTag && <EditTagSheet tag={selectedTag} />}
+      {!isFriendsTag && <EditTagSheet tag={tag} />}
 
       {isFriendsTag && (
         <BottomSheet ref={fuseBottomSheet}>
-          <FuseSheet tagId={selectedTag.id} />
+          <FuseSheet tagId={tag.id} />
         </BottomSheet>
       )}
-
-      <BottomSheet ref={infoBottomSheet}>
-        <YStack gap={12}>
-          <H4>Syncing Playlists</H4>
-
-          <Paragraph>
-            Fuse exports and syncs tracks that have been tagged in Fuse. Any
-            track added or removed in Spotify is not considered
-          </Paragraph>
-        </YStack>
-      </BottomSheet>
     </YStack>
   );
 }
 
-interface FuseSheetProps {
-  tagId: number;
+interface TagMetaDataProps extends Omit<YStackProps, 'tag'> {
+  tag: Tables<'tags'>;
+  listDuration: string;
+  isFriendsTag: boolean;
 }
 
-function FuseSheet({ tagId }: FuseSheetProps) {
-  const userId = useAppSelector(selectUserId);
-  const { mutate: createFuse } = useCreateFuseTag();
-  const { data } = useGetTags(userId);
+function TagMetaData({
+  tag,
+  listDuration,
+  isFriendsTag,
+  ...props
+}: TagMetaDataProps) {
+  const { data: profile } = useGetUser(tag.user_id);
+  const { data: avatarUrl } = useGetAvatarUrl(profile?.avatar_url);
+  const tagSyncStatus = getTagSyncStatus({ ...tag });
 
   return (
-    <YStack gap={12}>
-      <H4>Select Tag to Fuse with</H4>
+    <YStack gap={8} mx={12} {...props}>
+      <XStack jc="space-between" gap={8}>
+        <SectionBox>
+          <Text fontWeight="bold">Created by</Text>
+          <UserAvatar imageUrl={avatarUrl} size="small" alignSelf="flex-end" />
+        </SectionBox>
 
-      {data?.map((tag) => (
-        <TagBadge
-          name={tag.name}
-          color={tag.color}
-          key={tag.id}
-          onPress={() =>
-            createFuse({ initialTagId: tagId, matchedTagId: tag.id })
-          }
-        />
-      ))}
+        <SectionBox>
+          <Text fontWeight="bold">Tag</Text>
+          <TagBadge name={tag.name} color={tag.color} alignSelf="flex-end" />
+        </SectionBox>
+      </XStack>
+
+      <XStack jc="space-between" gap={8}>
+        <SectionBox>
+          <Text fontWeight="bold">Duration</Text>
+          <Text alignSelf="flex-end">{listDuration}</Text>
+        </SectionBox>
+
+        {isFriendsTag ? (
+          <SectionBox bg="$colorTransparent" />
+        ) : (
+          <SectionBox jc="space-between">
+            <Text fontWeight="bold">Status</Text>
+            <XStack jc="space-between">
+              <Text>{tagSyncStatus}</Text>
+              <TagStatusIcon status={tagSyncStatus} />
+            </XStack>
+          </SectionBox>
+        )}
+      </XStack>
     </YStack>
   );
 }
@@ -250,58 +254,54 @@ function TagTracksListEmptyComponent({
 
 interface TagSyncSectionProps {
   tag: Tables<'tags'>;
-  tagTracks: SpotifyTrack[];
-  openInfoSheet(): void;
+  tracks?: SpotifyTrack[] | undefined;
+  isFriendsTag: boolean;
+  openFuseSheet(): void;
 }
 
-function TagSyncSection({
+function TagActions({
   tag,
-  tagTracks,
-  openInfoSheet,
+  tracks,
+  isFriendsTag,
+  openFuseSheet,
 }: TagSyncSectionProps) {
-  const [tagStatus, setTagStatus] = useState<TagSyncStatus>();
-
+  const tagStatus = getTagSyncStatus({ ...tag });
   const { mutateAsync: syncPlaylist } = useSyncPlaylist({ tagStatus });
 
-  useEffect(() => {
-    const tagSyncStatus = getTagSyncStatus({ ...tag });
-
-    setTagStatus(tagSyncStatus);
-  }, [tag]);
-
-  function renderStatusIcon(status?: TagSyncStatus): ReactNode {
-    switch (status) {
-      case 'Unexported':
-        return <XOctagon color="$error600" />;
-      case 'Unsynced':
-        return <AlertOctagon color="$warning600" />;
-      case 'Synced':
-        return <CheckCircle2 color="$success500" />;
-      default:
-        return null;
-    }
-  }
-
   return (
-    <YStack gap={12}>
-      <ListItem
-        icon={() => renderStatusIcon(tagStatus)}
-        title={tagStatus}
-        iconAfter={<HelpCircle size={16} />}
-        onPress={openInfoSheet}
-        radiused
-      />
+    <XStack justifyContent="space-evenly">
+      {isFriendsTag && (
+        <CircleBUtton onPress={openFuseSheet} label="Fuse" icon={<Merge />} />
+      )}
 
-      <XStack justifyContent="space-between" gap={16}>
-        <Button
-          flex={1}
-          bg="$brandDark"
-          iconAfter={RefreshCw}
+      {!isFriendsTag &&
+        tag?.spotify_playlist_uri &&
+        tag.spotify_playlist_uri !== null && (
+          <CircleBUtton
+            onPress={() => Linking.openURL(tag.spotify_playlist_uri ?? '')}
+            icon={
+              <XStack>
+                <StyledImage
+                  source={require('../../../../assets/icons/Spotify_Icon_White.png')}
+                  h={30}
+                  width="$full"
+                  contentFit="contain"
+                />
+              </XStack>
+            }
+            label=" Open Spotify"
+          />
+        )}
+
+      {!isFriendsTag && !!tracks?.length && tagStatus !== 'Synced' && (
+        <CircleBUtton
+          label={tagStatus === 'Unexported' ? 'Export' : 'Sync'}
+          icon={tagStatus === 'Unexported' ? <Upload /> : <RefreshCw />}
           onPress={() =>
             syncPlaylist(
               {
                 name: tag.name,
-                tracks: tagTracks.map((track) => track.uri) ?? [],
+                tracks: tracks.map((track) => track.uri) ?? [],
                 id: tag.id,
                 type: 'tags',
                 snapshot_id: tag.latest_snapshot_id,
@@ -316,28 +316,35 @@ function TagSyncSection({
                         : 'Playlist synced',
                     preset: 'done',
                   });
-                  setTagStatus('Synced');
                 },
               },
             )
           }
-          disabled={tagStatus === 'Synced'}
-        >
-          {tagStatus === 'Unexported' ? 'Export to Spotify' : 'Sync'}
-        </Button>
+        />
+      )}
 
-        {tag?.spotify_playlist_uri && tag.spotify_playlist_uri !== null && (
-          <Button
-            flex={1}
-            onPress={() => Linking.openURL(tag.spotify_playlist_uri ?? '')}
-            iconAfter={ArrowUpRight}
-          >
-            Open in Spotify
-          </Button>
-        )}
-      </XStack>
-    </YStack>
+      {!isFriendsTag && (
+        <CircleBUtton
+          onPress={() => console.log('Not implemented')}
+          label="Add Tracks"
+          icon={<Plus />}
+        />
+      )}
+    </XStack>
   );
+}
+
+function TagStatusIcon({ status }: { status?: TagSyncStatus }) {
+  switch (status) {
+    case 'Unexported':
+      return <XOctagon color="$error600" />;
+    case 'Unsynced':
+      return <AlertOctagon color="$warning600" />;
+    case 'Synced':
+      return <CheckCircle2 color="$success500" />;
+    default:
+      return null;
+  }
 }
 
 type TagSyncStatusArgs = Pick<
@@ -415,5 +422,32 @@ function EditTagSheet({ tag }: EditTagSheetProps) {
         />
       </YStack>
     </BottomSheet>
+  );
+}
+
+interface FuseSheetProps {
+  tagId: number;
+}
+
+function FuseSheet({ tagId }: FuseSheetProps) {
+  const userId = useAppSelector(selectUserId);
+  const { mutate: createFuse } = useCreateFuseTag();
+  const { data } = useGetTags(userId);
+
+  return (
+    <YStack gap={12}>
+      <H4>Select Tag to Fuse with</H4>
+
+      {data?.map((tag) => (
+        <TagBadge
+          name={tag.name}
+          color={tag.color}
+          key={tag.id}
+          onPress={() =>
+            createFuse({ initialTagId: tagId, matchedTagId: tag.id })
+          }
+        />
+      ))}
+    </YStack>
   );
 }
