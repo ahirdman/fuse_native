@@ -40,8 +40,9 @@ export function Social({ navigation }: Props) {
         pages={pagerScreens}
         activePageIndex={activePageIndex}
         setPage={setPage}
-        m={12}
-        gap={8}
+        my={12}
+        px={8}
+        jc="center"
       />
 
       <PagerView

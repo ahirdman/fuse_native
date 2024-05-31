@@ -4,11 +4,11 @@ import {
   AnimatePresence,
   Checkbox,
   type GetProps,
-  H5,
-  Separator,
   XStack,
+  YStack,
   styled,
 } from 'tamagui';
+import { TagBadge } from './TagBadge';
 
 interface TagListRowProps extends TagRowProps {
   onPress?(): void;
@@ -28,18 +28,10 @@ export const TagRow = memo(
     ...props
   }: TagListRowProps) => {
     return (
-      <StyledTagRow {...props} onPress={onPress} justifyContent="space-between">
-        <XStack alignItems="center">
-          <Separator
-            vertical
-            borderWidth={1}
-            height={16}
-            borderColor={color}
-            ml={16}
-            mr={8}
-          />
-          <H5 color="white">{name}</H5>
-        </XStack>
+      <StyledTagRow {...props} onPress={onPress}>
+        <YStack>
+          <TagBadge name={name} color={color} />
+        </YStack>
 
         <AnimatePresence>
           {selecteble && (
@@ -76,10 +68,13 @@ type TagRowProps = GetProps<typeof StyledTagRow>;
 
 const StyledTagRow = styled(XStack, {
   borderRadius: 8,
-  elevation: 4,
-  borderWidth: 1,
+  elevation: 2,
+  borderWidth: 0.5,
   bg: '$primary700',
   borderColor: '$border500',
+  jc: 'space-between',
+  ai: 'center',
+  px: 12,
   pressStyle: {
     bg: '$primary600',
   },
@@ -88,6 +83,8 @@ const StyledTagRow = styled(XStack, {
     size: {
       small: {
         h: 40,
+        borderWidth: 0,
+        elevation: 0,
       },
       default: {
         h: 60,
