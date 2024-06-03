@@ -29,7 +29,7 @@ export function Profile({ route, navigation }: Props) {
   const isFriend = user?.relation === 'friend';
 
   function onTagPresa(id: number, name: string, color: string) {
-    navigation.push('Tag', { id, name, color });
+    navigation.push('Tag', { id, name, color, type: 'tag' });
   }
 
   if (!user) {

@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+
 import { supabase } from 'lib/supabase/supabase.init';
+
+import { fuseKeys } from 'fuse/queries/keys';
 import {
   getSpotifyTracks,
   sanitizeSpotifyTracks,
 } from 'track/queries/getTrack';
-import { fuseKeys } from './keys';
 
 interface GetFuseTracksPreviewArgs {
   initialTagId: number;
@@ -60,7 +62,7 @@ export const useGetFuseTracksPreview = (
 async function getFuseTracks({ id }: { id: number }) {
   const { error, data } = await supabase
     .from('fuseTags')
-    .select()
+    .select(`id, tags (id)`)
     .eq('id', id)
     .single();
 
@@ -68,33 +70,23 @@ async function getFuseTracks({ id }: { id: number }) {
     throw new Error(error.message);
   }
 
-  const { data: tag1TrackIds, error: tag1Error } = await supabase
-    .from('trackTags')
-    .select('track_id')
-    .eq('tag_id', data.tag_id_1);
+  const trackIdSets = await Promise.all(
+    data.tags.map(async (id) => {
+      const { data, error } = await supabase
+        .from('trackTags')
+        .select('track_id')
+        .eq('tag_id', id); // NOTE: Could maybe create q single query to check all ids at the same time
 
-  if (tag1Error) {
-    throw new Error(tag1Error.message);
-  }
+      if (error) {
+        throw new Error(error.message);
+      }
 
-  const { data: tag2TrackIds, error: tag2Error } = await supabase
-    .from('trackTags')
-    .select('track_id')
-    .eq('tag_id', data.tag_id_2);
+      return data.map((result) => result.track_id);
+    }),
+  );
 
-  if (tag2Error) {
-    throw new Error(tag2Error.message);
-  }
-
-  // const commonTracks = tag1TrackIds
-  //   .filter(({ track_id: id1 }) =>
-  //     tag2TrackIds.some(({ track_id: id2 }) => id1 === id2),
-  //   )
-  //   .map((item) => item.track_id);
-
-  const tag1ids = tag1TrackIds.map((tag) => tag.track_id);
-  const tag2ids = tag2TrackIds.map((tag) => tag.track_id);
-  const result = await getSpotifyTracks([...tag1ids, ...tag2ids]);
+  const trackIds = trackIdSets.flat();
+  const result = await getSpotifyTracks(trackIds);
 
   return result;
 }

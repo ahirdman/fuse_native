@@ -1,36 +1,25 @@
+import type { QueryData } from '@supabase/supabase-js';
 import { useQuery } from '@tanstack/react-query';
+
 import { supabase } from 'lib/supabase/supabase.init';
+
 import { fuseKeys } from './keys';
 
-export interface FuseTagRowRes {
-  id: number;
-  name: string;
-  created_at: string;
-  latest_snapshot_id: string | null;
-  spotify_playlist_id: string | null;
-  spotify_playlist_uri: string | null;
-  synced_at: string | null;
-  tag1: {
-    color: string;
-    name: string;
-    id: number;
-  };
-  tag2: {
-    color: string;
-    name: string;
-    id: number;
-  };
-}
+// NOTE: Seems wierd to be able to have to defined an expression for a type
+const fuseWithRelatedTagsQuery = supabase.from('fuseTags').select(`
+      *,
+      tags (id, name, color)
+    `);
 
-async function getFuseLists(): Promise<FuseTagRowRes[]> {
-  const { data, error } = await supabase
-    .from('fuseTags')
-    .select(`
-    *,
-    tag1:tags!tag_id_1(name, color, id),
-    tag2:tags!tag_id_2(name, color, id)
-  `)
-    .returns<FuseTagRowRes[]>();
+const singleQueryType = fuseWithRelatedTagsQuery.single();
+
+export type FuseTagWithSubTags = QueryData<typeof singleQueryType>;
+
+async function getFuseLists(): Promise<FuseTagWithSubTags[]> {
+  const { data, error } = await supabase.from('fuseTags').select(`
+      *,
+      tags (id, name, color)
+    `);
 
   if (error) {
     throw new Error(error.message);
@@ -39,8 +28,8 @@ async function getFuseLists(): Promise<FuseTagRowRes[]> {
   return data;
 }
 
-export const useGetFuseLists = <T = FuseTagRowRes[]>(
-  select?: (data: FuseTagRowRes[]) => T,
+export const useGetFuseLists = <T = FuseTagWithSubTags[]>(
+  select?: (data: FuseTagWithSubTags[]) => T,
 ) =>
   useQuery({
     queryKey: fuseKeys.lists(),

@@ -4,4 +4,5 @@ export const fuseKeys = {
   list: (filter: string) => [...fuseKeys.lists(), { filter }] as const,
   details: () => [...fuseKeys.all, 'detail'] as const,
   detail: (id: number) => [...fuseKeys.details(), id] as const,
+  tracks: (ids: number[]) => [...fuseKeys.details(), ...ids, 'tracks'],
 };

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { fuseKeys } from 'fuse/queries/keys';
 import { supabase } from 'lib/supabase/supabase.init';
 
 import { tagKeys } from 'tag/queries/keys';
@@ -8,34 +9,37 @@ import {
 } from 'track/queries/getTrack';
 import type { SpotifyTrackDto } from 'track/track.interface';
 
-async function getTagTracks(id: number): Promise<SpotifyTrackDto[]> {
-  const { data, error } = await supabase
-    .from('tags_with_track_ids')
-    .select()
-    .eq('id', id)
-    .single();
+async function getTagTracks(ids: number[]): Promise<SpotifyTrackDto[]> {
+  const trackIdSets = await Promise.all(
+    ids.map(async (id) => {
+      const { data, error } = await supabase
+        .from('trackTags')
+        .select('track_id')
+        .eq('tag_id', id); // NOTE: Could maybe create q single query to check all ids at the same time
 
-  if (error) {
-    throw new Error(error.message);
-  }
+      if (error) {
+        throw new Error(error.message);
+      }
 
-  if (!data.track_ids) {
-    return [];
-  }
+      return data.map((result) => result.track_id);
+    }),
+  );
 
-  const tracks = await getSpotifyTracks(data.track_ids);
+  const trackIds = Array.from(new Set(trackIdSets.flat()));
+  const tracks = await getSpotifyTracks(trackIds);
 
   return tracks;
 }
 
 interface UseGetTagTracksArgs {
-  tagId: number;
+  tagIds: number[];
 }
 
-export const useGetTagTracks = ({ tagId }: UseGetTagTracksArgs) =>
+export const useGetTagTracks = ({ tagIds }: UseGetTagTracksArgs) =>
   useQuery({
-    queryKey: tagKeys.tracks(tagId),
-    queryFn: () => getTagTracks(tagId),
+    queryKey:
+      tagIds.length > 1 ? fuseKeys.tracks(tagIds) : tagKeys.tracks(tagIds[0]!), //TODO: FIX
+    queryFn: () => getTagTracks(tagIds),
     select: (data) => {
       return sanitizeSpotifyTracks(data);
     },

@@ -10,7 +10,10 @@ import { useAppSelector } from 'store/hooks';
 
 import { selectUserId } from 'auth/auth.slice';
 import { SectionButton } from 'components/SectionButton';
-import { type FuseTagRowRes, useGetFuseLists } from 'fuse/queries/getFuseLists';
+import {
+  type FuseTagWithSubTags,
+  useGetFuseLists,
+} from 'fuse/queries/getFuseLists';
 import { usePager } from 'hooks/usePager';
 import { PagerChips } from 'social/components/PagerChips';
 import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
@@ -24,27 +27,27 @@ export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
   const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
   const { ref, setPage } = usePager();
 
-  function handleCreateFuse() {
-    navigation.navigate('AddFuseTag');
-  }
-
   function handleCreateTag() {
     setCreateTagSheetOpen(true);
   }
 
   function handleTagRowPress(tag: Tables<'tags'>) {
-    navigation.navigate('Tag', { ...tag });
+    navigation.navigate('Tag', { ...tag, type: 'tag' });
   }
 
-  function handleFuseRowPress({ id, name }: { id: number; name: string }) {
-    navigation.navigate('FuseList', { id, name });
+  function handleFuseRowPress({ id, name, tags }: FuseTagWithSubTags) {
+    navigation.navigate('Tag', {
+      id,
+      name,
+      type: 'fuse',
+      tagIds: tags.map((tag) => tag.id),
+    });
   }
 
   return (
     <YStack fullscreen bg="$primary700" px={12} pt={8} gap={12}>
       <XStack justifyContent="space-between" bg="$colorTransparent">
         <SectionButton title="Create Tag" onPress={handleCreateTag} />
-        <SectionButton title="Create Fuse" onPress={handleCreateFuse} />
       </XStack>
 
       <YStack flex={1}>
@@ -144,13 +147,13 @@ function FuseList({ onRowPress }: FuseListProps) {
     void refetch();
   }
 
-  const keyExtractor = (item: FuseTagRowRes) => item.id.toString();
+  const keyExtractor = (item: FuseTagWithSubTags) => item.id.toString();
 
-  const renderItem = ({ item }: { item: FuseTagRowRes }) => {
+  const renderItem = ({ item }: { item: FuseTagWithSubTags }) => {
     return (
       <TagRow
         name={item.name}
-        color={item.tag1.color}
+        color={item.tags[0]!.color}
         onPress={() => onRowPress({ ...item })}
       />
     );

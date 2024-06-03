@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
+import { fuseKeys } from 'fuse/queries/keys';
 
-import type { Tables } from 'lib/supabase/database.interface';
+import type {
+  Enums,
+  Tables,
+  UntionFuseTable,
+  UntionTagTable,
+} from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
 
 import { tagKeys } from 'tag/queries/keys';
@@ -19,7 +25,7 @@ async function getTags(userId: string): Promise<Tables<'tags'>[]> {
   const { data, error } = await supabase
     .from('tags')
     .select()
-    .eq('user_id', userId);
+    .eq('created_by', userId);
 
   if (error) {
     throw new Error(error.message);
@@ -36,26 +42,52 @@ export const useGetTags = (userId: string) =>
 
 interface UseGetTagArgs {
   id: number;
+  type: Enums<'tag_type'>;
 }
 
-async function getTag(id: number): Promise<Tables<'tags'>> {
-  const { data, error } = await supabase
-    .from('tags')
-    .select()
-    .eq('id', id)
-    .single();
+async function getTag({
+  id,
+  type,
+}: UseGetTagArgs): Promise<UntionTagTable | UntionFuseTable> {
+  if (type === 'tag') {
+    const { data, error } = await supabase
+      .from('tags')
+      .select()
+      .eq('id', id)
+      .single();
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { ...data, type: 'tag' };
   }
 
-  return data;
+  if (type === 'fuse') {
+    const { data, error } = await supabase
+      .from('fuseTags')
+      .select(`
+      *,
+      tags (id, name, color)
+    `)
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { ...data, type: 'fuse' };
+  }
+
+  throw new Error('Empty result');
 }
 
-export const useGetTag = ({ id }: UseGetTagArgs) =>
+export const useGetTag = (args: UseGetTagArgs) =>
   useQuery({
-    queryKey: tagKeys.detail(id),
-    queryFn: () => getTag(id),
+    queryKey:
+      args.type === 'tag' ? tagKeys.detail(args.id) : fuseKeys.detail(args.id),
+    queryFn: () => getTag(args),
   });
 
 async function getTagsWithTrackIds(userId: string) {

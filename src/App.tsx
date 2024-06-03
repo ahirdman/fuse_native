@@ -27,6 +27,7 @@ import { store } from 'store';
 import tamaguiConfig from '../tamagui.config';
 import RootNavigationStack from './navigation';
 
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAppDataLoader } from 'auth/hooks/useAppDataLoader';
 
 init(config.aptabase.apiKey);
@@ -67,8 +68,10 @@ export default function App() {
       <ReduxProvider store={store}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <TamaguiProvider config={tamaguiConfig}>
-            <StatusBar style="light" />
-            <RootNavigationStack />
+            <BottomSheetModalProvider>
+              <StatusBar style="light" />
+              <RootNavigationStack />
+            </BottomSheetModalProvider>
           </TamaguiProvider>
         </GestureHandlerRootView>
       </ReduxProvider>
