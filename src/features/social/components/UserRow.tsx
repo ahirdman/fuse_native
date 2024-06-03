@@ -9,15 +9,9 @@ import { XStack } from 'tamagui';
 import { Text } from 'components/Text';
 import { UserAvatar } from 'components/UserAvatar';
 import type { ReactNode } from 'react';
-import { useGetAvatarUrl } from 'social/queries/getSignedAvatarUrl';
 import type { UserRelation } from 'social/queries/getUsers';
 import { useSendFriendRequest } from 'social/queries/sendFriendRequest';
 import { showToast } from 'util/toast';
-
-// TODO: User row avatar image
-// - Handle url error with fallback
-// - Match avatar size with fallback size
-// - Loading state or just fallback
 
 interface UserRowProps {
   onPress(): void;
@@ -36,8 +30,6 @@ export function UserRow({
   onPress,
   renderRight,
 }: UserRowProps) {
-  const { data: signedUrl } = useGetAvatarUrl(avatarUrl);
-
   return (
     <XStack
       bg="$primary800"
@@ -49,7 +41,7 @@ export function UserRow({
       jc="space-between"
     >
       <XStack ai="center" gap={12}>
-        <UserAvatar imageUrl={signedUrl} />
+        <UserAvatar imageUrl={avatarUrl ?? undefined} />
 
         <Text fontWeight="bold" fontSize="$6">
           {username}

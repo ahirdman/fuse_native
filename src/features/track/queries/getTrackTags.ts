@@ -18,8 +18,6 @@ async function getTrackTags({
     .eq('track_id', trackId)
     .eq('user_id', userId);
 
-  console.log('TRACKS', JSON.stringify(data, null, 2));
-
   if (error) {
     throw new Error(error.message);
   }

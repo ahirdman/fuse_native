@@ -150,10 +150,14 @@ function FuseList({ onRowPress }: FuseListProps) {
   const keyExtractor = (item: FuseTagWithSubTags) => item.id.toString();
 
   const renderItem = ({ item }: { item: FuseTagWithSubTags }) => {
+    if (!item.tags[0]?.color) {
+      throw new Error('No tag on fuse track');
+    }
+
     return (
       <TagRow
         name={item.name}
-        color={item.tags[0]!.color}
+        color={item.tags[0].color}
         onPress={() => onRowPress({ ...item })}
       />
     );

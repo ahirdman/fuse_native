@@ -3,8 +3,9 @@ import { UserAvatar } from 'components/UserAvatar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { H6, XStack, YStack } from 'tamagui';
 
+import { selectUserId } from 'auth/auth.slice';
 import { Text } from 'components/Text';
-import { useGetAvatarUrl } from 'social/queries/getSignedAvatarUrl';
+import { useGetUser } from 'social/queries/getUser';
 import { useAppSelector } from 'store/hooks';
 
 interface AppDrawerProps extends DrawerContentComponentProps {}
@@ -12,7 +13,8 @@ interface AppDrawerProps extends DrawerContentComponentProps {}
 export function AppDrawer({ descriptors, navigation, state }: AppDrawerProps) {
   const insets = useSafeAreaInsets();
   const { user, profile } = useAppSelector((state) => state.auth);
-  const { data: url } = useGetAvatarUrl(profile?.avatarUrl);
+  const userId = useAppSelector(selectUserId);
+  const { data: userData } = useGetUser(userId);
 
   const drawerLinks = state.routes.map((route) => {
     return descriptors[route.key];
@@ -21,7 +23,7 @@ export function AppDrawer({ descriptors, navigation, state }: AppDrawerProps) {
   return (
     <YStack fullscreen bg="$black" pt={insets.top} pb={insets.bottom} pl={18}>
       <XStack gap={12} ai="center">
-        <UserAvatar imageUrl={url} />
+        <UserAvatar imageUrl={userData?.avatar_url ?? undefined} />
         <H6>{profile?.username}</H6>
       </XStack>
 

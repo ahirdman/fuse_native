@@ -11,7 +11,7 @@ import { Alert } from 'components/Alert';
 import { InputField } from 'components/InputField';
 import { Text } from 'components/Text';
 import { UserRow } from 'social/components/UserRow';
-import { type UsersView, useGetUsers } from 'social/queries/getUsers';
+import { type UsersView, useSearchUsers } from 'social/queries/getUsers';
 
 type Props = FriendsTabScreenProps<'Search'>;
 export function SearchUsersView({ navigation }: Props) {
@@ -24,7 +24,7 @@ export function SearchUsersView({ navigation }: Props) {
   const searchQuery = watch('searchQuery');
   const debouncedSearchQuery = useDebounce(searchQuery.trim(), 300);
 
-  const { data, isError, isFetching, isRefetching, refetch } = useGetUsers({
+  const { data, isError, isFetching, isRefetching, refetch } = useSearchUsers({
     searchQuery: debouncedSearchQuery,
   });
 

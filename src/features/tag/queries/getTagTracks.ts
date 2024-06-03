@@ -38,7 +38,9 @@ interface UseGetTagTracksArgs {
 export const useGetTagTracks = ({ tagIds }: UseGetTagTracksArgs) =>
   useQuery({
     queryKey:
-      tagIds.length > 1 ? fuseKeys.tracks(tagIds) : tagKeys.tracks(tagIds[0]!), //TODO: FIX
+      tagIds.length > 1
+        ? fuseKeys.tracks(tagIds)
+        : tagKeys.tracks(tagIds[0] ?? 0), // HACK: FIX
     queryFn: () => getTagTracks(tagIds),
     select: (data) => {
       return sanitizeSpotifyTracks(data);

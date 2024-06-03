@@ -42,7 +42,7 @@
         "noUnusedVariables": "warn"
       },
       "style": {
-        "useBlockStatements": "warn"
+        "useBlockStatements": "off"
       },
       "suspicious": {
         "noConsoleLog": "off"

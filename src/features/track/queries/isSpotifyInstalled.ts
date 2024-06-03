@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { skipToken, useQuery } from '@tanstack/react-query';
 import { canOpenURL } from 'expo-linking';
 
 async function isSpotifyInstalled(uri: string): Promise<boolean> {
@@ -7,9 +7,8 @@ async function isSpotifyInstalled(uri: string): Promise<boolean> {
   return isInstalled;
 }
 
-export const useIsSpotifyInstalled = (uri?: string) =>
+export const useIsSpotifyInstalled = (uri?: string | undefined) =>
   useQuery({
     queryKey: ['isInstalled'],
-    enabled: !!uri,
-    queryFn: uri ? () => isSpotifyInstalled(uri) : undefined,
+    queryFn: uri ? () => isSpotifyInstalled(uri) : skipToken,
   });
