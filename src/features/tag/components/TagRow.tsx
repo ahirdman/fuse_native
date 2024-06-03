@@ -30,7 +30,7 @@ export const TagRow = memo(
     return (
       <StyledTagRow {...props} onPress={onPress}>
         <YStack>
-          <TagBadge name={name} color={color} />
+          <TagBadge name={name} color={{ type: 'tag', color }} />
         </YStack>
 
         <AnimatePresence>

@@ -20,7 +20,6 @@ export type RootStackParamList = {
   AddTag: {
     trackId: string;
   };
-  AddFuseTag: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
@@ -73,6 +72,20 @@ export type LibraryTabScreenProps<T extends keyof LibraryParamList> =
     RootStackScreenProps<keyof RootStackParamList>
   >;
 
+interface TagViewParams {
+  type: 'fuse';
+  id: number;
+  name: string;
+  tagIds: number[];
+}
+
+interface FuseTagViewParams {
+  type: 'tag';
+  id: number;
+  name: string;
+  color: string;
+}
+
 /*
  * Social Stack
  * */
@@ -81,11 +94,7 @@ export type FriendsTabParamList = {
   Friends: undefined;
   Search: undefined;
   Profile: { userId: string };
-  Tag: {
-    id: number;
-    name: string;
-    color: string;
-  };
+  Tag: TagViewParams | FuseTagViewParams;
 };
 
 export type FriendsTabScreenProps<T extends keyof FriendsTabParamList> =
@@ -100,15 +109,7 @@ export type FriendsTabScreenProps<T extends keyof FriendsTabParamList> =
 
 export type TagTabParamList = {
   TagList: undefined;
-  Tag: {
-    id: number;
-    name: string;
-    color: string;
-  };
-  FuseList: {
-    id: number;
-    name: string;
-  };
+  Tag: TagViewParams | FuseTagViewParams;
 };
 
 export type TagTabScreenProps<T extends keyof TagTabParamList> =

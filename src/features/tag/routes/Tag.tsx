@@ -1,38 +1,28 @@
+import type { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { useNavigation } from '@react-navigation/native';
 import {
   AlertOctagon,
   CheckCircle2,
-  Disc,
-  Disc3,
   Merge,
   Plus,
   RefreshCw,
   SearchX,
-  Send,
   Upload,
   XOctagon,
 } from '@tamagui/lucide-icons';
 import * as Linking from 'expo-linking';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { RefreshControl } from 'react-native';
-import {
-  H4,
-  Separator,
-  Spinner,
-  View,
-  XStack,
-  YStack,
-  type YStackProps,
-} from 'tamagui';
+import { H4, Separator, Spinner, View, XStack, YStack } from 'tamagui';
 
-import type { Tables } from 'lib/supabase/database-generated.types';
+import type { Tables, TagOrFuseEntry } from 'lib/supabase/database.interface';
 import type { TagTabScreenProps } from 'navigation.types';
 import { formatMsDuration } from 'util/index';
 import { showToast } from 'util/toast';
 
-import { useNavigation } from '@react-navigation/native';
 import { selectUserId } from 'auth/auth.slice';
 import { Alert } from 'components/Alert';
-import { BottomSheet, type BottomSheetMethods } from 'components/BottomSheet';
+import { DetachedModal } from 'components/BottomSheetV2';
 import { CircleBUtton } from 'components/CircleButton';
 import { StyledImage } from 'components/Image';
 import { ListFooterComponent } from 'components/ListFooter';
@@ -62,27 +52,23 @@ export function TagView({
 
   const { data: tag, isLoading: isTagLoading } = useGetTag({
     id: params.id,
+    type: params.type,
   });
+
   const {
     data: tracks,
     refetch: refetchTracks,
     isRefetching: isRefetchingTracks,
     isError: isTracksError,
     isFetching: isFetchingTracks,
-  } = useGetTagTracks({ tagId: params.id });
-
-  const fuseBottomSheet = useRef<BottomSheetMethods>(null);
-
-  const listDuration = formatMsDuration(
-    tracks
-      ?.map((track) => track.duration)
-      .reduce((acc, curr) => acc + curr, 0) ?? 0,
-  );
+  } = useGetTagTracks({
+    tagIds: params.type === 'tag' ? [params.id] : params.tagIds,
+  });
 
   if (isTagLoading) {
     return (
       <YStack
-        bg="%primary700"
+        bg="$primary700"
         fullscreen
         justifyContent="center"
         alignItems="center"
@@ -95,7 +81,7 @@ export function TagView({
   if (!tag) {
     return (
       <YStack
-        bg="%primary700"
+        bg="$primary700"
         fullscreen
         justifyContent="center"
         alignItems="center"
@@ -105,7 +91,12 @@ export function TagView({
     );
   }
 
-  const isFriendsTag = tag.user_id !== userId;
+  const isFriendsTag = tag.created_by !== userId;
+  const listDuration = formatMsDuration(
+    tracks
+      ?.map((track) => track.duration)
+      .reduce((acc, curr) => acc + curr, 0) ?? 0,
+  );
 
   return (
     <YStack bg="$primary700" flex={1}>
@@ -116,12 +107,7 @@ export function TagView({
       />
 
       <YStack gap={16} px={12} pt={12}>
-        <TagActions
-          tag={tag}
-          tracks={tracks}
-          isFriendsTag={isFriendsTag}
-          openFuseSheet={() => fuseBottomSheet.current?.expand()}
-        />
+        <TagActions tag={tag} tracks={tracks} isFriendsTag={isFriendsTag} />
       </YStack>
 
       <Separator m={12} />
@@ -163,34 +149,28 @@ export function TagView({
       </View>
 
       {!isFriendsTag && <EditTagSheet tag={tag} />}
-
-      {isFriendsTag && (
-        <BottomSheet ref={fuseBottomSheet}>
-          <FuseSheet tagId={tag.id} />
-        </BottomSheet>
-      )}
     </YStack>
   );
 }
 
-interface TagMetaDataProps extends Omit<YStackProps, 'tag'> {
-  tag: Tables<'tags'>;
+interface TagMetaDataProps {
+  tag: TagOrFuseEntry;
   listDuration: string;
   isFriendsTag: boolean;
 }
 
-function TagMetaData({
-  tag,
-  listDuration,
-  isFriendsTag,
-  ...props
-}: TagMetaDataProps) {
-  const { data: profile } = useGetUser(tag.user_id);
+function TagMetaData({ tag, listDuration, isFriendsTag }: TagMetaDataProps) {
+  const { data: profile } = useGetUser(tag.created_by);
   const { data: avatarUrl } = useGetAvatarUrl(profile?.avatar_url);
+
   const tagSyncStatus = getTagSyncStatus({ ...tag });
+  const badgeColor =
+    tag.type === 'tag'
+      ? { color: tag.color, type: tag.type }
+      : { type: tag.type, colors: tag.tags.map((tag) => tag.color) };
 
   return (
-    <YStack gap={8} mx={12} {...props}>
+    <YStack gap={8} mx={12}>
       <XStack jc="space-between" gap={8}>
         <SectionBox>
           <Text fontWeight="bold">Created by</Text>
@@ -199,7 +179,7 @@ function TagMetaData({
 
         <SectionBox>
           <Text fontWeight="bold">Tag</Text>
-          <TagBadge name={tag.name} color={tag.color} alignSelf="flex-end" />
+          <TagBadge name={tag.name} color={badgeColor} alignSelf="flex-end" />
         </SectionBox>
       </XStack>
 
@@ -253,25 +233,28 @@ function TagTracksListEmptyComponent({
 }
 
 interface TagSyncSectionProps {
-  tag: Tables<'tags'>;
+  tag: TagOrFuseEntry;
   tracks?: SpotifyTrack[] | undefined;
   isFriendsTag: boolean;
-  openFuseSheet(): void;
 }
 
-function TagActions({
-  tag,
-  tracks,
-  isFriendsTag,
-  openFuseSheet,
-}: TagSyncSectionProps) {
+function TagActions({ tag, tracks, isFriendsTag }: TagSyncSectionProps) {
   const tagStatus = getTagSyncStatus({ ...tag });
   const { mutateAsync: syncPlaylist } = useSyncPlaylist({ tagStatus });
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetRef.current?.present();
+  }, []);
 
   return (
     <XStack justifyContent="space-evenly">
       {isFriendsTag && (
-        <CircleBUtton onPress={openFuseSheet} label="Fuse" icon={<Merge />} />
+        <CircleBUtton
+          onPress={handlePresentModalPress}
+          label="Fuse"
+          icon={<Merge />}
+        />
       )}
 
       {!isFriendsTag &&
@@ -330,6 +313,11 @@ function TagActions({
           icon={<Plus />}
         />
       )}
+      {isFriendsTag && (
+        <DetachedModal ref={bottomSheetRef} snapPoints={['20%']}>
+          <FuseForm tag={tag} />
+        </DetachedModal>
+      )}
     </XStack>
   );
 }
@@ -347,10 +335,13 @@ function TagStatusIcon({ status }: { status?: TagSyncStatus }) {
   }
 }
 
-type TagSyncStatusArgs = Pick<
-  Tables<'tags'>,
-  'latest_snapshot_id' | 'spotify_playlist_id' | 'updated_at' | 'synced_at'
->;
+interface TagSyncStatusArgs
+  extends Pick<
+    Tables<'tags'>,
+    'latest_snapshot_id' | 'spotify_playlist_id' | 'synced_at'
+  > {
+  updated_at?: string;
+}
 
 function getTagSyncStatus({
   latest_snapshot_id,
@@ -362,27 +353,31 @@ function getTagSyncStatus({
     return 'Unexported';
   }
 
+  if (!updated_at) {
+    return 'Unsynced'; // TODO: Missing property in fusetags
+  }
+
   return synced_at.slice(0, 19) >= updated_at.slice(0, 19)
     ? 'Synced'
     : 'Unsynced';
 }
 
-interface EditTagSheetProps {
-  tag: Tables<'tags'>;
-}
-
-function EditTagSheet({ tag }: EditTagSheetProps) {
+function EditTagSheet({ tag }: { tag: TagOrFuseEntry }) {
   const navigation = useNavigation();
-  const editBottomSheet = useRef<BottomSheetMethods>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   const { mutate: updateTagMutation, isPending } = useUpdateTag();
   const { mutate: deleteTagMutation } = useDeleteTag();
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetRef.current?.present();
+  }, []);
 
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <TagEditMenu
-          onEditPress={() => editBottomSheet.current?.expand()}
+          onEditPress={tag.type == 'tag' ? handlePresentModalPress : undefined}
           onDeletePress={() =>
             deleteTagMutation(tag.id, {
               onSuccess: () => {
@@ -395,41 +390,39 @@ function EditTagSheet({ tag }: EditTagSheetProps) {
     });
   }, [navigation, deleteTagMutation, tag.id]);
 
+  if (tag.type === 'fuse') {
+    return null;
+  }
+
   return (
-    <BottomSheet ref={editBottomSheet}>
-      <YStack gap={12} w="$full">
-        <TagForm
-          label="Edit Tag"
-          confirmAction={(data) =>
-            updateTagMutation(
-              {
-                id: tag.id,
-                color: data.color,
-                name: data.name,
+    <DetachedModal ref={bottomSheetRef}>
+      <TagForm
+        label="Edit Tag"
+        confirmAction={(data) =>
+          updateTagMutation(
+            {
+              id: tag.id,
+              color: data.color,
+              name: data.name,
+            },
+            {
+              onSuccess: (_, { name, color }) => {
+                //@ts-ignore
+                navigation.setParams({ name, color });
+                bottomSheetRef.current?.close();
               },
-              {
-                onSuccess: (_, { name, color }) => {
-                  //@ts-ignore
-                  navigation.setParams({ name, color });
-                  editBottomSheet.current?.close();
-                },
-              },
-            )
-          }
-          closeAction={() => editBottomSheet.current?.close()}
-          existingTag={{ color: tag.color, name: tag.name }}
-          isLoading={isPending}
-        />
-      </YStack>
-    </BottomSheet>
+            },
+          )
+        }
+        closeAction={() => bottomSheetRef.current?.close()}
+        existingTag={{ color: tag.color }}
+        isLoading={isPending}
+      />
+    </DetachedModal>
   );
 }
 
-interface FuseSheetProps {
-  tagId: number;
-}
-
-function FuseSheet({ tagId }: FuseSheetProps) {
+function FuseForm({ tag: currentTag }: { tag: TagOrFuseEntry }) {
   const userId = useAppSelector(selectUserId);
   const { mutate: createFuse } = useCreateFuseTag();
   const { data } = useGetTags(userId);
@@ -438,16 +431,21 @@ function FuseSheet({ tagId }: FuseSheetProps) {
     <YStack gap={12}>
       <H4>Select Tag to Fuse with</H4>
 
-      {data?.map((tag) => (
-        <TagBadge
-          name={tag.name}
-          color={tag.color}
-          key={tag.id}
-          onPress={() =>
-            createFuse({ initialTagId: tagId, matchedTagId: tag.id })
-          }
-        />
-      ))}
+      <XStack gap={12}>
+        {data?.map((tag) => (
+          <TagBadge
+            name={tag.name}
+            color={{ type: 'tag', color: tag.color }}
+            key={tag.id}
+            onPress={() =>
+              createFuse({
+                tagIds: [currentTag.id, tag.id],
+                name: `${currentTag.name} ${tag.name}`,
+              })
+            }
+          />
+        ))}
+      </XStack>
     </YStack>
   );
 }

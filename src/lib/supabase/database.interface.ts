@@ -1,8 +1,9 @@
 import type { PostgrestError } from '@supabase/supabase-js';
-import type { Database } from './database-generated.types';
-import { z } from 'zod';
 
+import type { Database } from './database-generated.types';
 export type { Database } from './database-generated.types';
+
+import type { FuseTagWithSubTags } from 'fuse/queries/getFuseLists';
 
 export type Tables<T extends keyof Database['public']['Tables']> =
   Database['public']['Tables'][T]['Row'];
@@ -15,7 +16,9 @@ export type DbResultOk<T> = T extends PromiseLike<{ data: infer U }>
   : never;
 export type DbResultErr = PostgrestError;
 
-export const supabaseQueryError = z.object({
-  message: z.string(),
-  status: z.number(),
-});
+export type UntionTagTable = Omit<Tables<"tags">, "type"> & { type: "tag" }
+export type UntionFuseTable = Omit<FuseTagWithSubTags, "type"> & { type: "fuse" };
+
+export type TagOrFuseEntry = 
+  | UntionTagTable
+  | UntionFuseTable

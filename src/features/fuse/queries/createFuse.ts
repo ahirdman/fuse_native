@@ -6,41 +6,36 @@ import { showToast } from 'util/toast';
 import { fuseKeys } from './keys';
 
 interface CreateFuseTagArgs {
-  initialTagId: number;
-  matchedTagId: number;
+  tagIds: number[];
+  name: string;
 }
 
-async function createFuseTag({
-  initialTagId,
-  matchedTagId,
-}: CreateFuseTagArgs) {
-  const { data: tag1, error: tag1Error } = await supabase
-    .from('tags')
-    .select()
-    .eq('id', initialTagId)
-    .single();
-  const { data: tag2, error: tag2Error } = await supabase
-    .from('tags')
-    .select()
-    .eq('id', matchedTagId)
-    .single();
-
-  if (tag1Error || tag2Error) {
-    throw new Error(tag1Error?.message);
+async function createFuseTag({ tagIds, name }: CreateFuseTagArgs) {
+  if (tagIds.length < 2) {
+    throw new Error('Creating a fuse requires at least two tags');
   }
 
   const { data, error } = await supabase
     .from('fuseTags')
-    .insert({
-      tag_id_1: initialTagId,
-      tag_id_2: matchedTagId,
-      name: `${tag1.name} ${tag2.name}`,
-    })
+    .insert({ name })
     .select('id')
     .single();
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  const fuseTagTagsData = tagIds.map((tagId) => ({
+    fuse_id: data.id,
+    tag_id: tagId,
+  }));
+
+  const { error: fuseTagTagsError } = await supabase
+    .from('fusetagtags')
+    .insert(fuseTagTagsData);
+
+  if (fuseTagTagsError) {
+    throw new Error(fuseTagTagsError.message);
   }
 
   return data;
@@ -58,6 +53,10 @@ export const useCreateFuseTag = () =>
       });
     },
     onSuccess: () => {
+      showToast({
+        title: 'Fuse created',
+        preset: 'done',
+      });
       queryClient.invalidateQueries({
         queryKey: fuseKeys.lists(),
       });

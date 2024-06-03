@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -73,7 +73,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "subscriptions"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       friend_requests: {
@@ -126,99 +126,97 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users_with_relation"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       fuseTags: {
         Row: {
           created_at: string
+          created_by: string
           id: number
           latest_snapshot_id: string | null
           name: string
           spotify_playlist_id: string | null
           spotify_playlist_uri: string | null
           synced_at: string | null
-          tag_id_1: number
-          tag_id_2: number
+          tag_id: number | null
+          tag_id_1: number | null
+          type: Database["public"]["Enums"]["tag_type"]
           updated_at: string
-          user_id: string
         }
         Insert: {
           created_at?: string
+          created_by?: string
           id?: number
           latest_snapshot_id?: string | null
           name: string
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
           synced_at?: string | null
-          tag_id_1: number
-          tag_id_2: number
+          tag_id?: number | null
+          tag_id_1?: number | null
+          type?: Database["public"]["Enums"]["tag_type"]
           updated_at?: string
-          user_id?: string
         }
         Update: {
           created_at?: string
+          created_by?: string
           id?: number
           latest_snapshot_id?: string | null
           name?: string
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
           synced_at?: string | null
-          tag_id_1?: number
-          tag_id_2?: number
+          tag_id?: number | null
+          tag_id_1?: number | null
+          type?: Database["public"]["Enums"]["tag_type"]
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "public_fuseTags_tag_id_1_fkey"
-            columns: ["tag_id_1"]
-            isOneToOne: false
-            referencedRelation: "initial_tags_with_matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_fuseTags_tag_id_1_fkey"
-            columns: ["tag_id_1"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_fuseTags_tag_id_1_fkey"
-            columns: ["tag_id_1"]
-            isOneToOne: false
-            referencedRelation: "tags_with_track_ids"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_fuseTags_tag_id_2_fkey"
-            columns: ["tag_id_2"]
-            isOneToOne: false
-            referencedRelation: "initial_tags_with_matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_fuseTags_tag_id_2_fkey"
-            columns: ["tag_id_2"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_fuseTags_tag_id_2_fkey"
-            columns: ["tag_id_2"]
-            isOneToOne: false
-            referencedRelation: "tags_with_track_ids"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "public_fuseTags_user_id_fkey"
-            columns: ["user_id"]
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      fusetagtags: {
+        Row: {
+          fuse_id: number
+          tag_id: number
+        }
+        Insert: {
+          fuse_id: number
+          tag_id: number
+        }
+        Update: {
+          fuse_id?: number
+          tag_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fusetagtags_fuse_id_fkey"
+            columns: ["fuse_id"]
+            isOneToOne: false
+            referencedRelation: "fuseTags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fusetagtags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fusetagtags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags_with_track_ids"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -244,7 +242,7 @@ export interface Database {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       subscriptions: {
@@ -293,47 +291,50 @@ export interface Database {
         Row: {
           color: string
           created_at: string
+          created_by: string
           id: number
           latest_snapshot_id: string | null
           name: string
           spotify_playlist_id: string | null
           spotify_playlist_uri: string | null
           synced_at: string | null
+          type: Database["public"]["Enums"]["tag_type"]
           updated_at: string
-          user_id: string
         }
         Insert: {
           color: string
           created_at?: string
+          created_by?: string
           id?: number
           latest_snapshot_id?: string | null
           name: string
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
           synced_at?: string | null
+          type?: Database["public"]["Enums"]["tag_type"]
           updated_at?: string
-          user_id?: string
         }
         Update: {
           color?: string
           created_at?: string
+          created_by?: string
           id?: number
           latest_snapshot_id?: string | null
           name?: string
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
           synced_at?: string | null
+          type?: Database["public"]["Enums"]["tag_type"]
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "public_tags_user_id_fkey"
-            columns: ["user_id"]
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       trackTags: {
@@ -370,13 +371,6 @@ export interface Database {
             foreignKeyName: "trackTags_tag_id_fkey"
             columns: ["tag_id"]
             isOneToOne: false
-            referencedRelation: "initial_tags_with_matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
             referencedRelation: "tags"
             referencedColumns: ["id"]
           },
@@ -386,7 +380,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "tags_with_track_ids"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       user_friends: {
@@ -435,71 +429,11 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "friend_requests"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
     Views: {
-      initial_tags_with_matches: {
-        Row: {
-          color: string | null
-          id: number | null
-          name: string | null
-        }
-        Relationships: []
-      }
-      matched_tags: {
-        Row: {
-          color: string | null
-          id: number | null
-          initial_tag_id: number | null
-          name: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["initial_tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["initial_tag_id"]
-            isOneToOne: false
-            referencedRelation: "initial_tags_with_matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["initial_tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags_with_track_ids"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "initial_tags_with_matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "trackTags_tag_id_fkey"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "tags_with_track_ids"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       tags_with_track_ids: {
         Row: {
           color: string | null
@@ -516,7 +450,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       track_tags_view: {
@@ -539,7 +473,7 @@ export interface Database {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -565,6 +499,7 @@ export interface Database {
     Enums: {
       friend_request_status: "pending" | "rejected" | "accepted"
       relation_type: "friend" | "requested_by" | "requested_to" | "none"
+      tag_type: "fuse" | "tag"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -679,7 +614,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "buckets"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       s3_multipart_uploads: {
@@ -720,7 +655,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "buckets"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       s3_multipart_uploads_parts: {
@@ -774,7 +709,7 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "s3_multipart_uploads"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -807,7 +742,7 @@ export interface Database {
         Args: {
           name: string
         }
-        Returns: unknown
+        Returns: string[]
       }
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>
@@ -877,14 +812,16 @@ export interface Database {
   }
 }
 
+type PublicSchema = Database[Extract<keyof Database, "public">]
+
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -892,68 +829,68 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-      Database["public"]["Views"])
-  ? (Database["public"]["Tables"] &
-      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof Database["public"]["Enums"]
+    | keyof PublicSchema["Enums"]
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
-  : never
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
 

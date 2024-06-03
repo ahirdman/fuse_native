@@ -2,17 +2,33 @@ import { type GetProps, Paragraph, View, styled } from 'tamagui';
 
 import { hexToRGBA } from 'util/color';
 
+type TagColor =
+  | { type: 'tag'; color: string }
+  | { type: 'fuse'; colors: string[] };
+
 interface TagProps extends StyledTagProps {
   name: string;
-  color: string;
+  color: TagColor;
 }
 
 export function TagBadge({ name, color, ...props }: TagProps) {
-  const badgeBackgroundColor = hexToRGBA(color, 0.1);
+  let backgroundColor;
+  let fontColor;
+
+  if (color.type === 'tag') {
+    fontColor = color.color;
+    backgroundColor = hexToRGBA(color.color, 0.1);
+  }
+
+  if (color.type === 'fuse') {
+    //TODO: Parse better
+    fontColor = color.colors[0]!;
+    backgroundColor = hexToRGBA(color.colors[0]!, 0.1);
+  }
 
   return (
-    <StyledTag bg={badgeBackgroundColor} {...props}>
-      <Paragraph fontWeight="bold" color={color}>
+    <StyledTag bg={backgroundColor} {...props}>
+      <Paragraph fontWeight="bold" color={fontColor}>
         {name}
       </Paragraph>
     </StyledTag>

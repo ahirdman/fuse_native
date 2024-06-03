@@ -247,7 +247,7 @@ function TrackTags({ trackId }: TrackTagsProps) {
             trackTags.map((tag) => (
               <TagBadge
                 name={tag.name}
-                color={tag.color}
+                color={{ type: 'tag', color: tag.color }}
                 onPress={() => removeTagFromTrack({ trackId, tagId: tag.id })}
                 key={tag.id}
                 mr={8}

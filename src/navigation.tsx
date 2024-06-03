@@ -23,7 +23,6 @@ import { Home } from 'features/dashboard/routes/Home';
 import { AppDrawer } from 'features/navigation/components/Drawer';
 import { FullScreenHeader } from 'features/navigation/components/FullScreenHeader';
 import { SocialStack } from 'features/social/social.stack';
-import { AddFuseTag } from 'fuse/routes/AddFuse';
 import { Profile } from 'social/routes/Profile';
 import { TagStack } from 'tag/tag.stack';
 import { LibraryStack } from 'track/library.stack';
@@ -52,19 +51,6 @@ function RootNavigationStack() {
           <>
             <RootStack.Screen name="Root" component={DrawerStack} />
             <RootStack.Screen name="Track" component={Track} />
-            <RootStack.Screen
-              name="AddFuseTag"
-              component={AddFuseTag}
-              options={() => {
-                return {
-                  presentation: 'fullScreenModal',
-                  title: 'Create Fuse',
-                  headerTitleStyle: { color: '#FFF' },
-                  headerShown: true,
-                  headerStyle: { backgroundColor: '#232323' },
-                };
-              }}
-            />
             <RootStack.Screen
               name="AddTag"
               component={AddTag}
