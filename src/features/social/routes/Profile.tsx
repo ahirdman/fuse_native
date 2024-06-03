@@ -9,10 +9,9 @@ import { selectUserId } from 'auth/auth.slice';
 import { Alert } from 'components/Alert';
 import { Text } from 'components/Text';
 import { UserAvatar } from 'components/UserAvatar';
-import { useGetUser } from 'features/social/queries/getUser';
+import { useGetUserWithRelation } from 'features/social/queries/getUser';
 import { useAcceptFriendRequest } from 'social/queries/acceptFriendRequest';
 import { useIsPendingRequest } from 'social/queries/getFriendRequests';
-import { useGetAvatarUrl } from 'social/queries/getSignedAvatarUrl';
 import type { UsersView } from 'social/queries/getUsers';
 import { useSendFriendRequest } from 'social/queries/sendFriendRequest';
 import { useAppSelector } from 'store/hooks';
@@ -23,8 +22,7 @@ import { showToast } from 'util/toast';
 type Props = FriendsTabScreenProps<'Profile'>;
 
 export function Profile({ route, navigation }: Props) {
-  const { data: user } = useGetUser(route.params.userId);
-  const { data: avatarUrl } = useGetAvatarUrl(user?.avatar_url);
+  const { data: user } = useGetUserWithRelation(route.params.userId);
 
   const isFriend = user?.relation === 'friend';
 
@@ -55,7 +53,7 @@ export function Profile({ route, navigation }: Props) {
       justifyContent="space-between"
     >
       <YStack gap={16} alignItems="center">
-        <UserAvatar imageUrl={avatarUrl} size="xl" />
+        <UserAvatar imageUrl={user.avatar_url ?? undefined} size="xl" />
 
         <H1 fontWeight="bold">{user.name}</H1>
       </YStack>

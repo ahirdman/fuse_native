@@ -4,18 +4,19 @@ import type { FriendsTabParamList } from 'navigation.types';
 import { AvatarButton } from 'navigation/components/AvatarButton';
 import { useAppSelector } from 'store/hooks';
 
+import { selectUserId } from 'auth/auth.slice';
 import { TabHeader } from 'features/navigation/components/TabHeader';
 import { Profile } from 'social/routes/Profile';
 import { TagView } from 'tag/routes/Tag';
-import { useGetAvatarUrl } from './queries/getSignedAvatarUrl';
+import { useGetUser } from './queries/getUser';
 import { SearchUsersView } from './routes/SearchUsers';
 import { Social } from './routes/social';
 
 const SocialNav = createNativeStackNavigator<FriendsTabParamList>();
 
 export function SocialStack() {
-  const avatarUrl = useAppSelector((state) => state.auth.profile?.avatarUrl);
-  const userAvatar = useGetAvatarUrl(avatarUrl);
+  const userId = useAppSelector(selectUserId);
+  const { data } = useGetUser(userId);
 
   return (
     <SocialNav.Navigator
@@ -31,7 +32,7 @@ export function SocialStack() {
           headerLeft: () => (
             <AvatarButton
               onPress={() => props.navigation.openDrawer()}
-              imageUrl={userAvatar.data}
+              imageUrl={data?.avatar_url}
             />
           ),
         })}

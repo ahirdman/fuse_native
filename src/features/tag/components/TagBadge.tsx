@@ -1,4 +1,5 @@
-import { type GetProps, Paragraph, View, styled } from 'tamagui';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Paragraph, XStack, type XStackProps } from 'tamagui';
 
 import { hexToRGBA } from 'util/color';
 
@@ -6,54 +7,34 @@ type TagColor =
   | { type: 'tag'; color: string }
   | { type: 'fuse'; colors: string[] };
 
-interface TagProps extends StyledTagProps {
+interface TagProps extends XStackProps {
   name: string;
   color: TagColor;
 }
 
 export function TagBadge({ name, color, ...props }: TagProps) {
-  let backgroundColor;
-  let fontColor;
-
-  if (color.type === 'tag') {
-    fontColor = color.color;
-    backgroundColor = hexToRGBA(color.color, 0.1);
-  }
-
-  if (color.type === 'fuse') {
-    //TODO: Parse better
-    fontColor = color.colors[0]!;
-    backgroundColor = hexToRGBA(color.colors[0]!, 0.1);
-  }
+  const gradientColors =
+    color.type === 'tag'
+      ? [hexToRGBA(color.color, 0.1), hexToRGBA(color.color, 0.1)]
+      : color.colors;
+  const fontColor = color.type === 'tag' ? color.color : 'white';
 
   return (
-    <StyledTag bg={backgroundColor} {...props}>
-      <Paragraph fontWeight="bold" color={fontColor}>
-        {name}
-      </Paragraph>
-    </StyledTag>
+    <XStack {...props}>
+      <LinearGradient
+        colors={gradientColors}
+        end={{ x: 1, y: 0 }}
+        style={{
+          borderRadius: 4,
+          paddingVertical: 4,
+          paddingHorizontal: 10,
+          alignSelf: 'flex-end',
+        }}
+      >
+        <Paragraph fontWeight="bold" color={fontColor}>
+          {name}
+        </Paragraph>
+      </LinearGradient>
+    </XStack>
   );
 }
-
-const StyledTag = styled(View, {
-  accessibilityRole: 'button',
-  borderRadius: 4,
-
-  variants: {
-    size: {
-      default: {
-        px: 10,
-        py: 4,
-      },
-      small: {
-        px: 8,
-        py: 2,
-      },
-    },
-  } as const,
-  defaultVariants: {
-    size: 'default',
-  },
-});
-
-type StyledTagProps = GetProps<typeof StyledTag>;

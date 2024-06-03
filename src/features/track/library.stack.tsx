@@ -4,17 +4,18 @@ import type { LibraryParamList } from 'navigation.types';
 import { AvatarButton } from 'navigation/components/AvatarButton';
 import { useAppSelector } from 'store/hooks';
 
+import { selectUserId } from 'auth/auth.slice';
 import { StyledImage } from 'components/Image';
 import { TabHeader } from 'features/navigation/components/TabHeader';
-import { useGetAvatarUrl } from 'social/queries/getSignedAvatarUrl';
+import { useGetUser } from 'social/queries/getUser';
 import { XStack } from 'tamagui';
 import { Tracks } from 'track/routes/Tracks';
 
 const LibraryNavigator = createNativeStackNavigator<LibraryParamList>();
 
 export function LibraryStack() {
-  const avatarUrl = useAppSelector((state) => state.auth.profile?.avatarUrl);
-  const userAvatar = useGetAvatarUrl(avatarUrl);
+  const userId = useAppSelector(selectUserId);
+  const { data } = useGetUser(userId);
 
   return (
     <LibraryNavigator.Navigator
@@ -29,7 +30,7 @@ export function LibraryStack() {
           headerLeft: () => (
             <AvatarButton
               onPress={() => props.navigation.openDrawer()}
-              imageUrl={userAvatar.data}
+              imageUrl={data?.avatar_url}
             />
           ),
           headerTitle: () => (

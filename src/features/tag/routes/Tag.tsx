@@ -30,13 +30,12 @@ import { SectionBox } from 'components/SecitonBox';
 import { Text } from 'components/Text';
 import { UserAvatar } from 'components/UserAvatar';
 import { useCreateFuseTag } from 'fuse/queries/createFuse';
-import { useGetAvatarUrl } from 'social/queries/getSignedAvatarUrl';
-import { useGetUser } from 'social/queries/getUser';
 import { useAppSelector } from 'store/hooks';
 import { TagBadge } from 'tag/components/TagBadge';
 import { TagForm } from 'tag/components/Tagform';
 import { TagEditMenu } from 'tag/components/tag.menu';
 import { useDeleteTag } from 'tag/queries/deleteTag';
+import { useGetTagCreators } from 'tag/queries/getTagCreators';
 import { useGetTagTracks } from 'tag/queries/getTagTracks';
 import { useGetTag, useGetTags } from 'tag/queries/getTags';
 import { type TagSyncStatus, useSyncPlaylist } from 'tag/queries/playlist';
@@ -49,7 +48,6 @@ export function TagView({
   route: { params },
 }: TagTabScreenProps<'Tag'>) {
   const userId = useAppSelector(selectUserId);
-
   const { data: tag, isLoading: isTagLoading } = useGetTag({
     id: params.id,
     type: params.type,
@@ -106,47 +104,43 @@ export function TagView({
         isFriendsTag={isFriendsTag}
       />
 
-      <YStack gap={16} px={12} pt={12}>
-        <TagActions tag={tag} tracks={tracks} isFriendsTag={isFriendsTag} />
-      </YStack>
+      <TagActions tag={tag} tracks={tracks} isFriendsTag={isFriendsTag} />
 
       <Separator m={12} />
 
-      <View h="86%">
-        <TracksList
-          tracks={tracks}
-          tagId={params.id}
-          isSwipeable
-          //onEndReachedThreshold={0.3} - TODO: Paginate response from SupaBase
-          ListEmptyComponent={
-            <TagTracksListEmptyComponent
-              isError={isTracksError}
-              isFetching={isFetchingTracks}
-            />
-          }
-          ListFooterComponent={
-            isFetchingTracks && !isRefetchingTracks ? (
-              <ListFooterComponent />
-            ) : null
-          }
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefetchingTracks}
-              onRefresh={refetchTracks}
-              tintColor="#F4753F"
-            />
-          }
-          onTrackPress={(trackId) =>
-            navigation.navigate('Track', {
-              trackId,
-            })
-          }
-          listStyle={{
-            paddingTop: 4,
-            paddingBottom: 8,
-          }}
-        />
-      </View>
+      <TracksList
+        tracks={tracks}
+        tagId={params.id}
+        isSwipeable
+        //onEndReachedThreshold={0.3} - TODO: Paginate response from SupaBase
+        ListEmptyComponent={
+          <TagTracksListEmptyComponent
+            isError={isTracksError}
+            isFetching={isFetchingTracks}
+          />
+        }
+        ListFooterComponent={
+          isFetchingTracks && !isRefetchingTracks ? (
+            <ListFooterComponent />
+          ) : null
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefetchingTracks}
+            onRefresh={refetchTracks}
+            tintColor="#F4753F"
+          />
+        }
+        onTrackPress={(trackId) =>
+          navigation.navigate('Track', {
+            trackId,
+          })
+        }
+        listStyle={{
+          paddingTop: 4,
+          paddingBottom: 8,
+        }}
+      />
 
       {!isFriendsTag && <EditTagSheet tag={tag} />}
     </YStack>
@@ -160,25 +154,36 @@ interface TagMetaDataProps {
 }
 
 function TagMetaData({ tag, listDuration, isFriendsTag }: TagMetaDataProps) {
-  const { data: profile } = useGetUser(tag.created_by);
-  const { data: avatarUrl } = useGetAvatarUrl(profile?.avatar_url);
-
   const tagSyncStatus = getTagSyncStatus({ ...tag });
   const badgeColor =
     tag.type === 'tag'
       ? { color: tag.color, type: tag.type }
       : { type: tag.type, colors: tag.tags.map((tag) => tag.color) };
 
+  const tagIds = tag.type === 'tag' ? [tag.id] : tag.tags.map((tag) => tag.id);
+
+  const { data: profiles } = useGetTagCreators(tagIds);
+
   return (
     <YStack gap={8} mx={12}>
       <XStack jc="space-between" gap={8}>
         <SectionBox>
           <Text fontWeight="bold">Created by</Text>
-          <UserAvatar imageUrl={avatarUrl} size="small" alignSelf="flex-end" />
+          <XStack justifyContent="flex-end" gap={4}>
+            {profiles?.map((profile) => {
+              return (
+                <UserAvatar
+                  imageUrl={profile?.avatar_url ?? undefined}
+                  size="small"
+                  key={profile.id}
+                />
+              );
+            })}
+          </XStack>
         </SectionBox>
 
         <SectionBox>
-          <Text fontWeight="bold">Tag</Text>
+          <Text fontWeight="bold">{tag.type === 'tag' ? 'Tag' : 'Fuse'}</Text>
           <TagBadge name={tag.name} color={badgeColor} alignSelf="flex-end" />
         </SectionBox>
       </XStack>
@@ -248,77 +253,79 @@ function TagActions({ tag, tracks, isFriendsTag }: TagSyncSectionProps) {
   }, []);
 
   return (
-    <XStack justifyContent="space-evenly">
-      {isFriendsTag && (
-        <CircleBUtton
-          onPress={handlePresentModalPress}
-          label="Fuse"
-          icon={<Merge />}
-        />
-      )}
-
-      {!isFriendsTag &&
-        tag?.spotify_playlist_uri &&
-        tag.spotify_playlist_uri !== null && (
+    <YStack gap={16} px={12} pt={12}>
+      <XStack justifyContent="space-evenly">
+        {isFriendsTag && (
           <CircleBUtton
-            onPress={() => Linking.openURL(tag.spotify_playlist_uri ?? '')}
-            icon={
-              <XStack>
-                <StyledImage
-                  source={require('../../../../assets/icons/Spotify_Icon_White.png')}
-                  h={30}
-                  width="$full"
-                  contentFit="contain"
-                />
-              </XStack>
-            }
-            label=" Open Spotify"
+            onPress={handlePresentModalPress}
+            label="Fuse"
+            icon={<Merge />}
           />
         )}
 
-      {!isFriendsTag && !!tracks?.length && tagStatus !== 'Synced' && (
-        <CircleBUtton
-          label={tagStatus === 'Unexported' ? 'Export' : 'Sync'}
-          icon={tagStatus === 'Unexported' ? <Upload /> : <RefreshCw />}
-          onPress={() =>
-            syncPlaylist(
-              {
-                name: tag.name,
-                tracks: tracks.map((track) => track.uri) ?? [],
-                id: tag.id,
-                type: 'tags',
-                snapshot_id: tag.latest_snapshot_id,
-                playlistId: tag.spotify_playlist_id,
-              },
-              {
-                onSuccess: () => {
-                  showToast({
-                    title:
-                      tagStatus === 'Unexported'
-                        ? 'Playlist created'
-                        : 'Playlist synced',
-                    preset: 'done',
-                  });
-                },
-              },
-            )
-          }
-        />
-      )}
+        {!isFriendsTag &&
+          tag?.spotify_playlist_uri &&
+          tag.spotify_playlist_uri !== null && (
+            <CircleBUtton
+              onPress={() => Linking.openURL(tag.spotify_playlist_uri ?? '')}
+              icon={
+                <XStack>
+                  <StyledImage
+                    source={require('../../../../assets/icons/Spotify_Icon_White.png')}
+                    h={30}
+                    width="$full"
+                    contentFit="contain"
+                  />
+                </XStack>
+              }
+              label=" Open Spotify"
+            />
+          )}
 
-      {!isFriendsTag && (
-        <CircleBUtton
-          onPress={() => console.log('Not implemented')}
-          label="Add Tracks"
-          icon={<Plus />}
-        />
-      )}
-      {isFriendsTag && (
-        <DetachedModal ref={bottomSheetRef} snapPoints={['20%']}>
-          <FuseForm tag={tag} />
-        </DetachedModal>
-      )}
-    </XStack>
+        {!isFriendsTag && !!tracks?.length && tagStatus !== 'Synced' && (
+          <CircleBUtton
+            label={tagStatus === 'Unexported' ? 'Export' : 'Sync'}
+            icon={tagStatus === 'Unexported' ? <Upload /> : <RefreshCw />}
+            onPress={() =>
+              syncPlaylist(
+                {
+                  name: tag.name,
+                  tracks: tracks.map((track) => track.uri) ?? [],
+                  id: tag.id,
+                  type: 'tags',
+                  snapshot_id: tag.latest_snapshot_id,
+                  playlistId: tag.spotify_playlist_id,
+                },
+                {
+                  onSuccess: () => {
+                    showToast({
+                      title:
+                        tagStatus === 'Unexported'
+                          ? 'Playlist created'
+                          : 'Playlist synced',
+                      preset: 'done',
+                    });
+                  },
+                },
+              )
+            }
+          />
+        )}
+
+        {!isFriendsTag && tag.type === 'tag' && (
+          <CircleBUtton
+            onPress={() => console.log('Not implemented')}
+            label="Add Tracks"
+            icon={<Plus />}
+          />
+        )}
+        {isFriendsTag && (
+          <DetachedModal ref={bottomSheetRef} snapPoints={['20%']}>
+            <FuseForm tag={tag} />
+          </DetachedModal>
+        )}
+      </XStack>
+    </YStack>
   );
 }
 
@@ -377,7 +384,7 @@ function EditTagSheet({ tag }: { tag: TagOrFuseEntry }) {
     navigation.setOptions({
       headerRight: () => (
         <TagEditMenu
-          onEditPress={tag.type == 'tag' ? handlePresentModalPress : undefined}
+          onEditPress={tag.type === 'tag' ? handlePresentModalPress : undefined}
           onDeletePress={() =>
             deleteTagMutation(tag.id, {
               onSuccess: () => {
@@ -388,7 +395,13 @@ function EditTagSheet({ tag }: { tag: TagOrFuseEntry }) {
         />
       ),
     });
-  }, [navigation, deleteTagMutation, tag.id]);
+  }, [
+    navigation,
+    deleteTagMutation,
+    tag.id,
+    tag.type,
+    handlePresentModalPress,
+  ]);
 
   if (tag.type === 'fuse') {
     return null;

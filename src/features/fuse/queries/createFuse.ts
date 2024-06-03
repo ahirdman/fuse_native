@@ -44,8 +44,7 @@ async function createFuseTag({ tagIds, name }: CreateFuseTagArgs) {
 export const useCreateFuseTag = () =>
   useMutation({
     mutationFn: createFuseTag,
-    onError: (error) => {
-      console.debug(error);
+    onError: () => {
       showToast({
         title: 'Something went wrong',
         preset: 'error',

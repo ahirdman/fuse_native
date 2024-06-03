@@ -14,7 +14,14 @@ async function getFriends(userId: string) {
   const res = data
     .filter((dto) => dto !== null)
     .filter((profile) => profile !== null)
-    .map((dto) => ({ requestID: dto.request_id, ...dto.profiles })) as {
+    .map((dto) => ({
+      ...dto.profiles,
+      requestID: dto.request_id,
+      avatar_url: dto.profiles.avatar_url
+        ? supabase.storage.from('avatars').getPublicUrl(dto.profiles.avatar_url)
+            .data.publicUrl
+        : undefined,
+    })) as {
     id: string;
     name: string;
     avatar_url: string | null;
@@ -26,6 +33,6 @@ async function getFriends(userId: string) {
 
 export const useGetFriends = (userId: string) =>
   useQuery({
-    queryKey: ['friends'],
+    queryKey: ['friends', userId],
     queryFn: () => getFriends(userId),
   });

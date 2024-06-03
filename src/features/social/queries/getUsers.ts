@@ -13,7 +13,9 @@ interface GetUsersArg {
   searchQuery: string;
 }
 
-async function getUsers({ searchQuery }: GetUsersArg): Promise<UsersView[]> {
+async function seratchUsers({
+  searchQuery,
+}: GetUsersArg): Promise<UsersView[]> {
   if (searchQuery.length === 0) {
     return Promise.resolve([]);
   }
@@ -30,8 +32,8 @@ async function getUsers({ searchQuery }: GetUsersArg): Promise<UsersView[]> {
   return data as UsersView[];
 }
 
-export const useGetUsers = (args: GetUsersArg) =>
+export const useSearchUsers = (args: GetUsersArg) =>
   useQuery({
     queryKey: ['getUsers', args.searchQuery],
-    queryFn: () => getUsers(args),
+    queryFn: () => seratchUsers(args),
   });

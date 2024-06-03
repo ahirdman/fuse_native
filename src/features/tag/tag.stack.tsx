@@ -2,9 +2,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import type { TagTabParamList } from 'navigation.types';
 
+import { selectUserId } from 'auth/auth.slice';
 import { TabHeader } from 'features/navigation/components/TabHeader';
 import { AvatarButton } from 'navigation/components/AvatarButton';
-import { useGetAvatarUrl } from 'social/queries/getSignedAvatarUrl';
+import { useGetUser } from 'social/queries/getUser';
 import { useAppSelector } from 'store/hooks';
 import { TagView } from 'tag/routes/Tag';
 import { TagListView } from 'tag/routes/Tags';
@@ -12,8 +13,8 @@ import { TagListView } from 'tag/routes/Tags';
 const TagStackNavigator = createNativeStackNavigator<TagTabParamList>();
 
 export function TagStack() {
-  const avatarUrl = useAppSelector((state) => state.auth.profile?.avatarUrl);
-  const userAvatar = useGetAvatarUrl(avatarUrl);
+  const userId = useAppSelector(selectUserId);
+  const { data } = useGetUser(userId);
 
   return (
     <TagStackNavigator.Navigator
@@ -27,7 +28,7 @@ export function TagStack() {
           headerLeft: () => (
             <AvatarButton
               onPress={() => props.navigation.openDrawer()}
-              imageUrl={userAvatar.data}
+              imageUrl={data?.avatar_url}
             />
           ),
         })}
