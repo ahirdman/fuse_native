@@ -16,7 +16,10 @@ import { RefreshControl } from 'react-native';
 import { H4, Separator, Spinner, View, XStack, YStack } from 'tamagui';
 
 import type { Tables, TagOrFuseEntry } from 'lib/supabase/database.interface';
-import type { TagTabScreenProps } from 'navigation.types';
+import type {
+  TagScreenNavigationProp,
+  TagTabScreenProps,
+} from 'navigation.types';
 import { formatMsDuration } from 'util/index';
 import { showToast } from 'util/toast';
 
@@ -243,14 +246,40 @@ interface TagSyncSectionProps {
   isFriendsTag: boolean;
 }
 
+interface CreateFuseArgs {
+  currentTag: Tables<'tags'>;
+  selectedTag: Tables<'tags'>;
+}
+
 function TagActions({ tag, tracks, isFriendsTag }: TagSyncSectionProps) {
   const tagStatus = getTagSyncStatus({ ...tag });
   const { mutateAsync: syncPlaylist } = useSyncPlaylist({ tagStatus });
+  const { mutate: createFuse } = useCreateFuseTag();
   const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const navigation = useNavigation<TagScreenNavigationProp>();
 
   const handlePresentModalPress = useCallback(() => {
     bottomSheetRef.current?.present();
   }, []);
+
+  function onCreateFuse({ currentTag, selectedTag }: CreateFuseArgs) {
+    createFuse(
+      {
+        tagIds: [currentTag.id, selectedTag.id],
+        name: `${currentTag.name} ${selectedTag.name}`,
+      },
+      {
+        onSuccess: (data, args) => {
+          navigation.setParams({
+            type: 'fuse',
+            tagIds: [currentTag.id, selectedTag.id],
+            name: args.name,
+            id: data.id,
+          });
+        },
+      },
+    );
+  }
 
   return (
     <YStack gap={16} px={12} pt={12}>
@@ -292,7 +321,7 @@ function TagActions({ tag, tracks, isFriendsTag }: TagSyncSectionProps) {
                   name: tag.name,
                   tracks: tracks.map((track) => track.uri) ?? [],
                   id: tag.id,
-                  type: 'tags',
+                  type: tag.type === 'fuse' ? 'fuseTags' : 'tags',
                   snapshot_id: tag.latest_snapshot_id,
                   playlistId: tag.spotify_playlist_id,
                 },
@@ -319,9 +348,9 @@ function TagActions({ tag, tracks, isFriendsTag }: TagSyncSectionProps) {
             icon={<Plus />}
           />
         )}
-        {isFriendsTag && (
+        {isFriendsTag && tag.type === 'tag' && (
           <DetachedModal ref={bottomSheetRef} snapPoints={['20%']}>
-            <FuseForm tag={tag} />
+            <FuseForm tag={tag} onCreateFuse={onCreateFuse} />
           </DetachedModal>
         )}
       </XStack>
@@ -435,9 +464,11 @@ function EditTagSheet({ tag }: { tag: TagOrFuseEntry }) {
   );
 }
 
-function FuseForm({ tag: currentTag }: { tag: TagOrFuseEntry }) {
+function FuseForm({
+  tag: currentTag,
+  onCreateFuse,
+}: { tag: Tables<'tags'>; onCreateFuse(args: CreateFuseArgs): void }) {
   const userId = useAppSelector(selectUserId);
-  const { mutate: createFuse } = useCreateFuseTag();
   const { data } = useGetTags(userId);
 
   return (
@@ -450,12 +481,7 @@ function FuseForm({ tag: currentTag }: { tag: TagOrFuseEntry }) {
             name={tag.name}
             color={{ type: 'tag', color: tag.color }}
             key={tag.id}
-            onPress={() =>
-              createFuse({
-                tagIds: [currentTag.id, tag.id],
-                name: `${currentTag.name} ${tag.name}`,
-              })
-            }
+            onPress={() => onCreateFuse({ currentTag, selectedTag: tag })}
           />
         ))}
       </XStack>
