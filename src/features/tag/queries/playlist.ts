@@ -3,6 +3,7 @@ import { store } from 'store';
 
 import { useMutation } from '@tanstack/react-query';
 import { selectSpotifyUserId } from 'auth/auth.slice';
+import { fuseKeys } from 'fuse/queries/keys';
 import { queryClient } from 'lib/query/init';
 import { spotifyService } from 'services/spotify.api';
 import { showToast } from 'util/toast';
@@ -143,9 +144,12 @@ export const useSyncPlaylist = ({ tagStatus }: UseSyncPlaylistArgs) =>
         message: 'Could not create playlist',
       });
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (_, args) => {
       queryClient.invalidateQueries({
-        queryKey: tagKeys.detail(variables.id),
+        queryKey:
+          args.type === 'tags'
+            ? tagKeys.detail(args.id)
+            : fuseKeys.detail(args.id),
       });
     },
   });

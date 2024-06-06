@@ -1,10 +1,14 @@
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { DrawerScreenProps } from '@react-navigation/drawer';
 import type {
+  CompositeNavigationProp,
   CompositeScreenProps,
   NavigatorScreenParams,
 } from '@react-navigation/native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type {
+  NativeStackNavigationProp,
+  NativeStackScreenProps,
+} from '@react-navigation/native-stack';
 
 /*
  *  Root Stack
@@ -72,14 +76,14 @@ export type LibraryTabScreenProps<T extends keyof LibraryParamList> =
     RootStackScreenProps<keyof RootStackParamList>
   >;
 
-interface TagViewParams {
+interface FuseTagViewParams {
   type: 'fuse';
   id: number;
   name: string;
   tagIds: number[];
 }
 
-interface FuseTagViewParams {
+interface TagViewParams {
   type: 'tag';
   id: number;
   name: string;
@@ -117,6 +121,11 @@ export type TagTabScreenProps<T extends keyof TagTabParamList> =
     NativeStackScreenProps<TagTabParamList, T>,
     RootStackScreenProps<keyof RootStackParamList>
   >;
+
+export type TagScreenNavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<TagTabParamList, 'Tag'>,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
 declare global {
   namespace ReactNavigation {
