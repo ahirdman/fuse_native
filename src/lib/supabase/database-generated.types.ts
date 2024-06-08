@@ -139,8 +139,6 @@ export type Database = {
           spotify_playlist_id: string | null
           spotify_playlist_uri: string | null
           synced_at: string | null
-          tag_id: number | null
-          tag_id_1: number | null
           type: Database["public"]["Enums"]["tag_type"]
           updated_at: string
         }
@@ -153,8 +151,6 @@ export type Database = {
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
           synced_at?: string | null
-          tag_id?: number | null
-          tag_id_1?: number | null
           type?: Database["public"]["Enums"]["tag_type"]
           updated_at?: string
         }
@@ -167,8 +163,6 @@ export type Database = {
           spotify_playlist_id?: string | null
           spotify_playlist_uri?: string | null
           synced_at?: string | null
-          tag_id?: number | null
-          tag_id_1?: number | null
           type?: Database["public"]["Enums"]["tag_type"]
           updated_at?: string
         }
@@ -197,21 +191,21 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fusetagtags_fuse_id_fkey"
+            foreignKeyName: "public_fusetagtags_fuse_id_fkey"
             columns: ["fuse_id"]
             isOneToOne: false
             referencedRelation: "fuseTags"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fusetagtags_tag_id_fkey"
+            foreignKeyName: "public_fusetagtags_tag_id_fkey"
             columns: ["tag_id"]
             isOneToOne: false
             referencedRelation: "tags"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "fusetagtags_tag_id_fkey"
+            foreignKeyName: "public_fusetagtags_tag_id_fkey"
             columns: ["tag_id"]
             isOneToOne: false
             referencedRelation: "tags_with_track_ids"
