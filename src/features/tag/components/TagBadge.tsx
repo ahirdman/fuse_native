@@ -1,3 +1,4 @@
+import { CheckCircle2 } from '@tamagui/lucide-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Paragraph, XStack, type XStackProps } from 'tamagui';
 
@@ -10,9 +11,10 @@ type TagColor =
 interface TagProps extends XStackProps {
   name: string;
   color: TagColor;
+  selected?: boolean;
 }
 
-export function TagBadge({ name, color, ...props }: TagProps) {
+export function TagBadge({ name, color, selected, ...props }: TagProps) {
   const gradientColors =
     color.type === 'tag'
       ? [hexToRGBA(color.color, 0.1), hexToRGBA(color.color, 0.1)]
@@ -28,12 +30,15 @@ export function TagBadge({ name, color, ...props }: TagProps) {
           borderRadius: 4,
           paddingVertical: 4,
           paddingHorizontal: 10,
-          alignSelf: 'flex-end',
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 8,
         }}
       >
         <Paragraph fontWeight="bold" color={fontColor}>
           {name}
         </Paragraph>
+        {selected && <CheckCircle2 color={fontColor} size={20} />}
       </LinearGradient>
     </XStack>
   );

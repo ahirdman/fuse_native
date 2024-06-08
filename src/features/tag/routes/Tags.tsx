@@ -19,6 +19,7 @@ import { PagerChips } from 'social/components/PagerChips';
 import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagRow } from 'tag/components/TagRow';
 import { useGetTags } from 'tag/queries/getTags';
+import { hapticFeedback } from 'util/haptic';
 
 const pagerScreens = ['tags', 'fuse tags'];
 
@@ -28,6 +29,7 @@ export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
   const { ref, setPage } = usePager();
 
   function handleCreateTag() {
+    hapticFeedback('Medium');
     setCreateTagSheetOpen(true);
   }
 

@@ -11,9 +11,9 @@ import {
   XOctagon,
 } from '@tamagui/lucide-icons';
 import * as Linking from 'expo-linking';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshControl } from 'react-native';
-import { H4, Separator, Spinner, View, XStack, YStack } from 'tamagui';
+import { Button, H4, Separator, Spinner, View, XStack, YStack } from 'tamagui';
 
 import type { Tables, TagOrFuseEntry } from 'lib/supabase/database.interface';
 import type {
@@ -349,7 +349,7 @@ function TagActions({ tag, tracks, isFriendsTag }: TagSyncSectionProps) {
           />
         )}
         {isFriendsTag && tag.type === 'tag' && (
-          <DetachedModal ref={bottomSheetRef} snapPoints={['20%']}>
+          <DetachedModal ref={bottomSheetRef} snapPoints={['30%']}>
             <FuseForm tag={tag} onCreateFuse={onCreateFuse} />
           </DetachedModal>
         )}
@@ -470,10 +470,23 @@ function FuseForm({
 }: { tag: Tables<'tags'>; onCreateFuse(args: CreateFuseArgs): void }) {
   const userId = useAppSelector(selectUserId);
   const { data } = useGetTags(userId);
+  const [selectedTagId, setSelectedTagId] = useState<number | undefined>(
+    undefined,
+  );
+
+  function handleCreateFuse() {
+    const selected = data?.find((tag) => tag.id === selectedTagId);
+
+    if (!selected) {
+      return;
+    }
+
+    onCreateFuse({ currentTag, selectedTag: selected });
+  }
 
   return (
-    <YStack gap={12}>
-      <H4>Select Tag to Fuse with</H4>
+    <YStack gap={12} justifyContent="space-between" f={1} pb={12}>
+      <H4>{`Select Tag to Fuse with ${currentTag.name}`}</H4>
 
       <XStack gap={12}>
         {data?.map((tag) => (
@@ -481,10 +494,15 @@ function FuseForm({
             name={tag.name}
             color={{ type: 'tag', color: tag.color }}
             key={tag.id}
-            onPress={() => onCreateFuse({ currentTag, selectedTag: tag })}
+            selected={tag.id === selectedTagId}
+            onPress={() => setSelectedTagId(tag.id)}
           />
         ))}
       </XStack>
+
+      <Button disabled={!selectedTagId} onPress={handleCreateFuse}>
+        Create Fuse
+      </Button>
     </YStack>
   );
 }
