@@ -1,9 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
-import { queryClient } from 'lib/query/init';
 
+import { queryClient } from 'lib/query/init';
 import { supabase } from 'lib/supabase/supabase.init';
 import { showToast } from 'util/toast';
-import { fuseKeys } from './keys';
+
+import { fuseKeys } from 'fuse/queries/keys';
 
 interface CreateFuseTagArgs {
   tagIds: number[];
@@ -13,6 +14,10 @@ interface CreateFuseTagArgs {
 async function createFuseTag({ tagIds, name }: CreateFuseTagArgs) {
   if (tagIds.length < 2) {
     throw new Error('Creating a fuse requires at least two tags');
+  }
+
+  if (tagIds.length > 2) {
+    throw new Error('Only two tags are supported');
   }
 
   const { data, error } = await supabase
