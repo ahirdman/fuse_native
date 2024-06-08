@@ -1,3 +1,4 @@
+import type BottomSheet from '@gorhom/bottom-sheet';
 import { X } from '@tamagui/lucide-icons';
 import { useRef } from 'react';
 import PagerView from 'react-native-pager-view';
@@ -20,14 +21,14 @@ import { CreateUserPage } from 'auth/pages/create-user';
 import { PickSubscription } from 'auth/pages/pick-subscription';
 import { SignUpProvider, useSignUp } from 'auth/proivders/signUp.provider';
 import { useDeleteUser } from 'auth/queries/deleteUser';
-import { BottomSheet, type BottomSheetMethods } from 'components/BottomSheet';
+import { DetachedBottomSheet } from 'components/DetachedBottomSheet';
 import { Text } from 'components/Text';
 
 type Props = RootStackScreenProps<'SignUp'>;
 
 export function SignUpView({ navigation }: Props) {
   const pager = usePager();
-  const bottomSheetRef = useRef<BottomSheetMethods>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   function handleOnClose() {
     navigation.goBack();
@@ -52,12 +53,12 @@ export function SignUpView({ navigation }: Props) {
         <PickSubscription />
       </PagerView>
 
-      <BottomSheet ref={bottomSheetRef}>
+      <DetachedBottomSheet ref={bottomSheetRef}>
         <CancelSignUpSheetContent
           handleClose={handleOnClose}
           handleResume={() => bottomSheetRef.current?.close()}
         />
-      </BottomSheet>
+      </DetachedBottomSheet>
     </SignUpProvider>
   );
 }
