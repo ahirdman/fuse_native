@@ -25,8 +25,8 @@ import { showToast } from 'util/toast';
 
 import { selectUserId } from 'auth/auth.slice';
 import { Alert } from 'components/Alert';
-import { DetachedModal } from 'components/BottomSheetV2';
 import { CircleBUtton } from 'components/CircleButton';
+import { DetachedModal } from 'components/DetachedModal';
 import { StyledImage } from 'components/Image';
 import { ListFooterComponent } from 'components/ListFooter';
 import { SectionBox } from 'components/SecitonBox';
@@ -349,7 +349,7 @@ function TagActions({ tag, tracks, isFriendsTag }: TagSyncSectionProps) {
           />
         )}
         {isFriendsTag && tag.type === 'tag' && (
-          <DetachedModal ref={bottomSheetRef} snapPoints={['30%']}>
+          <DetachedModal ref={bottomSheetRef}>
             <FuseForm tag={tag} onCreateFuse={onCreateFuse} />
           </DetachedModal>
         )}
@@ -485,7 +485,7 @@ function FuseForm({
   }
 
   return (
-    <YStack gap={12} justifyContent="space-between" f={1} pb={12}>
+    <YStack gap={12} justifyContent="space-between" pb={12}>
       <H4>{`Select Tag to Fuse with ${currentTag.name}`}</H4>
 
       <XStack gap={12}>

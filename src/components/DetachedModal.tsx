@@ -4,33 +4,15 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import { type ReactNode, forwardRef, useCallback, useMemo } from 'react';
+import { type ReactNode, forwardRef, useCallback } from 'react';
 import { StyleSheet, type ViewProps } from 'react-native';
-import type { SharedValue } from 'react-native-reanimated';
 
 interface DetachedModalProps extends ViewProps {
   children: ReactNode;
-  snapPoints?:
-    | (string | number)[]
-    | SharedValue<(string | number)[]>
-    | Readonly<(string | number)[] | SharedValue<(string | number)[]>>
-    | undefined;
 }
 
 export const DetachedModal = forwardRef<BottomSheetModal, DetachedModalProps>(
-  ({ children, snapPoints, ...props }, ref) => {
-    const baseSnapPoints = useMemo(() => {
-      if (snapPoints) {
-        return snapPoints;
-      }
-
-      return ['40%'];
-    }, [snapPoints]);
-
-    const handleSheetChanges = useCallback((index: number) => {
-      console.log('handleSheetChanges', index);
-    }, []);
-
+  ({ children, ...props }, ref) => {
     const renderBackdrop = useCallback(
       (props: BottomSheetBackdropProps) => (
         <BottomSheetBackdrop
@@ -49,8 +31,7 @@ export const DetachedModal = forwardRef<BottomSheetModal, DetachedModalProps>(
         index={0}
         bottomInset={46}
         detached={true}
-        onChange={handleSheetChanges}
-        snapPoints={baseSnapPoints}
+        enableDynamicSizing={true}
         backdropComponent={renderBackdrop}
         backgroundStyle={[styles.background, props.style]}
         handleStyle={[styles.handle, props.style]}
@@ -65,8 +46,8 @@ export const DetachedModal = forwardRef<BottomSheetModal, DetachedModalProps>(
 
 const styles = StyleSheet.create({
   sheetView: {
-    flex: 1,
     paddingHorizontal: 20,
+    paddingBottom: 24,
   },
   modal: {
     marginHorizontal: 24,
