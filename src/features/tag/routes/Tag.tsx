@@ -390,7 +390,7 @@ function getTagSyncStatus({
   }
 
   if (!updated_at) {
-    return 'Unsynced'; // TODO: Missing property in fusetags
+    return 'Unsynced';
   }
 
   return synced_at.slice(0, 19) >= updated_at.slice(0, 19)
