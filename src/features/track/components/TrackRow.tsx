@@ -1,5 +1,5 @@
-import { Tags } from '@tamagui/lucide-icons';
-import { Stack, View, type ViewProps, XStack, YStack } from 'tamagui';
+import { Check, Tags } from '@tamagui/lucide-icons';
+import { Checkbox, Stack, View, type ViewProps, XStack, YStack } from 'tamagui';
 
 import { StyledImage } from 'components/Image';
 import { Text } from 'components/Text';
@@ -11,6 +11,8 @@ interface TrackRowProps extends ViewProps {
   track: SpotifyTrack;
   height: number;
   isTagged?: boolean;
+  selectable?: boolean;
+  isSelected?: boolean;
 }
 
 export function TrackRow({
@@ -18,11 +20,13 @@ export function TrackRow({
   height,
   onPress,
   isTagged,
+  selectable,
+  isSelected,
   ...props
 }: TrackRowProps) {
   return (
     <View
-      accessibilityRole="button"
+      role="button"
       onPress={onPress}
       pressStyle={{ bg: '$primary600', borderRadius: 4, opacity: 0.5 }}
       {...props}
@@ -47,7 +51,7 @@ export function TrackRow({
               fontWeight="500"
               fontSize="$4"
               lineHeight="$1"
-              selectable={false}
+              userSelect={undefined}
             >
               {track.name}
             </Text>
@@ -57,7 +61,7 @@ export function TrackRow({
               numberOfLines={1}
               fontSize="$3"
               lineHeight="$2"
-              selectable={false}
+              userSelect={undefined}
             >
               {`${track.artist ?? 'NA'} - ${track.album}`}
             </Text>
@@ -74,6 +78,22 @@ export function TrackRow({
             >
               <Tags size={18} color="$brandDark" />
             </Stack>
+          )}
+
+          {selectable && (
+            <Checkbox
+              size="$4"
+              alignSelf="center"
+              mr={16}
+              radiused
+              key={track.id}
+              checked={isSelected}
+              onPress={onPress}
+            >
+              <Checkbox.Indicator>
+                <Check />
+              </Checkbox.Indicator>
+            </Checkbox>
           )}
         </XStack>
       </XStack>

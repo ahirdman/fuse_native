@@ -27,6 +27,7 @@ import { Profile } from 'social/routes/Profile';
 import { TagStack } from 'tag/tag.stack';
 import { LibraryStack } from 'track/library.stack';
 import { AddTag } from 'track/routes/AddTag';
+import { AddTracks } from 'track/routes/AddTracks';
 import { Track } from 'track/routes/Track';
 import { Settings } from 'user/routes/Settings';
 
@@ -52,6 +53,30 @@ function RootNavigationStack() {
             <RootStack.Screen name="Root" component={DrawerStack} />
             <RootStack.Screen name="Track" component={Track} />
             <RootStack.Screen
+              name="AddTracks"
+              component={AddTracks}
+              options={(props) => {
+                return {
+                  presentation: 'modal',
+                  title: 'Add Tracks',
+                  headerTitleStyle: { color: '#FFF' },
+                  headerShown: true,
+                  headerStyle: { backgroundColor: '#232323' },
+                  headerLeft: () => (
+                    <XStack onPress={() => props.navigation.goBack()}>
+                      <X
+                        color="$white"
+                        pressStyle={{
+                          color: '$border300',
+                        }}
+                      />
+                    </XStack>
+                  ),
+                };
+              }}
+            />
+
+            <RootStack.Screen
               name="AddTag"
               component={AddTag}
               options={(props) => {
@@ -64,6 +89,7 @@ function RootNavigationStack() {
                   headerLeft: () => (
                     <XStack onPress={() => props.navigation.goBack()}>
                       <X
+                        color="$white"
                         pressStyle={{
                           color: '$border300',
                         }}

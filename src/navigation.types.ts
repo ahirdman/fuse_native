@@ -24,6 +24,9 @@ export type RootStackParamList = {
   AddTag: {
     trackId: string;
   };
+  AddTracks: {
+    tagId: number;
+  };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
