@@ -38,7 +38,10 @@ export function InputField<T extends FieldValues>({
   const { field, fieldState } = useController(controlProps);
 
   return (
-    <YStack {...stackProps} pb={isDefined(fieldState.error) ? 0 : 20}>
+    <YStack
+      {...stackProps}
+      pb={isDefined(fieldState.error) ? 0 : stackProps?.pb ? stackProps.pb : 20}
+    >
       {label && (
         <Label
           unstyled
