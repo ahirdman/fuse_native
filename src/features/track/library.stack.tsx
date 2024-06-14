@@ -8,7 +8,6 @@ import { selectUserId } from 'auth/auth.slice';
 import { StyledImage } from 'components/Image';
 import { TabHeader } from 'features/navigation/components/TabHeader';
 import { useGetUser } from 'social/queries/getUser';
-import { XStack } from 'tamagui';
 import { Tracks } from 'track/routes/Tracks';
 
 const LibraryNavigator = createNativeStackNavigator<LibraryParamList>();
@@ -34,14 +33,12 @@ export function LibraryStack() {
             />
           ),
           headerTitle: () => (
-            <XStack>
-              <StyledImage
-                source={require('../../../assets/icons/Spotify_Logo_White.png')}
-                h={30}
-                width="$full"
-                contentFit="contain"
-              />
-            </XStack>
+            <StyledImage
+              source={require('../../../assets/icons/Spotify_Logo_White.png')}
+              h={30}
+              width="$full"
+              contentFit="contain"
+            />
           ),
         })}
       />

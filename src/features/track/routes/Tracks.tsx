@@ -107,25 +107,25 @@ export function Tracks({ navigation }: LibraryTabScreenProps<'Tracks'>) {
   return (
     <YStack fullscreen bg="$primary700">
       <XStack
-        bg="$primary300"
+        bg="$primary700"
         px={8}
         borderBottomColor="$border400"
-        borderWidth={0.5}
-        py={8}
+        borderBottomWidth={0.5}
+        pt={8}
         onLayout={(event) => handleListHeight(event.nativeEvent.layout.height)}
         gap={8}
       >
-        <FilterMenu
-          filterTags={filterTaggedTracks}
-          setFilterTags={onFilterToggle}
-        />
         <InputField
           controlProps={{ control, name: 'trackFilter' }}
           placeholder="Search for artists or track names"
           autoCorrect={false}
           autoCapitalize="none"
-          stackProps={{ flex: 3 }}
+          stackProps={{ flex: 3, pb: 12 }}
           iconLeft={<Search color="$border300" size={18} />}
+        />
+        <FilterMenu
+          filterTags={filterTaggedTracks}
+          setFilterTags={onFilterToggle}
         />
       </XStack>
 
