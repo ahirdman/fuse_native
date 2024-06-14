@@ -49,7 +49,7 @@ export function AddTag({
       headerRight: () => (
         <Text
           fontWeight="bold"
-          selectable={false}
+          userSelect={undefined}
           onPress={() => setSelectMultiple(!selectMultiple)}
           pressStyle={{
             color: '$border300',

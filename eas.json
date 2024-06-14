@@ -41,6 +41,7 @@
     "production": {
       "ios": {
         "appleId": "hirdman.alex@icloud.com",
+        "ascAppId": "6475268247",
         "appleTeamId": "64FFA8NJWP"
       }
     }

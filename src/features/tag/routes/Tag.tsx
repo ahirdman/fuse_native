@@ -343,7 +343,7 @@ function TagActions({ tag, tracks, isFriendsTag }: TagSyncSectionProps) {
 
         {!isFriendsTag && tag.type === 'tag' && (
           <CircleBUtton
-            onPress={() => console.log('Not implemented')}
+            onPress={() => navigation.navigate('AddTracks', { tagId: tag.id })}
             label="Add Tracks"
             icon={<Plus />}
           />
