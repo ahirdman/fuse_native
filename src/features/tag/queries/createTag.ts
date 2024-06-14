@@ -6,6 +6,7 @@ import { supabase } from 'lib/supabase/supabase.init';
 import { showToast } from 'util/toast';
 
 import { trackTagKeys } from 'track/queries/keys';
+import { tagKeys } from './keys';
 
 interface CreateTagArgs {
   color: string;
@@ -48,9 +49,13 @@ export const useCreateTag = () =>
   useMutation({
     mutationFn: createTag,
     onError: () => showToast({ title: 'Error creating tag', preset: 'error' }),
-    onSuccess: (_data) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: trackTagKeys.list(),
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: tagKeys.lists(data.created_by),
       });
     },
   });

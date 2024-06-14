@@ -1,6 +1,6 @@
 import { ArrowLeft } from '@tamagui/lucide-icons';
 import * as Linking from 'expo-linking';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Button,
@@ -17,11 +17,14 @@ import { StyledImage } from 'components/Image';
 import { Text } from 'components/Text';
 import type { RootStackScreenProps } from 'navigation.types';
 
+import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { Blur, Canvas, Image, useImage } from '@shopify/react-native-skia';
 import { selectUserId } from 'auth/auth.slice';
+import { DetachedModal } from 'components/DetachedModal';
 import { useAppSelector } from 'store/hooks';
-import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
 import { TagBadge } from 'tag/components/TagBadge';
+import { TagForm } from 'tag/components/Tagform';
+import { useCreateTag } from 'tag/queries/createTag';
 import { useGetTrack } from 'track/queries/getTrack';
 import { useGetTrackTags } from 'track/queries/getTrackTags';
 import { useIsSpotifyInstalled } from 'track/queries/isSpotifyInstalled';
@@ -35,9 +38,9 @@ export function Track({
   navigation,
 }: RootStackScreenProps<'Track'>) {
   const { data: track, isLoading, isError } = useGetTrack(trackId);
-
+  const { mutate: createTag } = useCreateTag();
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const insets = useSafeAreaInsets();
-  const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -78,7 +81,7 @@ export function Track({
       <TrackTags trackId={trackId} />
 
       <XStack gap={16} mx={8}>
-        <Button flex={1} onPress={() => setCreateTagSheetOpen(true)}>
+        <Button flex={1} onPress={() => bottomSheetRef.current?.present()}>
           Create new tag
         </Button>
         <Button flex={1} onPress={() => navigation.push('AddTag', { trackId })}>
@@ -86,11 +89,22 @@ export function Track({
         </Button>
       </XStack>
 
-      <CreateTagSheet
-        isOpen={createTagSheetOpen}
-        trackId={trackId}
-        closeSheet={() => setCreateTagSheetOpen(false)}
-      />
+      <DetachedModal ref={bottomSheetRef}>
+        <TagForm
+          label="Create New Tag"
+          closeAction={() => bottomSheetRef.current?.close()}
+          confirmAction={({ name, color }) =>
+            createTag(
+              { name, color, trackId },
+              {
+                onSuccess: () => {
+                  bottomSheetRef.current?.close();
+                },
+              },
+            )
+          }
+        />
+      </DetachedModal>
     </YStack>
   );
 }
