@@ -24,7 +24,7 @@ export function TagStack() {
         name="TagList"
         component={TagListView}
         options={(props) => ({
-          headerTitle: 'Tag',
+          headerTitle: 'Tags',
           headerLeft: () => (
             <AvatarButton
               onPress={() => props.navigation.openDrawer()}

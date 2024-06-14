@@ -1,18 +1,18 @@
 import { Check } from '@tamagui/lucide-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { memo } from 'react';
 import {
   AnimatePresence,
   Checkbox,
   type GetProps,
+  Text,
   XStack,
-  YStack,
   styled,
 } from 'tamagui';
-import { TagBadge } from './TagBadge';
 
 interface TagListRowProps extends TagRowProps {
   onPress?(): void;
-  color: string;
+  color: string | string[];
   name: string;
   selecteble?: boolean;
   isSelected?: boolean;
@@ -27,11 +27,18 @@ export const TagRow = memo(
     isSelected = false,
     ...props
   }: TagListRowProps) => {
+    const gradientColors = Array.isArray(color) ? color : [color, color];
+    const textColor = Array.isArray(color) ? 'white' : color;
+
     return (
       <StyledTagRow {...props} onPress={onPress}>
-        <YStack>
-          <TagBadge name={name} color={{ type: 'tag', color }} />
-        </YStack>
+        <XStack gap={12} ai="center">
+          <LinearGradient
+            colors={gradientColors}
+            style={{ width: 18, height: 18, borderRadius: 100 }}
+          />
+          <Text color={textColor}>{name}</Text>
+        </XStack>
 
         <AnimatePresence>
           {selecteble && (
@@ -66,7 +73,7 @@ export const TagRow = memo(
 
 type TagRowProps = GetProps<typeof StyledTagRow>;
 
-const StyledTagRow = styled(XStack, {
+export const StyledTagRow = styled(XStack, {
   borderRadius: 8,
   elevation: 2,
   borderWidth: 0.5,

@@ -1,23 +1,26 @@
+import type { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { FlashList } from '@shopify/flash-list';
-import { useState } from 'react';
+import { Plus } from '@tamagui/lucide-icons';
+import { useCallback, useRef, useState } from 'react';
 import { RefreshControl, StyleSheet } from 'react-native';
 import PagerView from 'react-native-pager-view';
-import { Paragraph, XStack, YStack } from 'tamagui';
+import { type ColorTokens, Paragraph, Text, XStack, YStack } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database-generated.types';
 import type { TagTabScreenProps } from 'navigation.types';
 import { useAppSelector } from 'store/hooks';
 
 import { selectUserId } from 'auth/auth.slice';
-import { SectionButton } from 'components/SectionButton';
+import { DetachedModal } from 'components/DetachedModal';
 import {
   type FuseTagWithSubTags,
   useGetFuseLists,
 } from 'fuse/queries/getFuseLists';
 import { usePager } from 'hooks/usePager';
 import { PagerChips } from 'social/components/PagerChips';
-import { CreateTagSheet } from 'tag/components/CreateTag.sheet';
-import { TagRow } from 'tag/components/TagRow';
+import { StyledTagRow, TagRow } from 'tag/components/TagRow';
+import { TagForm } from 'tag/components/Tagform';
+import { useCreateTag } from 'tag/queries/createTag';
 import { useGetTags } from 'tag/queries/getTags';
 import { hapticFeedback } from 'util/haptic';
 
@@ -25,13 +28,7 @@ const pagerScreens = ['tags', 'fuse tags'];
 
 export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
   const [activePageIndex, setActivePageIndex] = useState(0);
-  const [createTagSheetOpen, setCreateTagSheetOpen] = useState(false);
   const { ref, setPage } = usePager();
-
-  function handleCreateTag() {
-    hapticFeedback('Medium');
-    setCreateTagSheetOpen(true);
-  }
 
   function handleTagRowPress(tag: Tables<'tags'>) {
     navigation.navigate('Tag', { ...tag, type: 'tag' });
@@ -48,10 +45,6 @@ export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
 
   return (
     <YStack fullscreen bg="$primary700" px={12} pt={8} gap={12}>
-      <XStack justifyContent="space-between" bg="$colorTransparent">
-        <SectionButton title="Create Tag" onPress={handleCreateTag} />
-      </XStack>
-
       <YStack flex={1}>
         <PagerChips
           pages={pagerScreens}
@@ -76,12 +69,6 @@ export function TagListView({ navigation }: TagTabScreenProps<'TagList'>) {
           </YStack>
         </PagerView>
       </YStack>
-
-      <CreateTagSheet
-        modal
-        isOpen={createTagSheetOpen}
-        closeSheet={() => setCreateTagSheetOpen(false)}
-      />
     </YStack>
   );
 }
@@ -123,6 +110,7 @@ function TagList({ onRowPress }: TagListProps) {
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       ListEmptyComponent={ListEmpytComponent}
+      ListFooterComponent={<TagListFooter />}
       estimatedItemSize={40}
       ItemSeparatorComponent={ItemSeparatorComponent}
       contentContainerStyle={styles.flashList}
@@ -134,6 +122,46 @@ function TagList({ onRowPress }: TagListProps) {
         />
       }
     />
+  );
+}
+
+function TagListFooter() {
+  const { mutate: createTag } = useCreateTag();
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  const onRowPress = useCallback(() => {
+    hapticFeedback('Medium');
+    bottomSheetRef.current?.present();
+  }, []);
+
+  const color: ColorTokens = '$lightText';
+
+  return (
+    <>
+      <StyledTagRow mt={8} onPress={onRowPress}>
+        <XStack ai="center" gap={8}>
+          <Plus color={color} size={20} />
+          <Text color={color}>Create new tag</Text>
+        </XStack>
+      </StyledTagRow>
+
+      <DetachedModal ref={bottomSheetRef}>
+        <TagForm
+          label="Create New Tag"
+          closeAction={() => bottomSheetRef.current?.close()}
+          confirmAction={({ name, color }) =>
+            createTag(
+              { name, color },
+              {
+                onSuccess: () => {
+                  bottomSheetRef.current?.close();
+                },
+              },
+            )
+          }
+        />
+      </DetachedModal>
+    </>
   );
 }
 
@@ -152,14 +180,10 @@ function FuseList({ onRowPress }: FuseListProps) {
   const keyExtractor = (item: FuseTagWithSubTags) => item.id.toString();
 
   const renderItem = ({ item }: { item: FuseTagWithSubTags }) => {
-    if (!item.tags[0]?.color) {
-      throw new Error('No tag on fuse track');
-    }
-
     return (
       <TagRow
         name={item.name}
-        color={item.tags[0].color}
+        color={item.tags.map((tag) => tag.color)}
         onPress={() => onRowPress({ ...item })}
       />
     );
