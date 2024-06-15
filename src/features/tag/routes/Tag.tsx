@@ -227,7 +227,7 @@ function TagTracksListEmptyComponent({
   }
 
   if (isError) {
-    return <Alert label="Could not get users" type="error" />;
+    return <Alert label="Error getting tracks" type="error" mx={12} />;
   }
 
   return (
