@@ -75,6 +75,7 @@ async function signInSupabase({
     user: {
       id: userData.user.id,
       email: userData.user.email,
+      pushToken: userAccount.pushToken,
     },
     profile: {
       username: userProfile.name,

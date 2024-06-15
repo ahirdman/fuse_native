@@ -22,10 +22,18 @@ export const authSlice = createSlice({
     updateSpotifyToken: (state, action: PayloadAction<SpotifyToken>) => {
       state.spotifyToken = action.payload;
     },
+    updatePushToken: (state, action: PayloadAction<string>) => {
+      if (!state.user) {
+        throw new Error('Tried updating push token without active user');
+      }
+
+      state.user.pushToken = action.payload;
+    },
   },
 });
 
-export const { signIn, signOut, updateSpotifyToken } = authSlice.actions;
+export const { signIn, signOut, updateSpotifyToken, updatePushToken } =
+  authSlice.actions;
 
 export default authSlice.reducer;
 
