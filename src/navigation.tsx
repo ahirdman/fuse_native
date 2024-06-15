@@ -6,6 +6,8 @@ import {
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { X } from '@tamagui/lucide-icons';
+import * as Linking from 'expo-linking';
+import { addNotificationResponseReceivedListener } from 'expo-notifications';
 import { XStack } from 'tamagui';
 
 import type {
@@ -23,6 +25,8 @@ import { Home } from 'features/dashboard/routes/Home';
 import { AppDrawer } from 'features/navigation/components/Drawer';
 import { FullScreenHeader } from 'features/navigation/components/FullScreenHeader';
 import { SocialStack } from 'features/social/social.stack';
+import { useNotifications } from 'hooks/useNotifications';
+import { getStateFromPath } from 'navigation/linking.state';
 import { Profile } from 'social/routes/Profile';
 import { TagStack } from 'tag/tag.stack';
 import { LibraryStack } from 'track/library.stack';
@@ -30,12 +34,14 @@ import { AddTag } from 'track/routes/AddTag';
 import { AddTracks } from 'track/routes/AddTracks';
 import { Track } from 'track/routes/Track';
 import { Settings } from 'user/routes/Settings';
+import { showToast } from 'util/toast';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabsParamList>();
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
+const prefix = Linking.createURL('/');
 
 function RootNavigationStack() {
   const { user, spotifyToken, subscription } = useAppSelector(
@@ -46,7 +52,46 @@ function RootNavigationStack() {
     isDefined(user) && isDefined(spotifyToken) && isDefined(subscription);
 
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer
+      ref={navigationRef}
+      linking={{
+        prefixes: [prefix],
+        getStateFromPath: (path) => {
+          try {
+            if (!userReady) {
+              throw new Error('Cannot route without an active user');
+            }
+
+            const { state } = getStateFromPath({ path });
+
+            return state;
+          } catch (_error) {
+            showToast({
+              title: 'Could not navigate',
+              preset: 'error',
+            });
+          }
+        },
+        subscribe(listener) {
+          const notificationSubscription =
+            addNotificationResponseReceivedListener((response) => {
+              listener(response.notification.request.content.data.url);
+            });
+
+          const linkingSubscription = Linking.addEventListener(
+            'url',
+            ({ url }) => {
+              listener(url);
+            },
+          );
+
+          return () => {
+            notificationSubscription.remove();
+            linkingSubscription.remove();
+          };
+        },
+      }}
+    >
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {userReady ? (
           <>
@@ -116,6 +161,12 @@ function RootNavigationStack() {
 }
 
 function DrawerStack() {
+  useNotifications();
+
+  // const state = useNavigation()
+  //
+  // console.log(JSON.stringify(state.getState(), null, 2))
+
   return (
     <Drawer.Navigator
       initialRouteName="Tabs"

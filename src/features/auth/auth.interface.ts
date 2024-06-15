@@ -11,9 +11,10 @@ export const spotifyTokenSchema = z.object({
 
 export type SpotifyToken = z.infer<typeof spotifyTokenSchema>;
 
-const userSchema = z.object({
+export const userSchema = z.object({
   id: z.string(),
   email: z.string().optional(),
+  pushToken: z.string().optional(),
 });
 
 export type User = z.infer<typeof userSchema>;

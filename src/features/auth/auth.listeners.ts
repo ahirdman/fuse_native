@@ -1,12 +1,22 @@
-import { updateSpotifyToken as updateSpotifyTokenState } from 'auth/auth.slice';
+import Purchases from 'react-native-purchases';
+
 import { queryClient } from 'lib/query/init';
 import { supabase } from 'lib/supabase/supabase.init';
-import Purchases from 'react-native-purchases';
 import { stringSchema } from 'schema';
 import type { AppStartListening } from 'store/middleware';
-import { signIn, signOut } from './auth.slice';
-import { deleteAuthStorageValue, setAuthStorageValue } from './auth.storage';
-import { updateSpotifyToken } from './queries/updateSpotifyToken';
+
+import {
+  deleteAuthStorageValue,
+  setAuthStorageValue,
+} from 'auth//auth.storage';
+import {
+  updatePushToken as updatePushTokenState,
+  updateSpotifyToken as updateSpotifyTokenState,
+} from 'auth/auth.slice';
+import { signIn, signOut } from 'auth/auth.slice';
+import { updatePushToken } from 'auth/queries/updatePushToken';
+import { updateSpotifyToken } from 'auth/queries/updateSpotifyToken';
+import { userSchema } from './auth.interface';
 
 export const addSignOutDispatchListener = (
   startListening: AppStartListening,
@@ -59,6 +69,25 @@ export const addSpotifyTokenUpdateListener = (
         await updateSpotifyToken({ tokenData: action.payload, userId });
 
         setAuthStorageValue('spotifyToken', action.payload);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+  });
+};
+
+export const addPushTokenUpdateListener = (
+  startListening: AppStartListening,
+) => {
+  startListening({
+    actionCreator: updatePushTokenState,
+    effect: async (action, listenerApi) => {
+      try {
+        const user = userSchema.parse(listenerApi.getState().auth.user);
+
+        await updatePushToken({ pushToken: action.payload, userId: user.id });
+
+        setAuthStorageValue('user', { ...user, pushToken: action.payload });
       } catch (error) {
         console.error(error);
       }
