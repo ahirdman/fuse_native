@@ -1,5 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
+import { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
+
+interface GetFriendsRes extends Tables<"profiles"> {
+  requestID: number
+}
 
 async function getFriends(userId: string) {
   const { data, error } = await supabase
@@ -11,24 +16,21 @@ async function getFriends(userId: string) {
     throw new Error(error.message);
   }
 
-  const res = data
+  return data
     .filter((dto) => dto !== null)
     .filter((profile) => profile !== null)
-    .map((dto) => ({
-      ...dto.profiles,
-      requestID: dto.request_id,
-      avatar_url: dto.profiles.avatar_url
+    .map((dto) => {
+      const publicAvatarUrl = dto.profiles.avatar_url
         ? supabase.storage.from('avatars').getPublicUrl(dto.profiles.avatar_url)
-            .data.publicUrl
-        : undefined,
-    })) as {
-    id: string;
-    name: string;
-    avatar_url: string | null;
-    requestID: number;
-  }[];
+          .data.publicUrl
+        : undefined
 
-  return res;
+      return {
+        ...dto.profiles,
+        requestID: dto.request_id,
+        avatar_url: publicAvatarUrl
+      }
+    }) as GetFriendsRes[];
 }
 
 export const useGetFriends = (userId: string) =>

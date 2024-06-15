@@ -29,7 +29,17 @@ async function seratchUsers({
     throw new Error(error.message);
   }
 
-  return data as UsersView[];
+  return data.map(user => {
+    const publicAvatarUrl = user.avatar_url
+      ? supabase.storage.from('avatars').getPublicUrl(user.avatar_url)
+        .data.publicUrl
+      : undefined
+
+    return {
+      ...user,
+      avatar_url: publicAvatarUrl
+    } as UsersView
+  })
 }
 
 export const useSearchUsers = (args: GetUsersArg) =>

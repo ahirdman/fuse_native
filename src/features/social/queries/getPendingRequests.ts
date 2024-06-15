@@ -17,11 +17,17 @@ async function getPendingFriendRequests(
     throw new Error(error.message);
   }
 
-  const res = data
+  return data
     .filter((dto) => dto !== null)
-    .map((profile) => profile.sender_profile) as Tables<'profiles'>[];
+    .map((profile) => {
+      const publicAvatarUrl = profile.sender_profile?.avatar_url
+        ? supabase.storage.from('avatars').getPublicUrl(profile.sender_profile.avatar_url)
+          .data.publicUrl
+        : undefined
 
-  return res;
+
+      return { ...profile.sender_profile, avatar_url: publicAvatarUrl } as Tables<'profiles'>
+    })
 }
 
 export const useGetPendingFriendRequests = (userId: string) =>

@@ -28,9 +28,20 @@ async function getFriendRequests(
     throw new Error(error.message);
   }
 
-  return data.filter(
-    (dto) => dto.sender_profile !== null,
-  ) as RecievedFriendRequest[];
+  return data.filter((dto) => dto.sender_profile !== null,).map(dto => {
+    const publicAvatarUrl = dto.sender_profile?.avatar_url
+      ? supabase.storage.from('avatars').getPublicUrl(dto.sender_profile.avatar_url)
+        .data.publicUrl
+      : undefined
+
+    return {
+      ...dto,
+      sender_profile: {
+        ...dto.sender_profile,
+        avatar_url: publicAvatarUrl
+      }
+    } as RecievedFriendRequest
+  });
 }
 
 export const useGetFriendRequests = <T = RecievedFriendRequest[]>(
