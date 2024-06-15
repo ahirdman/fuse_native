@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { Tables } from 'lib/supabase/database.interface';
+import type { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
 
-interface GetFriendsRes extends Tables<"profiles"> {
-  requestID: number
+interface GetFriendsRes extends Tables<'profiles'> {
+  requestID: number;
 }
 
 async function getFriends(userId: string) {
@@ -22,14 +22,14 @@ async function getFriends(userId: string) {
     .map((dto) => {
       const publicAvatarUrl = dto.profiles.avatar_url
         ? supabase.storage.from('avatars').getPublicUrl(dto.profiles.avatar_url)
-          .data.publicUrl
-        : undefined
+            .data.publicUrl
+        : undefined;
 
       return {
         ...dto.profiles,
         requestID: dto.request_id,
-        avatar_url: publicAvatarUrl
-      }
+        avatar_url: publicAvatarUrl,
+      };
     }) as GetFriendsRes[];
 }
 

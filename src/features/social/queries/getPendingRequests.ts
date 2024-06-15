@@ -21,13 +21,16 @@ async function getPendingFriendRequests(
     .filter((dto) => dto !== null)
     .map((profile) => {
       const publicAvatarUrl = profile.sender_profile?.avatar_url
-        ? supabase.storage.from('avatars').getPublicUrl(profile.sender_profile.avatar_url)
-          .data.publicUrl
-        : undefined
+        ? supabase.storage
+            .from('avatars')
+            .getPublicUrl(profile.sender_profile.avatar_url).data.publicUrl
+        : undefined;
 
-
-      return { ...profile.sender_profile, avatar_url: publicAvatarUrl } as Tables<'profiles'>
-    })
+      return {
+        ...profile.sender_profile,
+        avatar_url: publicAvatarUrl,
+      } as Tables<'profiles'>;
+    });
 }
 
 export const useGetPendingFriendRequests = (userId: string) =>

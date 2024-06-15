@@ -1,6 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
-import { Check, X } from '@tamagui/lucide-icons';
-import { Button, H1, XStack, YStack } from 'tamagui';
+import { Check, Tags, X } from '@tamagui/lucide-icons';
+import { Button, H2, Separator, XStack, YStack } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database.interface';
 import type { FriendsTabScreenProps } from 'navigation.types';
@@ -45,18 +45,34 @@ export function Profile({ route, navigation }: Props) {
   }
 
   return (
-    <YStack
-      fullscreen
-      bg="$primary700"
-      px={16}
-      pb={24}
-      justifyContent="space-between"
-    >
-      <YStack gap={16} alignItems="center">
-        <UserAvatar imageUrl={user.avatar_url ?? undefined} size="xl" />
+    <YStack fullscreen bg="$primary700" justifyContent="space-between">
+      <XStack
+        gap={16}
+        px={24}
+        justifyContent="space-between"
+        position="relative"
+        bg="$brandDark"
+      >
+        <YStack justifyContent="flex-end" zIndex={100} pb={24}>
+          <H2 fontWeight="bold" verticalAlign="bottom">
+            {user.name}
+          </H2>
+        </YStack>
+        <YStack
+          position="absolute"
+          bg="$primary700"
+          h="50%"
+          w="120%"
+          bottom={0}
+        />
 
-        <H1 fontWeight="bold">{user.name}</H1>
-      </YStack>
+        <UserAvatar
+          imageUrl={user.avatar_url ?? undefined}
+          size="xl"
+          borderColor="$primary700"
+          borderWidth={6}
+        />
+      </XStack>
 
       {isFriend ? (
         <FriendProfile user={user} onTagPress={onTagPresa} />
@@ -88,10 +104,25 @@ function FriendProfile({
   }
 
   return (
-    <YStack flex={1} pt={12}>
+    <YStack flex={1} pt={24} px={12} gap={24}>
+      <XStack
+        bg="$primary800"
+        borderRadius={8}
+        h={56}
+        p={8}
+        ai="center"
+        jc="space-evenly"
+      >
+        <XStack gap={8}>
+          <Tags />
+          <Text>{data?.length} tags</Text>
+        </XStack>
+      </XStack>
+
       <FlashList
         data={data}
         renderItem={renderItem}
+        ItemSeparatorComponent={() => <Separator h={8} />}
         estimatedItemSize={100}
         ListEmptyComponent={<Text textAlign="center">No tags</Text>}
       />

@@ -21,7 +21,8 @@ export function UserAvatar({
     small: '$3',
     default: '$6',
     large: '$8',
-    xl: '$16',
+    xl: '$12',
+    xxl: '$16',
   }[size];
 
   return (
@@ -50,14 +51,16 @@ function AvatarBadge({ size, isVisible, onPress }: AvatarBadgeProps) {
     small: { h: 10, right: 0, bottom: 0 },
     default: { h: 20, right: 0, bottom: 0 },
     large: { h: 25, right: 2.5, bottom: 2.5 },
-    xl: { h: 45, right: 10, bottom: 10 },
+    xl: { h: 30, right: 7, bottom: 7 },
+    xxl: { h: 45, right: 10, bottom: 10 },
   }[size];
 
   const iconSize = {
     small: 0,
     default: 8,
     large: 12,
-    xl: 18,
+    xl: 14,
+    xxl: 18,
   }[size];
 
   return (
