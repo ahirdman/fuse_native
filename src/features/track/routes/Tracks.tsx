@@ -8,9 +8,11 @@ import { XStack, YStack } from 'tamagui';
 import { useDebounce } from 'hooks/useDebounce';
 import type { LibraryTabScreenProps } from 'navigation.types';
 
+import { selectUserId } from 'auth/auth.slice';
 import { InputField } from 'components/InputField';
 import { ListEmptyComponent } from 'components/ListEmptyComponent';
 import { ListFooterComponent } from 'components/ListFooter';
+import { useAppSelector } from 'store/hooks';
 import { FilterMenu } from 'track/components/Filter.menu';
 import { TrackRow } from 'track/components/TrackRow';
 import {
@@ -36,7 +38,8 @@ export function Tracks({ navigation }: LibraryTabScreenProps<'Tracks'>) {
   const debouncedTrackFilter = useDebounce(formValue.trackFilter, 300);
   const listRef = useRef<FlashList<SpotifyTrack> | null>(null);
 
-  const { data: trackIds } = useGetTaggedTrackIds();
+  const userId = useAppSelector(selectUserId);
+  const { data: trackIds } = useGetTaggedTrackIds({ userId });
   const {
     data: tracks,
     isError,
