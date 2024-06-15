@@ -26,6 +26,11 @@ async function getTagTracks(ids: number[]): Promise<SpotifyTrackDto[]> {
   );
 
   const trackIds = Array.from(new Set(trackIdSets.flat()));
+
+  if (trackIds.length === 0) {
+    return [];
+  }
+
   const tracks = await getSpotifyTracks(trackIds);
 
   return tracks;
