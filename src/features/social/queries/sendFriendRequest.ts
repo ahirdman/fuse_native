@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { queryClient } from 'lib/query/init';
 import { supabase } from 'lib/supabase/supabase.init';
 import { showToast } from 'util/toast';
 
@@ -28,6 +29,15 @@ async function sendFriendRequest(friendId: string) {
 export const useSendFriendRequest = () =>
   useMutation({
     mutationFn: sendFriendRequest,
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ['getUsers']
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: ['friendRequestsSent']
+      })
+    },
     onError: () => {
       showToast({
         title: 'Could not send friend request',
