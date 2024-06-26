@@ -163,10 +163,6 @@ function RootNavigationStack() {
 function DrawerStack() {
   useNotifications();
 
-  // const state = useNavigation()
-  //
-  // console.log(JSON.stringify(state.getState(), null, 2))
-
   return (
     <Drawer.Navigator
       initialRouteName="Tabs"

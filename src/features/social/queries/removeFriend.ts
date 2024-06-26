@@ -1,16 +1,19 @@
 import { useMutation } from '@tanstack/react-query';
+import { queryClient } from 'lib/query/init';
 import { supabase } from 'lib/supabase/supabase.init';
 import { showToast } from 'util/toast';
 
-async function removeFriend(friendReqId: number) {
+async function removeFriend(friendUserId: string) {
+  const { error: userError, data } = await supabase.from("user_friends").select("request_id").eq("friend_user_id", friendUserId).single()
+
+  if (userError) throw userError
+
   const { error } = await supabase
     .from('friend_requests')
     .delete()
-    .eq('id', friendReqId);
+    .eq('id', data.request_id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw error
 }
 
 export const useRemoveFriend = () =>
@@ -21,5 +24,10 @@ export const useRemoveFriend = () =>
         title: 'Error removing friend',
         preset: 'error',
       });
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["friends"]
+      })
     },
   });

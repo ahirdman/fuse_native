@@ -18,6 +18,10 @@ import { useAppSelector } from 'store/hooks';
 import { TagRow } from 'tag/components/TagRow';
 import { useGetTags } from 'tag/queries/getTags';
 import { showToast } from 'util/toast';
+import { useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { FriendProfileMenu } from 'social/components/profile.menu';
+import { useRemoveFriend } from 'social/queries/removeFriend';
 
 type Props = FriendsTabScreenProps<'Profile'>;
 
@@ -92,6 +96,19 @@ function FriendProfile({
   onTagPress(id: number, name: string, color: string): void;
 }) {
   const { data } = useGetTags(user.id);
+  const navigation = useNavigation()
+  const { mutate } = useRemoveFriend()
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <FriendProfileMenu
+          onDeletePress={() => mutate(user.id, { onSuccess: () => navigation.goBack() })
+          }
+        />
+      ),
+    });
+  }, [navigation]);
 
   function renderItem({ item }: { item: Tables<'tags'> }) {
     return (
@@ -161,7 +178,7 @@ function NonFriendProfile({ user }: ProfileProps) {
   }
 
   return (
-    <YStack jc="center" ai="center" flex={1}>
+    <YStack flex={1} pt={24} px={12} gap={24}>
       {pendingRequest ? (
         <XStack gap={12}>
           <XStack

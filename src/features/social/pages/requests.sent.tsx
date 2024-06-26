@@ -7,7 +7,7 @@ import { UserRow } from 'social/components/UserRow';
 import { useGetPendingFriendRequests } from 'social/queries/getPendingRequests';
 import type { CommonPageProps } from 'social/routes/social';
 import { useAppSelector } from 'store/hooks';
-import { Spinner, View } from 'tamagui';
+import { Separator, Spinner, View } from 'tamagui';
 
 export function SentRequestsPage(props: CommonPageProps) {
   const userId = useAppSelector(selectUserId);
@@ -32,6 +32,7 @@ export function SentRequestsPage(props: CommonPageProps) {
         data={data ?? []}
         renderItem={renderSentRequest}
         estimatedItemSize={72}
+        ItemSeparatorComponent={() => <Separator h={8} />}
         contentContainerStyle={{ paddingHorizontal: 8 }}
         ListEmptyComponent={
           isFetching ? (

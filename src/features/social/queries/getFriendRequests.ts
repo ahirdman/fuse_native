@@ -69,3 +69,13 @@ export const useIsPendingRequest = ({
   useGetFriendRequests(userId, (data) =>
     data.find((request) => request.sender_profile.id === profileId),
   );
+
+interface ProfileRequestStatusArgs {
+  currentUserId: string
+  profileUserId: string
+}
+
+async function getProfileRequestStatus({  currentUserId, profileUserId }: ProfileRequestStatusArgs) {
+  const { data, error } = await supabase.from("friend_requests").select().
+
+}
