@@ -1,0 +1,89 @@
+name: 🐾 Fingerprint Status
+
+on: pull_request
+
+permissions:
+  pull-requests: write
+  actions: write
+  contents: read
+
+jobs:
+  check-pr-fingerprint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Check out Git repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - name: ⬇️ Fetch commits from base branch
+        run: git fetch origin main:main --depth 100
+
+      - name: 🐾 Check Fingerprint and Install Dependencies
+        id: fingerprint
+        uses: ahirdman/gh-actions/fingerprint@main
+        with:
+          profile: 'pull-request'
+
+      - name: 💬 Add Diff Preview
+        uses: ahirdman/gh-actions/comment@main
+        if: ${{ steps.fingerprint.outputs.includes-changes }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fingerprint-diff: ${{ steps.fingerprint.outputs.diff }}
+          template: fingerprint
+          comment-id: diff
+
+      - name: 💬 Delete Old Diff
+        uses: ahirdman/gh-actions/comment@main
+        if: ${{ !steps.fingerprint.outputs.includes-changes }}
+        with:
+          header: fingerprint-diff
+          comment-id: diff
+          delete: true
+
+      - uses: actions/github-script@v7
+        if: ${{ !steps.fingerprint.outputs.includes-changes }}
+        with:
+          script: |
+            try {
+              await github.rest.issues.removeLabel({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: ['Fingerprint:changed']
+              })
+            } catch (e) {
+              if (e.status != 404) {
+                throw e;
+              }
+            }
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Fingerprint:compatible']
+            })
+
+      - uses: actions/github-script@v7
+        if: ${{ steps.fingerprint.outputs.includes-changes }}
+        with:
+          script: |
+            try {
+              await github.rest.issues.removeLabel({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: ['Fingerprint:compatible']
+              })
+            } catch (e) {
+              if (e.status != 404) {
+                throw e;
+              }
+            }
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['Fingerprint:changed']
+            })
