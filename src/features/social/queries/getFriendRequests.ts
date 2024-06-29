@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import type { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
+import type { UsersView } from './getUsers';
 
 export interface RecievedFriendRequest {
   id: number;
@@ -70,12 +71,27 @@ export const useIsPendingRequest = ({
     data.find((request) => request.sender_profile.id === profileId),
   );
 
-interface ProfileRequestStatusArgs {
-  currentUserId: string
-  profileUserId: string
+interface ProfileRelationStatusArgs {
+  profileUserId: string;
 }
 
-async function getProfileRequestStatus({  currentUserId, profileUserId }: ProfileRequestStatusArgs) {
-  const { data, error } = await supabase.from("friend_requests").select().
+async function getProfileRelationStatus({
+  profileUserId,
+}: ProfileRelationStatusArgs): Promise<UsersView> {
+  const { data, error } = await supabase
+    .from('users_with_relation')
+    .select()
+    .eq('id', profileUserId)
+    .returns<UsersView>()
+    .single();
 
+  if (error) throw error;
+
+  return data;
 }
+
+export const useGetProfileRelationStatus = (args: ProfileRelationStatusArgs) =>
+  useQuery({
+    queryKey: ['profile', 'status', args.profileUserId],
+    queryFn: () => getProfileRelationStatus(args),
+  });
