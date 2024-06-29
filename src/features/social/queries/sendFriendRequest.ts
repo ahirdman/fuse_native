@@ -31,12 +31,16 @@ export const useSendFriendRequest = () =>
     mutationFn: sendFriendRequest,
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['getUsers']
-      })
+        queryKey: ['getUsers'],
+      });
 
       queryClient.invalidateQueries({
-        queryKey: ['friendRequestsSent']
-      })
+        queryKey: ['friendRequestsSent'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['profile'],
+      });
     },
     onError: () => {
       showToast({

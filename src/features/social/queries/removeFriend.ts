@@ -4,16 +4,20 @@ import { supabase } from 'lib/supabase/supabase.init';
 import { showToast } from 'util/toast';
 
 async function removeFriend(friendUserId: string) {
-  const { error: userError, data } = await supabase.from("user_friends").select("request_id").eq("friend_user_id", friendUserId).single()
+  const { error: userError, data } = await supabase
+    .from('user_friends')
+    .select('request_id')
+    .eq('friend_user_id', friendUserId)
+    .single();
 
-  if (userError) throw userError
+  if (userError) throw userError;
 
   const { error } = await supabase
     .from('friend_requests')
     .delete()
     .eq('id', data.request_id);
 
-  if (error) throw error
+  if (error) throw error;
 }
 
 export const useRemoveFriend = () =>
@@ -27,7 +31,7 @@ export const useRemoveFriend = () =>
     },
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ["friends"]
-      })
+        queryKey: ['friends'],
+      });
     },
   });
