@@ -9,9 +9,10 @@ interface Props extends NativeStackHeaderProps {}
 export function TabHeader(props: Props) {
   const insets = useSafeAreaInsets();
   const canGoBack = props.navigation.canGoBack();
+  const style = props.options.headerStyle;
 
   return (
-    <XStack pt={insets.top} bg="$primary700" pb={12} ai="center">
+    <XStack pt={insets.top} bg="$primary700" style={style} pb={12} ai="center">
       <Stack f={1} jc="center" ai="center">
         {props.options.headerLeft ? (
           props.options.headerLeft({ canGoBack })

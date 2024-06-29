@@ -1,6 +1,6 @@
 import { FlashList } from '@shopify/flash-list';
 import { RefreshControl } from 'react-native';
-import { Spinner, View } from 'tamagui';
+import { Separator, Spinner, View } from 'tamagui';
 
 import type { Tables } from 'lib/supabase/database.interface';
 
@@ -31,6 +31,7 @@ export function FriendsPage(props: CommonPageProps) {
       <FlashList
         data={data}
         renderItem={renderFriend}
+        ItemSeparatorComponent={() => <Separator h={8} />}
         estimatedItemSize={72}
         contentContainerStyle={{
           paddingHorizontal: 8,

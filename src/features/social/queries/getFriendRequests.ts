@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import type { Tables } from 'lib/supabase/database.interface';
 import { supabase } from 'lib/supabase/supabase.init';
+import type { UsersView } from './getUsers';
 
 export interface RecievedFriendRequest {
   id: number;
@@ -28,9 +29,23 @@ async function getFriendRequests(
     throw new Error(error.message);
   }
 
-  return data.filter(
-    (dto) => dto.sender_profile !== null,
-  ) as RecievedFriendRequest[];
+  return data
+    .filter((dto) => dto.sender_profile !== null)
+    .map((dto) => {
+      const publicAvatarUrl = dto.sender_profile?.avatar_url
+        ? supabase.storage
+            .from('avatars')
+            .getPublicUrl(dto.sender_profile.avatar_url).data.publicUrl
+        : undefined;
+
+      return {
+        ...dto,
+        sender_profile: {
+          ...dto.sender_profile,
+          avatar_url: publicAvatarUrl,
+        },
+      } as RecievedFriendRequest;
+    });
 }
 
 export const useGetFriendRequests = <T = RecievedFriendRequest[]>(
@@ -55,3 +70,28 @@ export const useIsPendingRequest = ({
   useGetFriendRequests(userId, (data) =>
     data.find((request) => request.sender_profile.id === profileId),
   );
+
+interface ProfileRelationStatusArgs {
+  profileUserId: string;
+}
+
+async function getProfileRelationStatus({
+  profileUserId,
+}: ProfileRelationStatusArgs): Promise<UsersView> {
+  const { data, error } = await supabase
+    .from('users_with_relation')
+    .select()
+    .eq('id', profileUserId)
+    .returns<UsersView>()
+    .single();
+
+  if (error) throw error;
+
+  return data;
+}
+
+export const useGetProfileRelationStatus = (args: ProfileRelationStatusArgs) =>
+  useQuery({
+    queryKey: ['profile', 'status', args.profileUserId],
+    queryFn: () => getProfileRelationStatus(args),
+  });

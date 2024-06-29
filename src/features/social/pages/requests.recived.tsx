@@ -4,7 +4,10 @@ import { selectUserId } from 'auth/auth.slice';
 import { ListEmptyComponent } from 'components/ListEmptyComponent';
 import { RefreshControl } from 'react-native';
 import { UserRow } from 'social/components/UserRow';
-import { useAcceptFriendRequest } from 'social/queries/acceptFriendRequest';
+import {
+  type FriendRequestResponseArgs,
+  useAcceptFriendRequest,
+} from 'social/queries/acceptFriendRequest';
 import {
   type RecievedFriendRequest,
   useGetFriendRequests,
@@ -20,13 +23,15 @@ export function FriendRequestPage(props: CommonPageProps) {
     useGetFriendRequests(userId);
   const { mutateAsync: acceptFriendRequest } = useAcceptFriendRequest();
 
-  async function acceptRequest(requestId: number) {
-    await acceptFriendRequest(requestId, {
+  async function respondeToRequest(args: FriendRequestResponseArgs) {
+    await acceptFriendRequest(args, {
       onSuccess: () => {
-        showToast({
-          title: 'You just made a new friend',
-          preset: 'done',
-        });
+        if (args.status === 'accepted') {
+          showToast({
+            title: 'You just made a new friend',
+            preset: 'done',
+          });
+        }
       },
     });
   }
@@ -39,29 +44,34 @@ export function FriendRequestPage(props: CommonPageProps) {
       avatarUrl={item.sender_profile.avatar_url}
       onPress={() => props.onRowPress(item.sender_profile.id)}
       renderRight={() => (
-        <XStack gap={12}>
+        <XStack gap={12} mr={4}>
           <XStack
-            px={12}
-            py={4}
+            px={8}
+            py={8}
             borderRadius={4}
             borderWidth={0.5}
             pressStyle={{ bg: '$border500' }}
             bg="$success500"
             borderColor="$success600"
-            onPress={() => acceptRequest(item.id)}
+            onPress={() =>
+              respondeToRequest({ requestId: item.id, status: 'accepted' })
+            }
           >
-            <Check size={18} color="$white" />
+            <Check size={22} color="$white" />
           </XStack>
           <XStack
             bg="$error777"
             borderColor="$error600"
-            px={12}
-            py={4}
+            px={8}
+            py={8}
             borderRadius={4}
             borderWidth={0.5}
             pressStyle={{ bg: '$border500' }}
+            onPress={() =>
+              respondeToRequest({ requestId: item.id, status: 'rejected' })
+            }
           >
-            <X size={18} color="$error700" />
+            <X size={22} color="$error700" />
           </XStack>
         </XStack>
       )}

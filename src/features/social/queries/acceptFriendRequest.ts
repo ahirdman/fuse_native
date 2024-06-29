@@ -4,12 +4,18 @@ import { queryClient } from 'lib/query/init';
 import { supabase } from 'lib/supabase/supabase.init';
 import { showToast } from 'util/toast';
 
-import type { RecievedFriendRequest } from './getFriendRequests';
+export interface FriendRequestResponseArgs {
+  requestId: number;
+  status: 'accepted' | 'rejected';
+}
 
-async function acceptFirendRequest(requestId: number): Promise<void> {
+async function friendRequestResponse({
+  requestId,
+  status,
+}: FriendRequestResponseArgs): Promise<void> {
   const { error } = await supabase
     .from('friend_requests')
-    .update({ status: 'accepted' })
+    .update({ status })
     .eq('id', requestId);
 
   if (error) {
@@ -19,15 +25,14 @@ async function acceptFirendRequest(requestId: number): Promise<void> {
 
 export const useAcceptFriendRequest = () =>
   useMutation({
-    mutationFn: acceptFirendRequest,
+    mutationFn: friendRequestResponse,
     onError: () => {
       showToast({ title: 'Could not accept friend request', preset: 'error' });
     },
-    onSuccess: (_, friendRequestId) => {
-      queryClient.setQueryData<RecievedFriendRequest[]>(
-        ['friendRequests'],
-        (prev) => prev?.filter((req) => req.id !== friendRequestId),
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['friendRequests'],
+      });
 
       queryClient.invalidateQueries({
         queryKey: ['friends'],

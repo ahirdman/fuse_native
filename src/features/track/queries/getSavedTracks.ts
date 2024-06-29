@@ -93,8 +93,17 @@ interface GetTagedTrackIdsRes {
   track_id: string | null;
 }
 
-async function getTagedTrackIds(): Promise<GetTagedTrackIdsRes[]> {
-  const { error, data } = await supabase.from('track_tags_view').select();
+interface GetTaggedTrackIdsArgs {
+  userId: string;
+}
+
+async function getTagedTrackIds({
+  userId,
+}: GetTaggedTrackIdsArgs): Promise<GetTagedTrackIdsRes[]> {
+  const { error, data } = await supabase
+    .from('track_tags_view')
+    .select()
+    .eq('user_id', userId);
 
   if (error) {
     throw new Error(error.message);
@@ -109,9 +118,9 @@ function sanitizeTrackIds(data: GetTagedTrackIdsRes[]): string[] {
     .map((item) => item.track_id);
 }
 
-export const useGetTaggedTrackIds = () =>
+export const useGetTaggedTrackIds = (args: GetTaggedTrackIdsArgs) =>
   useQuery({
-    queryKey: trackTagKeys.list(),
-    queryFn: getTagedTrackIds,
+    queryKey: [...trackTagKeys.list(), args.userId],
+    queryFn: () => getTagedTrackIds(args),
     select: (data) => sanitizeTrackIds(data),
   });

@@ -453,8 +453,17 @@ export type Database = {
       track_tags_view: {
         Row: {
           track_id: string | null
+          user_id: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "public_trackTags_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users_with_relation: {
         Row: {

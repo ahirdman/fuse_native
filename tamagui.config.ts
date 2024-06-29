@@ -54,6 +54,7 @@ const customTokens = createTokens({
     lightText: '#BBBBBB',
     darkText: '#191C1D',
     lightHeader: '#EDEDED',
+    success300: '#327656',
     success500: '#54976F',
     success600: '#6CCC93',
     error400: '#1D1415',
