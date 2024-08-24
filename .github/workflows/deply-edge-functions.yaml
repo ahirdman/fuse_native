@@ -22,4 +22,4 @@ jobs:
           version: latest
 
       - name: 🚢 Deploy
-        run: supabase functions deploy friend-request-notifications --project-ref $PROJECT_ID
+        run: supabase functions deploy friend-request-notification --project-ref $PROJECT_ID
