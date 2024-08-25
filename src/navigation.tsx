@@ -1,5 +1,4 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import {
   NavigationContainer,
   createNavigationContainerRef,
@@ -10,20 +9,14 @@ import * as Linking from 'expo-linking';
 import { addNotificationResponseReceivedListener } from 'expo-notifications';
 import { XStack } from 'tamagui';
 
-import type {
-  DrawerParamList,
-  RootStackParamList,
-  TabsParamList,
-} from 'navigation.types';
+import type { RootStackParamList, TabsParamList } from 'navigation.types';
 import { useAppSelector } from 'store/hooks';
 import { isDefined } from 'util/assert';
 
 import { SignIn } from 'auth/routes/SignIn';
 import { SignUpView } from 'auth/routes/SignUp';
 import { CustomTabBar } from 'components/TabBar';
-import { Home } from 'features/dashboard/routes/Home';
-import { AppDrawer } from 'features/navigation/components/Drawer';
-import { FullScreenHeader } from 'features/navigation/components/FullScreenHeader';
+import { Account } from 'features/account/routes/Account';
 import { SocialStack } from 'features/social/social.stack';
 import { useNotifications } from 'hooks/useNotifications';
 import { getStateFromPath } from 'navigation/linking.state';
@@ -38,7 +31,6 @@ import { showToast } from 'util/toast';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabsParamList>();
-const Drawer = createDrawerNavigator<DrawerParamList>();
 
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 const prefix = Linking.createURL('/');
@@ -95,7 +87,7 @@ function RootNavigationStack() {
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {userReady ? (
           <>
-            <RootStack.Screen name="Root" component={DrawerStack} />
+            <RootStack.Screen name="Root" component={TabStack} />
             <RootStack.Screen name="Track" component={Track} />
             <RootStack.Screen
               name="AddTracks"
@@ -144,6 +136,11 @@ function RootNavigationStack() {
                 };
               }}
             />
+            <RootStack.Screen
+              name="Account"
+              component={Account}
+              options={{ presentation: 'modal' }}
+            />
           </>
         ) : (
           <>
@@ -160,69 +157,6 @@ function RootNavigationStack() {
   );
 }
 
-function DrawerStack() {
-  useNotifications();
-
-  return (
-    <Drawer.Navigator
-      initialRouteName="Tabs"
-      id="appDrawer"
-      drawerContent={(props) => <AppDrawer {...props} />}
-      screenOptions={{
-        drawerActiveTintColor: '#F4753F',
-        drawerInactiveTintColor: '#FFFFFF',
-        headerShown: false,
-        headerStyle: {
-          height: 110,
-        },
-      }}
-    >
-      <Drawer.Screen
-        name="Tabs"
-        component={TabStack}
-        options={() => {
-          let swipeEnabled = true;
-
-          const drawerSwipeEnabledScreens = [
-            'Home',
-            'Tags',
-            'Library',
-            'Social',
-            'Root',
-            'Friends',
-            'Tracks',
-            'TagList',
-          ];
-
-          if (navigationRef.isReady()) {
-            swipeEnabled = drawerSwipeEnabledScreens.some(
-              (tabRoute) => tabRoute === navigationRef.getCurrentRoute()?.name,
-            );
-          }
-
-          return { swipeEnabled };
-        }}
-      />
-      <Drawer.Screen
-        name="Profile"
-        component={Profile}
-        options={{
-          headerShown: true,
-          header: (props) => <FullScreenHeader {...props} />,
-        }}
-      />
-      <Drawer.Screen
-        name="Settings"
-        component={Settings}
-        options={{
-          headerShown: true,
-          header: (props) => <FullScreenHeader {...props} />,
-        }}
-      />
-    </Drawer.Navigator>
-  );
-}
-
 function TabStack() {
   return (
     <Tab.Navigator
@@ -234,7 +168,6 @@ function TabStack() {
       }}
       tabBar={(props) => <CustomTabBar {...props} />}
     >
-      <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="Tags" navigationKey="tags-tab" component={TagStack} />
       <Tab.Screen
         name="Library"

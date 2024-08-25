@@ -4,6 +4,7 @@ import type { LibraryParamList } from 'navigation.types';
 import { AvatarButton } from 'navigation/components/AvatarButton';
 import { useAppSelector } from 'store/hooks';
 
+import { useNavigation } from '@react-navigation/native';
 import { selectUserId } from 'auth/auth.slice';
 import { StyledImage } from 'components/Image';
 import { TabHeader } from 'features/navigation/components/TabHeader';
@@ -15,6 +16,7 @@ const LibraryNavigator = createNativeStackNavigator<LibraryParamList>();
 export function LibraryStack() {
   const userId = useAppSelector(selectUserId);
   const { data } = useGetUser(userId);
+  const navigation = useNavigation();
 
   return (
     <LibraryNavigator.Navigator
@@ -25,10 +27,10 @@ export function LibraryStack() {
       <LibraryNavigator.Screen
         name="Tracks"
         component={Tracks}
-        options={(props) => ({
+        options={{
           headerLeft: () => (
             <AvatarButton
-              onPress={() => props.navigation.openDrawer()}
+              onPress={() => navigation.navigate('Account')}
               imageUrl={data?.avatar_url}
             />
           ),
@@ -40,7 +42,7 @@ export function LibraryStack() {
               contentFit="contain"
             />
           ),
-        })}
+        }}
       />
     </LibraryNavigator.Navigator>
   );

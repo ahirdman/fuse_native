@@ -1,5 +1,4 @@
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import type { DrawerScreenProps } from '@react-navigation/drawer';
 import type {
   CompositeNavigationProp,
   CompositeScreenProps,
@@ -15,9 +14,10 @@ import type {
  * */
 
 export type RootStackParamList = {
-  Root: NavigatorScreenParams<DrawerParamList>;
+  Root: NavigatorScreenParams<TabsParamList>;
   SignIn: undefined;
   SignUp: undefined;
+  Account: undefined;
   Track: {
     trackId: string;
   };
@@ -31,22 +31,6 @@ export type RootStackParamList = {
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
   NativeStackScreenProps<RootStackParamList, T>;
-
-/*
- *  Drawer Stack
- * */
-
-export type DrawerParamList = {
-  Tabs: NavigatorScreenParams<TabsParamList>;
-  Profile: { userId: string };
-  Settings: undefined;
-};
-
-export type DrawerStackScreenProps<T extends keyof DrawerParamList> =
-  CompositeScreenProps<
-    DrawerScreenProps<DrawerParamList, T>,
-    RootStackScreenProps<keyof RootStackParamList>
-  >;
 
 /*
  *  Tab Stack
