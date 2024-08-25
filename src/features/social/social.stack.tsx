@@ -19,7 +19,6 @@ const SocialNav = createNativeStackNavigator<FriendsTabParamList>();
 export function SocialStack() {
   const userId = useAppSelector(selectUserId);
   const { data } = useGetUser(userId);
-  const { color } = getTokens();
   const navigation = useNavigation();
 
   return (
@@ -45,7 +44,9 @@ export function SocialStack() {
       <SocialNav.Screen
         name="Profile"
         component={Profile}
-        options={{ headerStyle: { backgroundColor: color.$brandDark.val } }}
+        options={{
+          headerTitle: () => <></>,
+        }}
       />
       <SocialNav.Screen name="Tag" component={TagView} />
     </SocialNav.Navigator>

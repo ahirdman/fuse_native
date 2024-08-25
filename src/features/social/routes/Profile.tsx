@@ -37,6 +37,14 @@ export function Profile({ route, navigation }: Props) {
     navigation.push('Tag', { id, name, color, type: 'tag' });
   }
 
+  useEffect(() => {
+    if (user?.profile_color) {
+      navigation.setOptions({
+        headerStyle: { backgroundColor: user.profile_color },
+      });
+    }
+  }, [user?.profile_color, navigation]);
+
   if (!user) {
     return (
       <YStack
@@ -58,7 +66,7 @@ export function Profile({ route, navigation }: Props) {
         px={24}
         justifyContent="space-between"
         position="relative"
-        bg="$brandDark"
+        bg={user.profile_color ?? '$brandDark'}
       >
         <YStack justifyContent="flex-end" zIndex={100} pb={24}>
           <H2 fontWeight="bold" verticalAlign="bottom">
