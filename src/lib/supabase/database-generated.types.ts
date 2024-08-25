@@ -221,16 +221,19 @@ export type Database = {
           avatar_url: string | null
           id: string
           name: string
+          profile_color: string
         }
         Insert: {
           avatar_url?: string | null
           id?: string
           name: string
+          profile_color?: string
         }
         Update: {
           avatar_url?: string | null
           id?: string
           name?: string
+          profile_color?: string
         }
         Relationships: [
           {
@@ -470,6 +473,7 @@ export type Database = {
           avatar_url: string | null
           id: string | null
           name: string | null
+          profile_color: string | null
           relation: Database["public"]["Enums"]["relation_type"] | null
         }
         Relationships: [
