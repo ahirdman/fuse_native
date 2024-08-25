@@ -2,6 +2,7 @@ import {
   type BottomSheetModal,
   BottomSheetModalProvider,
   useBottomSheet,
+  useBottomSheetModal,
 } from '@gorhom/bottom-sheet';
 import {
   AlertTriangle,
@@ -27,6 +28,7 @@ import {
   H6,
   ListItem,
   Paragraph,
+  Spinner,
   XStack,
   YGroup,
   YStack,
@@ -40,15 +42,19 @@ import { selectUserId } from 'auth/auth.slice';
 import { DetachedModal } from 'components/DetachedModal';
 import { Text } from 'components/Text';
 import { UserAvatar } from 'components/UserAvatar';
+import { Controller, useForm } from 'react-hook-form';
+import ColorPicker, { HueSlider } from 'reanimated-color-picker';
 import { useGetUser } from 'social/queries/getUser';
 import type { AppSubscription } from 'subscription/subscription.interface';
 import { DeleteAccountForm } from 'user/components/delete-account.form';
 import { PasswordChangeForm } from 'user/components/password-change.form';
+import { useEditProfileColor } from '../queries/editColor';
 
 export function Account() {
   const signOutBottomSheetRef = useRef<BottomSheetModal>(null);
   const accountBottomSheetRef = useRef<BottomSheetModal>(null);
   const subscriptionBottomSheetRef = useRef<BottomSheetModal>(null);
+  const profileColorBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
@@ -66,6 +72,10 @@ export function Account() {
 
   const handlePresentSubscriptionModal = useCallback(() => {
     subscriptionBottomSheetRef.current?.present();
+  }, []);
+
+  const handlePresentProfileColorModal = useCallback(() => {
+    profileColorBottomSheetRef.current?.present();
   }, []);
 
   return (
@@ -153,17 +163,17 @@ export function Account() {
               profile
             </H6>
             <YGroup width="$full" mb={8}>
-              <ListItem //TODO: Add functionality and read color in profile page
+              <ListItem
                 title="Color"
                 subTitle="Change profile header color"
                 icon={<Palette size={24} />}
                 iconAfter={<ChevronRight size={18} color="$brandDark" />}
                 pressStyle={{ bg: '$primary300' }}
-                onPress={() => console.debug('Not implemented')}
+                onPress={handlePresentProfileColorModal}
               />
 
               <ListItem
-                title="Avatar"
+                title="Avatar" //TODO: Implement functionality
                 subTitle="Change your avatar picture"
                 icon={<Image size={24} />}
                 iconAfter={<ChevronRight size={18} color="$brandDark" />}
@@ -216,6 +226,13 @@ export function Account() {
         </XStack>
       </DetachedModal>
 
+      <DetachedModal
+        ref={profileColorBottomSheetRef}
+        style={styles.bottomSheet}
+      >
+        <ProfileColorSheet title="Edit Profile Color" />
+      </DetachedModal>
+
       <DetachedModal ref={accountBottomSheetRef} style={styles.bottomSheet}>
         <AccountSheet title="Fuse Account" />
       </DetachedModal>
@@ -240,9 +257,68 @@ interface SheetProps {
   title: string;
 }
 
+function ProfileColorSheet(props: SheetProps) {
+  const userId = useAppSelector(selectUserId);
+  const { data } = useGetUser(userId);
+  const { mutate: editProfileColor, isPending } = useEditProfileColor();
+  const modal = useBottomSheetModal();
+
+  const { control, handleSubmit } = useForm<{ color: string }>({
+    defaultValues: {
+      color: data?.profile_color ?? '#FFFFFF',
+    },
+  });
+
+  function onSubmit(input: { color: string }) {
+    if (!data) {
+      throw new Error('UserId was undefined');
+    }
+
+    editProfileColor(
+      { userId: data?.id, color: input.color },
+      { onSuccess: () => modal.dismiss() },
+    );
+  }
+
+  return (
+    <YStack gap={4}>
+      <Paragraph fontWeight="$8">{props.title}</Paragraph>
+      <Controller
+        control={control}
+        name="color"
+        render={({ field }) => (
+          <ColorPicker
+            value={field.value}
+            onComplete={(c) => {
+              field.onChange(c.hex);
+            }}
+          >
+            <HueSlider boundedThumb />
+          </ColorPicker>
+        )}
+      />
+
+      <Button
+        mt={42}
+        onPress={handleSubmit(onSubmit)}
+        disabled={isPending}
+        fontWeight="bold"
+        bg="$brandDark"
+      >
+        {isPending && (
+          <Button.Icon>
+            <Spinner />
+          </Button.Icon>
+        )}
+        Submit
+      </Button>
+    </YStack>
+  );
+}
+
 type AccountOption = 'passwordChange' | 'deleteAccount' | undefined;
 
-export function AccountSheet({ title }: SheetProps) {
+function AccountSheet({ title }: SheetProps) {
   const [optionSelected, setOptionSelected] =
     useState<AccountOption>(undefined);
   const user = useAppSelector((state) => state.auth.user);
