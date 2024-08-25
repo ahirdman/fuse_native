@@ -4,6 +4,7 @@ import type { FriendsTabParamList } from 'navigation.types';
 import { AvatarButton } from 'navigation/components/AvatarButton';
 import { useAppSelector } from 'store/hooks';
 
+import { useNavigation } from '@react-navigation/native';
 import { selectUserId } from 'auth/auth.slice';
 import { TabHeader } from 'features/navigation/components/TabHeader';
 import { Profile } from 'social/routes/Profile';
@@ -19,6 +20,7 @@ export function SocialStack() {
   const userId = useAppSelector(selectUserId);
   const { data } = useGetUser(userId);
   const { color } = getTokens();
+  const navigation = useNavigation();
 
   return (
     <SocialNav.Navigator
@@ -30,14 +32,14 @@ export function SocialStack() {
       <SocialNav.Screen
         name="Friends"
         component={Social}
-        options={(props) => ({
+        options={{
           headerLeft: () => (
             <AvatarButton
-              onPress={() => props.navigation.openDrawer()}
+              onPress={() => navigation.navigate('Account')}
               imageUrl={data?.avatar_url}
             />
           ),
-        })}
+        }}
       />
       <SocialNav.Screen name="Search" component={SearchUsersView} />
       <SocialNav.Screen
