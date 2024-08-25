@@ -11,10 +11,15 @@ export const applicationConfiguration: EnvironmentConfig = {
     baseUrl: 'https://api.spotify.com/v1',
     authScope: [
       'user-read-email',
-      'user-library-read',
       'user-read-private',
+      'user-top-read',
+      'user-library-read',
+      'user-library-modify',
       'playlist-modify-public',
       'playlist-modify-private',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+      'ugc-image-upload',
     ],
   },
   expoAuth: {

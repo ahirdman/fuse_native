@@ -11,9 +11,14 @@ export const applicationConfiguration: EnvironmentConfig = {
     authScope: [
       'user-read-email',
       'user-read-private',
+      'user-top-read',
       'user-library-read',
+      'user-library-modify',
       'playlist-modify-public',
       'playlist-modify-private',
+      'playlist-read-private',
+      'playlist-read-collaborative',
+      'ugc-image-upload',
     ],
   },
   expoAuth: {
