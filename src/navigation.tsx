@@ -26,7 +26,6 @@ import { LibraryStack } from 'track/library.stack';
 import { AddTag } from 'track/routes/AddTag';
 import { AddTracks } from 'track/routes/AddTracks';
 import { Track } from 'track/routes/Track';
-import { Settings } from 'user/routes/Settings';
 import { showToast } from 'util/toast';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
