@@ -37,17 +37,22 @@ import {
 import { config } from 'config';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 
+import { useMutation } from '@tanstack/react-query';
+import { DeleteAccountForm } from 'account/components/delete-account.form';
+import { PasswordChangeForm } from 'account/components/password-change.form';
+import { useUpdateAvatar } from 'account/queries/updateAvatar';
 import { signOut } from 'auth/auth.slice';
 import { selectUserId } from 'auth/auth.slice';
 import { DetachedModal } from 'components/DetachedModal';
 import { Text } from 'components/Text';
 import { UserAvatar } from 'components/UserAvatar';
+import { launchImageLibraryAsync } from 'expo-image-picker';
 import { Controller, useForm } from 'react-hook-form';
 import ColorPicker, { HueSlider } from 'reanimated-color-picker';
 import { useGetUser } from 'social/queries/getUser';
 import type { AppSubscription } from 'subscription/subscription.interface';
-import { DeleteAccountForm } from 'user/components/delete-account.form';
-import { PasswordChangeForm } from 'user/components/password-change.form';
+import { isDefined } from 'util/assert';
+import { showToast } from 'util/toast';
 import { useEditProfileColor } from '../queries/editColor';
 
 export function Account() {
@@ -55,10 +60,12 @@ export function Account() {
   const accountBottomSheetRef = useRef<BottomSheetModal>(null);
   const subscriptionBottomSheetRef = useRef<BottomSheetModal>(null);
   const profileColorBottomSheetRef = useRef<BottomSheetModal>(null);
+  const avatarBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const appVersion = `Version ${config.meta.appVersion} (${Application.nativeBuildVersion})`;
+
   const userId = useAppSelector(selectUserId);
   const { data } = useGetUser(userId);
 
@@ -76,6 +83,10 @@ export function Account() {
 
   const handlePresentProfileColorModal = useCallback(() => {
     profileColorBottomSheetRef.current?.present();
+  }, []);
+
+  const handlePresentAvatarModal = useCallback(() => {
+    avatarBottomSheetRef.current?.present();
   }, []);
 
   return (
@@ -173,12 +184,12 @@ export function Account() {
               />
 
               <ListItem
-                title="Avatar" //TODO: Implement functionality
+                title="Avatar"
                 subTitle="Change your avatar picture"
                 icon={<Image size={24} />}
                 iconAfter={<ChevronRight size={18} color="$brandDark" />}
                 pressStyle={{ bg: '$primary300' }}
-                onPress={() => console.debug('Not implemented')}
+                onPress={handlePresentAvatarModal}
               />
             </YGroup>
           </YStack>
@@ -233,6 +244,15 @@ export function Account() {
         <ProfileColorSheet title="Edit Profile Color" />
       </DetachedModal>
 
+      {isDefined(data) ? (
+        <DetachedModal ref={avatarBottomSheetRef} style={styles.bottomSheet}>
+          <EditAvatarSheet
+            userId={data?.id}
+            currentAvatarUrl={data?.avatar_url}
+          />
+        </DetachedModal>
+      ) : null}
+
       <DetachedModal ref={accountBottomSheetRef} style={styles.bottomSheet}>
         <AccountSheet title="Fuse Account" />
       </DetachedModal>
@@ -255,6 +275,87 @@ const styles = StyleSheet.create({
 
 interface SheetProps {
   title: string;
+}
+
+interface EditAvatarSheetProps {
+  currentAvatarUrl: string;
+  userId: string;
+}
+
+function EditAvatarSheet(props: EditAvatarSheetProps) {
+  const { mutateAsync: updateAvatar, isPending } = useUpdateAvatar();
+  const modal = useBottomSheetModal();
+  const { control, setValue, handleSubmit } = useForm<{ avatarUrl: string }>({
+    defaultValues: {
+      avatarUrl: props.currentAvatarUrl,
+    },
+  });
+
+  async function handleSelectImage() {
+    const result = await launchImageLibraryAsync({
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets) {
+      setValue('avatarUrl', result.assets[0]?.uri ?? 'NA');
+    }
+  }
+
+  async function onSubmit(input: { avatarUrl: string }) {
+    await updateAvatar(
+      {
+        userId: props.userId,
+        localAvatarPath: input.avatarUrl,
+        remoteAvatarUrl: props.currentAvatarUrl,
+      },
+      {
+        onSuccess() {
+          showToast({
+            preset: 'done',
+            title: 'Profile picture updated',
+          });
+
+          modal.dismiss();
+        },
+      },
+    );
+  }
+
+  return (
+    <YStack jc="space-between" gap={24} pt={24}>
+      <YStack ai="center">
+        <Controller
+          name="avatarUrl"
+          control={control}
+          render={({ field }) => (
+            <UserAvatar
+              imageUrl={field.value}
+              size="xl"
+              badge="edit"
+              onPress={handleSelectImage}
+            />
+          )}
+        />
+      </YStack>
+
+      <Button
+        mb={16}
+        bg="$brandDark"
+        fontWeight="bold"
+        fontSize="$5"
+        onPress={handleSubmit(onSubmit)}
+        disabled={isPending}
+      >
+        {isPending && (
+          <Button.Icon>
+            <Spinner />
+          </Button.Icon>
+        )}
+        Submit
+      </Button>
+    </YStack>
+  );
 }
 
 function ProfileColorSheet(props: SheetProps) {
