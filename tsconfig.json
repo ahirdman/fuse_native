@@ -17,6 +17,7 @@
       "user/*": ["features/user/*"],
       "auth/*": ["features/auth/*"],
       "config": ["config/index.ts"],
+      "account/*": ["features/account/*"],
       "test-utils": ["../__test__/test-utils.tsx"]
     },
     "types": ["bun-types"]

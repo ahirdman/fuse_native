@@ -20,7 +20,4 @@ async function editProfileColor(args: EditProfileColorArgs): Promise<void> {
 export const useEditProfileColor = () =>
   useMutation({
     mutationFn: editProfileColor,
-    onError(error) {
-      console.error(error);
-    },
   });

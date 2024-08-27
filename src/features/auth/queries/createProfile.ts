@@ -36,7 +36,9 @@ async function createProfile({
 
   const { error: storageError, data } = await supabase.storage
     .from('avatars')
-    .upload(`${userId}/avatar.png`, decode(imageBase64));
+    .upload(`${userId}/avatar.png`, decode(imageBase64), {
+      contentType: 'image/png',
+    });
 
   if (storageError) {
     throw new Error(storageError.message);
