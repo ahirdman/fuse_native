@@ -106,7 +106,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const name = 'Fuse - Playlist Manager';
   const slug = 'fuse';
   const applicationIdentifier = 'com.ahirdman.fuse';
-  const icon = './assets/icons/app_icon.png';
+  const icon = './assets/images/icon.png';
   const version = config.version
     ? parseReleaseCandidateVersion(config.version)
     : config.version;

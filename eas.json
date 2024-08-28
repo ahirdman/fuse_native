@@ -5,6 +5,7 @@
   },
   "build": {
     "development": {
+      "autoIncrement": true,
       "env": {
         "EAS_ENV": "development"
       },
@@ -17,6 +18,7 @@
       }
     },
     "test": {
+      "autoIncrement": true,
       "env": {
         "EAS_ENV": "test"
       },
@@ -28,6 +30,7 @@
       "developmentClient": true
     },
     "production": {
+      "autoIncrement": true,
       "channel": "production",
       "env": {
         "EAS_ENV": "production"
