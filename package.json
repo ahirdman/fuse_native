@@ -29,6 +29,7 @@
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "@reduxjs/toolkit": "^1.9.5",
+    "@sentry/react-native": "^5.31.1",
     "@shopify/flash-list": "1.6.4",
     "@shopify/react-native-skia": "1.2.3",
     "@supabase/supabase-js": "^2.43.2",

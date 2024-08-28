@@ -29,11 +29,23 @@ import RootNavigationStack from './navigation';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useAppDataLoader } from 'auth/hooks/useAppDataLoader';
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://c5335b4f59964695b505f94c4e8c312d@o4505549130301440.ingest.us.sentry.io/4505549132922880',
+  tracesSampleRate: 1.0,
+  _experiments: {
+    profilesSampleRate: 1.0,
+  },
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // enableSpotlight: __DEV__,
+});
 
 init(config.aptabase.apiKey);
 void SplashScreen.preventAutoHideAsync();
 
-export default function App() {
+function App() {
   Purchases.setLogLevel(LOG_LEVEL.DEBUG);
   Purchases.configure({ apiKey: config.revenueCat.apiKey });
 
@@ -78,3 +90,5 @@ export default function App() {
     </QueryClientProvider>
   );
 }
+
+export default Sentry.wrap(App);

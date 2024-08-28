@@ -1,17 +1,5 @@
 import type { ConfigContext, ExpoConfig } from 'expo/config';
 
-// biome-ignore lint/suspicious/noExplicitAny: reason
-type ExpoPlugins = (string | [] | [string] | [string, any])[];
-
-function expoPlugins(env: string): ExpoPlugins {
-  const common = ['expo-build-properties', 'expo-font'];
-
-  switch (env) {
-    default:
-      return common;
-  }
-}
-
 const common: Partial<ExpoConfig> = {
   slug: 'fuse',
   orientation: 'portrait',
@@ -62,7 +50,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const slug = 'fuse';
   const applicationIdentifier = 'com.ahirdman.fuse';
   const icon = './assets/icons/app_icon.png';
-  const plugins = expoPlugins(buildEnv as string);
   const version = config.version
     ? parseReleaseCandidateVersion(config.version)
     : config.version;
@@ -81,7 +68,18 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ...common.ios,
       bundleIdentifier: applicationIdentifier,
     },
-    plugins,
+    plugins: [
+      'expo-build-properties',
+      'expo-font',
+      [
+        '@sentry/react-native/expo',
+        {
+          url: 'https://sentry.io/',
+          project: 'fuse',
+          organization: 'nomad-1l',
+        },
+      ],
+    ],
   };
 
   switch (buildEnv) {
@@ -103,7 +101,18 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           ...common.ios,
           bundleIdentifier: applicationIdentifier,
         },
-        plugins,
+        plugins: [
+          'expo-build-properties',
+          'expo-font',
+          [
+            '@sentry/react-native/expo',
+            {
+              url: 'https://sentry.io/',
+              project: 'fuse',
+              organization: 'nomad-1l',
+            },
+          ],
+        ],
       };
 
     case 'production':
@@ -121,7 +130,18 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           ...common.ios,
           bundleIdentifier: applicationIdentifier,
         },
-        plugins,
+        plugins: [
+          'expo-build-properties',
+          'expo-font',
+          [
+            '@sentry/react-native/expo',
+            {
+              url: 'https://sentry.io/',
+              project: 'fuse',
+              organization: 'nomad-1l',
+            },
+          ],
+        ],
       };
 
     default:
