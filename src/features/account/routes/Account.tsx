@@ -40,10 +40,12 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { useMutation } from '@tanstack/react-query';
 import { DeleteAccountForm } from 'account/components/delete-account.form';
 import { PasswordChangeForm } from 'account/components/password-change.form';
+import { useGetSpotifyUser } from 'account/queries/getSpotifyUser';
 import { useUpdateAvatar } from 'account/queries/updateAvatar';
 import { signOut } from 'auth/auth.slice';
 import { selectUserId } from 'auth/auth.slice';
 import { DetachedModal } from 'components/DetachedModal';
+import { StyledImage } from 'components/Image';
 import { Text } from 'components/Text';
 import { UserAvatar } from 'components/UserAvatar';
 import { launchImageLibraryAsync } from 'expo-image-picker';
@@ -67,7 +69,8 @@ export function Account() {
   const appVersion = `Version ${config.meta.appVersion} (${Application.nativeBuildVersion})`;
 
   const userId = useAppSelector(selectUserId);
-  const { data } = useGetUser(userId);
+  const { data: user } = useGetUser(userId);
+  const spotifyUser = useGetSpotifyUser();
 
   const handlePresentSignOutModal = useCallback(() => {
     signOutBottomSheetRef.current?.present();
@@ -101,7 +104,7 @@ export function Account() {
       >
         <YStack gap={16}>
           <XStack ai="center" space>
-            <UserAvatar imageUrl={data?.avatar_url} />
+            <UserAvatar imageUrl={user?.avatar_url} />
             <H6
               fontWeight="bold"
               fontSize="$8"
@@ -110,7 +113,7 @@ export function Account() {
               textTransform="uppercase"
               color="$brandDark"
             >
-              {data?.name}
+              {user?.name}
             </H6>
           </XStack>
           <YStack>
@@ -123,13 +126,17 @@ export function Account() {
               spotify
             </H6>
             <YGroup width="$full" mb={8}>
-              <ListItem //TODO: Link to connected profile on spotify - or simply display name?
-                title="Cream Beam"
+              <ListItem
+                title={spotifyUser.data?.display_name ?? 'N/A'}
                 subTitle="Spotify Account"
-                iconAfter={
-                  <ArrowUpRightFromSquare size={18} color="$brandDark" />
+                icon={
+                  <StyledImage
+                    source={require('../../../../assets/icons/Spotify_Icon_White.png')}
+                    h={24}
+                    width={24}
+                    contentFit="contain"
+                  />
                 }
-                onPress={() => console.debug('Not implemented')}
               />
             </YGroup>
           </YStack>
@@ -244,11 +251,12 @@ export function Account() {
         <ProfileColorSheet title="Edit Profile Color" />
       </DetachedModal>
 
-      {isDefined(data) ? (
+      {isDefined(user) ? (
         <DetachedModal ref={avatarBottomSheetRef} style={styles.bottomSheet}>
           <EditAvatarSheet
-            userId={data?.id}
-            currentAvatarUrl={data?.avatar_url}
+            title="Edit Avatar"
+            userId={user?.id}
+            currentAvatarUrl={user?.avatar_url}
           />
         </DetachedModal>
       ) : null}
@@ -277,7 +285,7 @@ interface SheetProps {
   title: string;
 }
 
-interface EditAvatarSheetProps {
+interface EditAvatarSheetProps extends SheetProps {
   currentAvatarUrl: string;
   userId: string;
 }
@@ -323,8 +331,13 @@ function EditAvatarSheet(props: EditAvatarSheetProps) {
   }
 
   return (
-    <YStack jc="space-between" gap={24} pt={24}>
-      <YStack ai="center">
+    <YStack jc="space-between" gap={16}>
+      <XStack justifyContent="space-between" alignItems="center">
+        <H4>{props.title}</H4>
+        <XCircle onPress={() => modal.dismiss()} />
+      </XStack>
+
+      <YStack ai="center" py={16}>
         <Controller
           name="avatarUrl"
           control={control}
@@ -340,7 +353,6 @@ function EditAvatarSheet(props: EditAvatarSheetProps) {
       </YStack>
 
       <Button
-        mb={16}
         bg="$brandDark"
         fontWeight="bold"
         fontSize="$5"
@@ -360,30 +372,34 @@ function EditAvatarSheet(props: EditAvatarSheetProps) {
 
 function ProfileColorSheet(props: SheetProps) {
   const userId = useAppSelector(selectUserId);
-  const { data } = useGetUser(userId);
+  const { data: user } = useGetUser(userId);
   const { mutate: editProfileColor, isPending } = useEditProfileColor();
   const modal = useBottomSheetModal();
 
   const { control, handleSubmit } = useForm<{ color: string }>({
     defaultValues: {
-      color: data?.profile_color ?? '#FFFFFF',
+      color: user?.profile_color ?? '#FFFFFF',
     },
   });
 
   function onSubmit(input: { color: string }) {
-    if (!data) {
+    if (!user) {
       throw new Error('UserId was undefined');
     }
 
     editProfileColor(
-      { userId: data?.id, color: input.color },
+      { userId: user?.id, color: input.color },
       { onSuccess: () => modal.dismiss() },
     );
   }
 
   return (
-    <YStack gap={4}>
-      <Paragraph fontWeight="$8">{props.title}</Paragraph>
+    <YStack gap={32}>
+      <XStack justifyContent="space-between" alignItems="center">
+        <H4>{props.title}</H4>
+        <XCircle onPress={() => modal.dismiss()} />
+      </XStack>
+
       <Controller
         control={control}
         name="color"
@@ -400,7 +416,6 @@ function ProfileColorSheet(props: SheetProps) {
       />
 
       <Button
-        mt={42}
         onPress={handleSubmit(onSubmit)}
         disabled={isPending}
         fontWeight="bold"
