@@ -18,6 +18,51 @@ const common: Partial<ExpoConfig> = {
     infoPlist: {
       LSApplicationQueriesSchemes: ['spotify'],
     },
+    privacyManifests: {
+      NSPrivacyCollectedDataTypes: [
+        {
+          NSPrivacyCollectedDataType: 'NSPrivacyCollectedDataTypeCrashData',
+          NSPrivacyCollectedDataTypeLinked: false,
+          NSPrivacyCollectedDataTypeTracking: false,
+          NSPrivacyCollectedDataTypePurposes: [
+            'NSPrivacyCollectedDataTypePurposeAppFunctionality',
+          ],
+        },
+        {
+          NSPrivacyCollectedDataType:
+            'NSPrivacyCollectedDataTypePerformanceData',
+          NSPrivacyCollectedDataTypeLinked: false,
+          NSPrivacyCollectedDataTypeTracking: false,
+          NSPrivacyCollectedDataTypePurposes: [
+            'NSPrivacyCollectedDataTypePurposeAppFunctionality',
+          ],
+        },
+        {
+          NSPrivacyCollectedDataType:
+            'NSPrivacyCollectedDataTypeOtherDiagnosticData',
+          NSPrivacyCollectedDataTypeLinked: false,
+          NSPrivacyCollectedDataTypeTracking: false,
+          NSPrivacyCollectedDataTypePurposes: [
+            'NSPrivacyCollectedDataTypePurposeAppFunctionality',
+          ],
+        },
+      ],
+      NSPrivacyAccessedAPITypes: [
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryUserDefaults',
+          NSPrivacyAccessedAPITypeReasons: ['CA92.1'],
+        },
+        {
+          NSPrivacyAccessedAPIType:
+            'NSPrivacyAccessedAPICategorySystemBootTime',
+          NSPrivacyAccessedAPITypeReasons: ['35F9.1'],
+        },
+        {
+          NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryFileTimestamp',
+          NSPrivacyAccessedAPITypeReasons: ['C617.1'],
+        },
+      ],
+    },
   },
   experiments: {
     tsconfigPaths: true,
@@ -29,6 +74,18 @@ const common: Partial<ExpoConfig> = {
   runtimeVersion: {
     policy: 'fingerprint',
   },
+  plugins: [
+    'expo-build-properties',
+    'expo-font',
+    [
+      '@sentry/react-native/expo',
+      {
+        url: 'https://sentry.io/',
+        project: 'fuse',
+        organization: 'nomad-1l',
+      },
+    ],
+  ],
   extra: {
     eas: {
       projectId: 'deeb4c71-d291-4e30-b509-43b38582400a',
@@ -68,18 +125,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ...common.ios,
       bundleIdentifier: applicationIdentifier,
     },
-    plugins: [
-      'expo-build-properties',
-      'expo-font',
-      [
-        '@sentry/react-native/expo',
-        {
-          url: 'https://sentry.io/',
-          project: 'fuse',
-          organization: 'nomad-1l',
-        },
-      ],
-    ],
   };
 
   switch (buildEnv) {
@@ -101,18 +146,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           ...common.ios,
           bundleIdentifier: applicationIdentifier,
         },
-        plugins: [
-          'expo-build-properties',
-          'expo-font',
-          [
-            '@sentry/react-native/expo',
-            {
-              url: 'https://sentry.io/',
-              project: 'fuse',
-              organization: 'nomad-1l',
-            },
-          ],
-        ],
       };
 
     case 'production':
@@ -130,18 +163,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           ...common.ios,
           bundleIdentifier: applicationIdentifier,
         },
-        plugins: [
-          'expo-build-properties',
-          'expo-font',
-          [
-            '@sentry/react-native/expo',
-            {
-              url: 'https://sentry.io/',
-              project: 'fuse',
-              organization: 'nomad-1l',
-            },
-          ],
-        ],
       };
 
     default:

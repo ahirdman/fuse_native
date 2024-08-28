@@ -28,8 +28,8 @@ import tamaguiConfig from '../tamagui.config';
 import RootNavigationStack from './navigation';
 
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { useAppDataLoader } from 'auth/hooks/useAppDataLoader';
 import * as Sentry from '@sentry/react-native';
+import { useAppDataLoader } from 'auth/hooks/useAppDataLoader';
 
 Sentry.init({
   dsn: 'https://c5335b4f59964695b505f94c4e8c312d@o4505549130301440.ingest.us.sentry.io/4505549132922880',
