@@ -30,7 +30,7 @@ interface SpotifyUserImage {
   width: number | null;
 }
 
-async function getSpotifyUser(token?: string | undefined) {
+export async function getSpotifyUser(token?: string | undefined) {
   const result = await spotifyService.get<GetSpotifyUserRes>('/me', {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
