@@ -7,8 +7,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { X } from '@tamagui/lucide-icons';
 import * as Linking from 'expo-linking';
 import { addNotificationResponseReceivedListener } from 'expo-notifications';
-import { XStack } from 'tamagui';
 import { PostHogProvider } from 'posthog-react-native';
+import { XStack } from 'tamagui';
 
 import type { RootStackParamList, TabsParamList } from 'navigation.types';
 import { useAppSelector } from 'store/hooks';

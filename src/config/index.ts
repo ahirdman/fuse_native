@@ -22,9 +22,6 @@ export interface EnvironmentConfig {
 }
 
 export interface CommonConfig {
-  aptabase: {
-    apiKey: string;
-  };
   revenueCat: {
     apiKey: string;
   };
@@ -37,9 +34,6 @@ export interface CommonConfig {
 }
 
 const commonConfig: CommonConfig = {
-  aptabase: {
-    apiKey: process.env.EXPO_PUBLIC_APTABASE_KEY,
-  },
   revenueCat: {
     apiKey: process.env.EXPO_PUBLIC_REVENUE_CAT_KEY,
   },
