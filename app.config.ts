@@ -77,6 +77,7 @@ const common: Partial<ExpoConfig> = {
   plugins: [
     'expo-build-properties',
     'expo-font',
+    'expo-localization',
     [
       '@sentry/react-native/expo',
       {

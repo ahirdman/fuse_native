@@ -1,4 +1,3 @@
-import { init } from '@aptabase/react-native';
 import { useMMKVDevTools } from '@dev-plugins/react-native-mmkv';
 import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import {
@@ -42,7 +41,6 @@ Sentry.init({
   // enableSpotlight: __DEV__,
 });
 
-init(config.aptabase.apiKey);
 void SplashScreen.preventAutoHideAsync();
 
 function App() {

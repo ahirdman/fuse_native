@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { X } from '@tamagui/lucide-icons';
 import * as Linking from 'expo-linking';
 import { addNotificationResponseReceivedListener } from 'expo-notifications';
+import { PostHogProvider } from 'posthog-react-native';
 import { XStack } from 'tamagui';
 
 import type { RootStackParamList, TabsParamList } from 'navigation.types';
@@ -83,75 +84,82 @@ function RootNavigationStack() {
         },
       }}
     >
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
-        {userReady ? (
-          <>
-            <RootStack.Screen name="Root" component={TabStack} />
-            <RootStack.Screen name="Track" component={Track} />
-            <RootStack.Screen
-              name="AddTracks"
-              component={AddTracks}
-              options={(props) => {
-                return {
-                  presentation: 'modal',
-                  title: 'Add Tracks',
-                  headerTitleStyle: { color: '#FFF' },
-                  headerShown: true,
-                  headerStyle: { backgroundColor: '#232323' },
-                  headerLeft: () => (
-                    <XStack onPress={() => props.navigation.goBack()}>
-                      <X
-                        color="$white"
-                        pressStyle={{
-                          color: '$border300',
-                        }}
-                      />
-                    </XStack>
-                  ),
-                };
-              }}
-            />
+      <PostHogProvider
+        apiKey="phc_u7X37aRofg6quyF3AmmMxksVUxZnfa7vBZi6E0ePg8w"
+        options={{
+          host: 'https://us.i.posthog.com',
+        }}
+      >
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          {userReady ? (
+            <>
+              <RootStack.Screen name="Root" component={TabStack} />
+              <RootStack.Screen name="Track" component={Track} />
+              <RootStack.Screen
+                name="AddTracks"
+                component={AddTracks}
+                options={(props) => {
+                  return {
+                    presentation: 'modal',
+                    title: 'Add Tracks',
+                    headerTitleStyle: { color: '#FFF' },
+                    headerShown: true,
+                    headerStyle: { backgroundColor: '#232323' },
+                    headerLeft: () => (
+                      <XStack onPress={() => props.navigation.goBack()}>
+                        <X
+                          color="$white"
+                          pressStyle={{
+                            color: '$border300',
+                          }}
+                        />
+                      </XStack>
+                    ),
+                  };
+                }}
+              />
 
-            <RootStack.Screen
-              name="AddTag"
-              component={AddTag}
-              options={(props) => {
-                return {
-                  presentation: 'modal',
-                  title: 'Add Tags to track',
-                  headerTitleStyle: { color: '#FFF' },
-                  headerShown: true,
-                  headerStyle: { backgroundColor: '#232323' },
-                  headerLeft: () => (
-                    <XStack onPress={() => props.navigation.goBack()}>
-                      <X
-                        color="$white"
-                        pressStyle={{
-                          color: '$border300',
-                        }}
-                      />
-                    </XStack>
-                  ),
-                };
-              }}
-            />
-            <RootStack.Screen
-              name="Account"
-              component={Account}
-              options={{ presentation: 'modal' }}
-            />
-          </>
-        ) : (
-          <>
-            <RootStack.Screen
-              name="SignIn"
-              component={SignIn}
-              options={{ animationTypeForReplace: 'pop' }}
-            />
-            <RootStack.Screen name="SignUp" component={SignUpView} />
-          </>
-        )}
-      </RootStack.Navigator>
+              <RootStack.Screen
+                name="AddTag"
+                component={AddTag}
+                options={(props) => {
+                  return {
+                    presentation: 'modal',
+                    title: 'Add Tags to track',
+                    headerTitleStyle: { color: '#FFF' },
+                    headerShown: true,
+                    headerStyle: { backgroundColor: '#232323' },
+                    headerLeft: () => (
+                      <XStack onPress={() => props.navigation.goBack()}>
+                        <X
+                          color="$white"
+                          pressStyle={{
+                            color: '$border300',
+                          }}
+                        />
+                      </XStack>
+                    ),
+                  };
+                }}
+              />
+              <RootStack.Screen
+                name="Account"
+                component={Account}
+                options={{ presentation: 'modal' }}
+              />
+            </>
+          ) : (
+            <>
+              <RootStack.Screen
+                name="SignIn"
+                component={SignIn}
+                options={{ animationTypeForReplace: 'pop' }}
+              />
+              <RootStack.Screen name="SignUp" component={SignUpView} />
+            </>
+          )}
+        </RootStack.Navigator>
+      </PostHogProvider>
     </NavigationContainer>
   );
 }
